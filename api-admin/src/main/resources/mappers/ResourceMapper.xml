@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.ResourceMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.Resource">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="path" jdbcType="VARCHAR" property="path" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="service_id" jdbcType="VARCHAR" property="serviceId" />
+    <result column="parent" jdbcType="INTEGER" property="parent" />
+    <result column="sign" jdbcType="VARCHAR" property="sign" />
+    <result column="disabled" jdbcType="TINYINT" property="disabled" />
+  </resultMap>
+
+
+  <select id="queryByRoleId" resultType="com.vrv.vap.admin.model.Resource">
+        SELECT r.*  FROM resource AS r
+        INNER JOIN role_resource AS rr
+        ON r.id = rr.resource_id
+        WHERE rr.role_id = #{param.roleId} and r.disabled = 0
+        <if test = "param.threePowerConf == 1 and param.threePowers != null">
+            and r.three_powers in
+            <foreach collection="param.threePowers" item="threepower" close=")" open="(" separator=",">
+              #{threepower}
+            </foreach>
+        </if>
+  </select>
+
+  <select id="queryByRoleIds" parameterType="java.util.List" resultType="com.vrv.vap.admin.model.Resource">
+        SELECT r.*  FROM resource AS r
+        INNER JOIN role_resource AS rr
+        ON r.id = rr.resource_id
+        WHERE rr.role_id in <foreach collection="roleIds" item="roleId" close=")" open="(" separator=",">
+          #{roleId}
+        </foreach>
+        AND r.disabled = 0
+        GROUP BY r.id
+  </select>
+
+    <update id="disableResource" parameterType="java.lang.String">
+        update resource set disabled = 1 where id = #{resourceId}
+    </update>
+
+    <update id="enableResource">
+        update resource set disabled = 0 where id = #{resourceId}
+    </update>
+</mapper>

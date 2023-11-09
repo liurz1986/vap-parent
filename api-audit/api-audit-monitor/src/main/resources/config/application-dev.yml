@@ -1,0 +1,101 @@
+feign:
+  sentinel:
+    enabled: true
+monitor:
+  #是否开启监控
+  dynamic: ${MONITOR_DYNAMIC:true}
+  #自监管为true
+  xc: true
+  #是否写入kafka
+  write-kafka: false
+  #采集时间间隔秒
+  refresh-time: 30
+
+elk:
+  cluster:
+    name: ${ES_CLUSTER_NAME:es-cluster-5.5.3}
+  ip: ${ES_CLUSTER_HOST:192.168.119.213}
+  xpack:
+    security:
+      user: ${ES_CLUSTER_UNAME:admin}
+      password: ${ES_CLUSTER_PWD:vrv@12345}
+  port: ${ES_CLUSTER_PORT_REST:9200}
+  #版本可选5,6,7, (此配置已废弃, 启动后会自动检测版本)
+  version: ${ES_VERSION:7}
+index:
+  index-format: "${index}-${time}"
+  cache: [monitor]
+  refresh: true
+  startTime: 2010.01.01
+  time-foramt: "yyyy.MM.dd"
+  time-format-month: "yyyy.MM"
+  result-total: 10000
+  result-max: 500000
+  day-index:
+    - copy:复制粘贴
+  month-index:
+    - third:第三方应用
+  time-field:
+    default: event_time
+
+dir:
+  base: f:/vap_server_dir
+  upload: /upload
+  tmp: /tmp
+  backup: /home/backup/es_backup
+
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  session:
+    store-type: redis
+  kafka:
+    producer:
+      bootstrap-servers: 192.168.119.213:9092
+      batch-size: 1000
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+        #低于0.11版本时设置false
+        enable.idempotence: false
+#      properties:
+#        session.timeout.ms: 15000
+#        sasl.mechanism: PLAIN
+#        security.protocol: SASL_PLAINTEXT
+#        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="username" password="password";
+
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 0
+    # Redis服务器地址
+    host: ${REDIS_HOST:192.168.119.213}
+    port:  ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:vrv@1234}
+    # 连接池最大连接数（使用负值表示没有限制）
+    pool.max-active: 1000
+    # 连接池最大阻塞等待时间（使用负值表示没有限制）
+    pool.max-wait: -1
+    # 连接池中的最大空闲连接
+    pool.max-idle: 10
+    # 连接池中的最小空闲连接
+    pool.min-idle: 2
+    # 连接超时时间（毫秒）
+    timeout: 60000ms
+  datasource:
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:mysql}
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:192.168.119.213}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=CONVERT_TO_NULL
+  rabbitmq:
+    host:  ${RABBITMQ_HOST:192.168.119.213}
+    port:  ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+    queueName:  sys_user_log
+    topicExchange: vap-exchange
+
+

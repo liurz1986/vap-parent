@@ -1,0 +1,85 @@
+conf.settings: 
+  - setting:
+      type: probe-netflow
+      index: probe-netflow
+      time-key: event_time
+      time-format: yyyy-MM-dd HH:mm:ss
+      es-time-format: yyyy.MM
+      lv1-fields: all_bytes,upload_pkg,all_pkg,safety_margin,upload_bytes,src_area,dst_ip,src_ip,report_ip_num,log_type,src_app_id,report_msg,dst_city,download_bytes,dst_province,app_id,dst_country,src_city,report_ip,safety_margin_ip,end_time,security_level,src_port,protocol_type,start_time,download_pkg,src_country,dst_port,dst_app_id,indate,msg_src,dst_area,transport_protocol,event_time,src_province
+      fix:
+        rename:
+        add:
+          - event_time:dt
+        handle:     
+          - dt:sdf#yyyy-MM-dd HH:mm:ss#yyyyMMdd
+          
+  - setting:
+      type: fireware-event
+      index: fireware-event
+      time-key: event_time
+      time-format: yyyy-MM-dd HH:mm:ss
+      es-time-format: yyyy.MM
+      lv1-fields: action_result,safety_margin,src_area,dst_ip,src_ip,event_abstract,report_ip_num,log_type,device_name,action_time,report_msg,app_protocol,report_ip,safety_margin_ip,security_level,device_ip,src_port,action_content,dst_port,strategy_id,event_level,indate,msg_src,dst_area,transport_protocol,event_time,strategy_name
+      fix:
+        rename:
+        add:
+          - event_time:dt
+        handle:     
+          - dt:sdf#yyyy-MM-dd HH:mm:ss#yyyyMMdd
+          
+  - setting:
+      type: ids-event
+      index: ids-event
+      time-key: event_time
+      time-format: yyyy-MM-dd HH:mm:ss
+      es-time-format: yyyy.MM
+      lv1-fields: safety_margin,src_area,dst_ip,src_ip,event_abstract,report_ip_num,log_type,device_name,report_msg,event_code,app_protocol,report_ip,safety_margin_ip,security_level,src_port,device_ip,dst_port,strategy_id,event_level,event_name,indate,msg_src,dst_area,transport_protocol,event_time
+      fix:
+        rename:
+        add:
+          - event_time:dt
+        handle:     
+          - dt:sdf#yyyy-MM-dd HH:mm:ss#yyyyMMdd
+          
+          
+  - setting:
+      type: probe-net
+      index: probe-net
+      time-key: event_time
+      time-format: yyyy-MM-dd HH:mm:ss
+      es-time-format: yyyy.MM
+      lv1-fields: status_code,safety_margin,src_area,dst_ip,src_ip,report_ip_num,log_type,resp_times,http_method,report_msg,app_id,time_slot,report_ip,safety_margin_ip,http_type,resp_header,url,security_level,src_port,req_body,resp_body,dst_port,indate,msg_src,req_head,dst_area,event_time
+      fix:
+        rename:
+        add:
+          - event_time:dt
+        handle:     
+          - dt:sdf#yyyy-MM-dd HH:mm:ss#yyyyMMdd
+          
+  - setting:
+      type: app-audit
+      index: app-audit
+      time-key: event_time
+      time-format: yyyy-MM-dd HH:mm:ss
+      es-time-format: yyyy.MM
+      lv1-fields: terminal_type,safety_margin,report_ip_num,log_type,operate_name,http_method,report_msg,app_id,terminal_id,report_ip,operate_type,user_code_type,safety_margin_ip,num_id,operate_result,url,security_level,operation_time,user_id,operate_condition,organization,organization_id,indate,msg_src,error_code,event_time,username
+      fix:
+        rename:
+        add:
+          - event_time:dt
+        handle:     
+          - dt:sdf#yyyy-MM-dd HH:mm:ss#yyyyMMdd
+          
+  - setting:
+      type: netflow
+      index: netflow
+      time-key: event_time
+      time-format: yyyy-MM-dd HH:mm:ss
+      es-time-format: yyyy.MM
+      lv1-fields: report_ip,all_bytes,upload_pkg,all_pkg,end_time,upload_bytes,src_area,dst_ip,src_ip,src_port,protocol_type,start_time,report_time,download_pkg,dst_port,download_bytes,dst_area,event_time
+      fix:
+        rename:
+        add:
+          - event_time:dt
+        handle:     
+          - dt:sdf#yyyy-MM-dd HH:mm:ss#yyyyMMdd

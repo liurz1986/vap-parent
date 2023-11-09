@@ -1,0 +1,47 @@
+{
+  "order": 10,
+  "index_patterns": [
+    "monitor-asset-v2-*"
+  ],
+  "settings": {
+    "index": {
+      "max_result_window": "100000000",
+      "number_of_shards": "2",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "properties": {
+      "monitor_data": {
+        "index": false,
+        "type": "text"
+      },
+      "reachable": {
+        "type": "long"
+      },
+      "sno": {
+        "type": "keyword"
+      },
+      "dev_ip": {
+        "type": "keyword"
+      },
+      "units": {
+        "type": "keyword"
+      },
+      "dev_type": {
+        "type": "keyword"
+      },
+      "event_time": {
+        "format": "yyyy-MM-dd HH:mm:ss",
+        "type": "date"
+      },
+      "tips": {
+        "type": "keyword"
+      },
+      "dev_id": {
+        "type": "keyword"
+      }
+    }
+  },
+  "aliases": {}
+}

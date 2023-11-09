@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vrv.vap.xc.mapper.core.XgsDataChannelMapper">
+
+	<select id="queryCascadeStrategy" resultType="com.vrv.vap.xc.model.CascadeStrategyReceive">
+		select id, puid, "type", "number", op_code opCode, kind, "level", start_time startTime, end_time endTime,
+		execute_status executeStatus, kafka, time_flag timeFlag
+		from cascade_strategy_receive
+		where execute_status != 1 or end_time is null or end_time = ''
+	</select>
+
+	<update id="updateTimeFlag" parameterType="map">
+		update cascade_strategy_receive set time_flag = #{time_flag},execute_status = #{execute_status} where id = #{pk}
+	</update>
+
+	<select id="queryLocalId" resultType="string">
+		select platform_id from cascade_platform where "local" = 1
+	</select>
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+	<mapping>
+		<class-a>com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.bean.EventCategory</class-a>
+		<class-b>com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.vo.event.EventCategoryVRVTreeVO</class-b>
+		<field>
+			<a>id</a>
+			<b>key</b>
+		</field>
+	</mapping>
+	<mapping>
+		<class-a>com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.bean.EventCategory</class-a>
+		<class-b>com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.vo.event.EventCategoryUrgeTreeVO</class-b>
+		<field>
+			<a>id</a>
+			<b>key</b>
+		</field>
+	</mapping>
+	<mapping>
+		<class-a>com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.bean.RiskEventRule</class-a>
+		<class-b>com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.vo.RiskRuleListVO</class-b>
+		<field>
+			<a>riskEventId</a>
+			<b>event.value</b>
+		</field>
+	</mapping>
+	
+	<mapping>
+		<class-a>com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.bean.RiskEventRule</class-a>
+		<class-b>com.vrv.vap.alarmdeal.business.analysis.vo.RiskRuleEditVO</class-b>
+		<field>
+			<a>riskEventId</a>
+			<b>eventId</b>
+		</field>
+	</mapping>
+	
+	
+</mappings>

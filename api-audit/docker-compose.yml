@@ -1,0 +1,22 @@
+version: '2'
+services:
+  vap-eureka:
+    hostname: vap
+    image: vap-eureka:0.0.1-SNAPSHOT
+    ports:
+      - "8761:8761"
+    networks:
+      - "netName1"
+  vap-config:
+    depends_on: 
+      - vap-eureka
+    image: vap-config:0.0.1-SNAPSHOT
+    ports:
+      - "8765:8765"
+    links:
+      - "vap-eureka:vap"
+    networks:
+      - "netName1"
+networks:
+  netName1:
+    driver: bridge

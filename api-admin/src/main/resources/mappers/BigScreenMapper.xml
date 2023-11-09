@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BigScreenMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.BigScreen">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="guid" jdbcType="VARCHAR" property="guid" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="intro" jdbcType="VARCHAR" property="intro" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="img" jdbcType="VARCHAR" property="img" />
+    <result column="resolution" jdbcType="VARCHAR" property="resolution" />
+    <result column="flag" jdbcType="INTEGER" property="flag" />
+    
+  </resultMap>
+</mapper>

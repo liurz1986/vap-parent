@@ -1,0 +1,14 @@
+version: '2'
+services:
+  api-audit-business:
+    external_links:
+      - "vap-eureka:vap"
+      - "vap-config:config"
+    image: api-audit-business:0.0.1-SNAPSHOT
+    ports:
+      - "8764:8764"
+    networks:
+      - "netName1"
+networks:
+  netName1:
+    driver: bridge

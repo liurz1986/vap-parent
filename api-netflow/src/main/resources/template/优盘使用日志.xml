@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>username</field>
+		<field>dev_id</field>
+		<field>action_type</field>
+		<field>media_user</field>
+		<field>media_unit</field>
+		<field>std_dyperiph_pid</field>
+		<field>std_dyperiph_vid</field>
+		<field>std_dyperiph_sn</field>
+		<field>u_type</field>
+		<field>dev_ip</field>
+		<field>op_code</field>
+		<field>u_pid</field>
+		<field>u_level</field>
+		<field>op_description</field>
+		<field>event_time</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>wz</value>
+		<value>132323</value>
+		<value>插入</value>
+		<value>wz</value>
+		<value>cs</value>
+		<value>1341</value>
+		<value>aaaa</value>
+		<value>156245</value>
+		<value>1</value>
+		<value>139.211.222.235</value>
+		<value>SM专用优盘使用</value>
+		<value>0008</value>
+		<value>0</value>
+		<value>文件系统挂载成功！</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>DT025</value>
+	</log>
+</data>

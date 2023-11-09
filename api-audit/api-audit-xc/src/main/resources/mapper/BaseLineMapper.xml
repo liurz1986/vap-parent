@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.BaseLineMapper">
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO base_line
+        (
+        `name`,
+        `config`,
+        `type`,
+        `open_group`,
+        `days`,
+        `alias`,
+        `label`,
+        `multiple`,
+        `save_index`,
+        `save_columns`,
+        `time_slot`,
+        `cron`,
+        `status`,
+        `description`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.name},
+            #{item.config},
+            #{item.type},
+            #{item.openGroup},
+            #{item.days},
+            #{item.alias},
+            #{item.label},
+            #{item.multiple},
+            #{item.saveIndex},
+            #{item.saveColumns},
+            #{item.timeSlot},
+            #{item.cron},
+            #{item.status},
+            #{item.description}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryLineBysql" parameterType="com.vrv.vap.xc.model.LineModel" resultType="map">
+        select LEFT(DATE_SUB(insert_time,INTERVAL 1 DAY),10) data_time, ${fields} from ${table} where insert_time >= #{startTime} and insert_time <![CDATA[ <= ]]> #{endTime}
+        <if test="userNo != null and userNo != ''">
+            and `user_no` = #{userNo}
+        </if>
+        <if test="sysId != null and sysId != ''">
+            and `sys_id` = #{sysId}
+        </if>
+        <if test="orgId != null and orgId != ''">
+            and `org_id` = #{orgId}
+        </if>
+        <if test="type != null and type != ''">
+            and `type` = #{type}
+        </if>
+        <if test="where != null and where != ''">
+           AND ${where}
+        </if>
+        <if test="group != null and group != ''">
+            group by ${group}
+        </if>
+        <if test="order != null and order != ''">
+            order by ${order}
+        </if>
+    </select>
+
+    <select id="querySummaryBysql" parameterType="com.vrv.vap.xc.model.LineModel" resultType="map">
+        select data_time, ${fields} from ${table} where insert_time >= #{startTime} and insert_time <![CDATA[ <= ]]> #{endTime}
+        <if test="userNo != null and userNo != ''">
+            and `user_no` = #{userNo}
+        </if>
+        <if test="sysId != null and sysId != ''">
+            and `sys_id` = #{sysId}
+        </if>
+        <if test="orgId != null and orgId != ''">
+            and `org_id` = #{orgId}
+        </if>
+        <if test="type != null and type != ''">
+            and `type` = #{type}
+        </if>
+        <if test="where != null and where != ''">
+            AND ${where}
+        </if>
+        <if test="group != null and group != ''">
+            group by ${group}
+        </if>
+        <if test="order != null and order != ''">
+            order by ${order}
+        </if>
+    </select>
+
+</mapper>

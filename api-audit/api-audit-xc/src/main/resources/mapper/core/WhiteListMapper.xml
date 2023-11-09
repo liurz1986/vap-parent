@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vrv.vap.xc.mapper.rds2.WhiteListMapper">
+    <select id="queryWhiteListStatistic" parameterType="string" resultType="int">
+        select count(id) from white_list where 1=1
+        <if test="_parameter != null and _parameter == '12'">
+            and number in ('1','2')
+        </if>
+        <if test="_parameter != null and _parameter == '345'">
+            and number in ('3','4','5')
+        </if>
+        <if test="_parameter != null and _parameter == '1-5'">
+            and number not in ('1','2','3','4','5')
+        </if>
+    </select>
+</mapper>

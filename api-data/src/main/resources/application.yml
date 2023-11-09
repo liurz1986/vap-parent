@@ -1,0 +1,247 @@
+spring:
+  datasource:
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:mysql}
+    url: jdbc:mysql://${MYSQL_HOST:192.168.119.213}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+    druid:
+      filters: stat
+      maxActive: 20
+      initialSize: 1
+      maxWait: 60000
+      minIdle: 1
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20
+      stat-view-servlet:
+        login-username: vap
+        login-password: vap
+  jpa:
+    show-sql: true
+  session:
+    store-type: redis
+  redis:
+    host: ${REDIS_HOST:192.168.119.213}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:vrv@1234}
+    lettuce:
+      pool:
+        max-active: -1
+        max-wait: 10000
+        max-idle:  16
+        min-idle: 0
+    timeout: 10000
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:192.168.119.213}:${KAFKA_PORT:9092}
+    producer:
+      bootstrap-servers: ${KAFKA_URL:192.168.119.213}:${KAFKA_PORT:9092}
+    listener:
+      concurrency: 3
+    template:
+      default-topic: test10
+  servlet:
+    multipart:
+      max-file-size: 300MB      # Max file size，默认1M
+      max-request-size: 300MB   # Max request size，默认10M
+
+api-data:
+  permission: none
+  monitor: true
+  report: java
+
+elk:
+  permission: none
+  cluster:
+    name: ${ES_CLUSTER_NAME:es-cluster-5.5.3}
+  ip: ${ES_CLUSTER_HOST:192.168.119.213}
+  port: ${ES_CLUSTER_PORT_REST:9200}
+  connect_time_out: 30000
+  socket_time_out: 30000
+  request_time_out: 30000
+  max_connect_number: 100
+  max_connect_per_route: 100
+  total: 2000
+  max: 10000
+  segmentDay: 7
+
+  xpack:
+    security:
+      user: ${ES_CLUSTER_UNAME:admin}
+      password: ${ES_CLUSTER_PWD:vrv@12345}
+  index:
+    format: "[*NAME*]-[*TIME*]"
+    timeformat: "yyyy.MM.dd"
+    monthformat: "yyyy.MM"
+    startTime: 2019/01/01
+    slice:
+      - host-virus,yyyy.MM.dd
+      - anti-virus-event
+      - probe-net
+      - probe-netflow
+      - switch-event
+      - switch-performance
+      - route-event
+      - route-performance
+      - fireware-netflow
+      - anti-virus-audit
+      - fireware-event
+      - fireware-audit
+      - ips-event
+      - ips-performance
+      - ips-audit
+      - ids-event
+      - ids-performance
+      - ids-audit
+      - waf-event
+      - waf-audit
+      - app-audit,yyyy.MM
+      - db-audit
+      - fort-audit
+      - weak-event
+      - weak-audit
+      - webaudit
+      - access-gateway-event
+      - not-catch-events
+      - windows_vulnerability
+      - threaten-warn
+      - warnresulttmp,yyyy-MM-dd
+    ref:
+      copy: \u590d\u5236\u7c98\u8d34
+      moveablestorage: \u79fb\u52a8\u5b58\u50a8
+      net: \u4e0a\u7f51
+      netflow: \u7f51\u7edc\u4f1a\u8bdd
+      pki: PKI
+      pro: \u8fdb\u7a0b
+      screenshots: \u622a\u5c4f
+      startshutdown: \u5f00\u5173\u673a
+      wangkang: \u7f51\u5eb7
+      yysj-julongv2.1: \u5de8\u9f99
+      pic: \u7ec8\u7aef\u622a\u5c4f
+      third: \u7b2c\u4e09\u65b9\u5e94\u7528
+      ruixing: \u745e\u661f
+      dongxu-trojan: \u4e1c\u5dfd\u75c5\u6bd2
+      dongxu-file: \u4e1c\u5dfd\u6587\u4ef6
+      dongxu-web: \u4e1c\u5dfdweb
+  auto-alias:
+    default-time-field: event_time
+    default-time-format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+    #只创建当月
+    current-month: false
+    indices:
+      - host-virus
+      - anti-virus-event
+      - probe-net
+      - probe-netflow
+      - switch-event
+      - switch-performance
+      - route-event
+      - route-performance
+      - fireware-netflow
+      - anti-virus-audit
+      - fireware-event
+      - fireware-audit
+      - ips-event
+      - ips-performance
+      - ips-audit
+      - ids-event
+      - ids-performance
+      - ids-audit
+      - waf-event
+      - waf-audit
+      - app-audit
+      - db-audit
+      - fort-audit
+      - weak-event
+      - weak-audit
+      - webaudit
+      - access-gateway-event
+      - not-catch-events,indate,yyyy-MM-dd'T'HH:mm:ss,year
+      - windows_vulnerability,created_time,yyyy-MM-dd'T'HH:mm:ss,day
+      #- threaten-warn,warn_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+      - threaten-warn,warn_time,yyyy-MM-dd'T'HH:mm:ss,month
+  # 多集群相关配置
+  multi-cluster:
+    # 是否开启多集群模式
+    open: false
+    configs:
+      - cluster-name: test1
+        index-mapping:
+          - index11
+          - index12
+          - index13
+      - cluster-name: test2
+        index-mapping:
+          - index21
+          - index22
+          - index23
+      - cluster-name: test3
+        index-mapping:
+          - index31
+          - index32
+          - index33
+
+vap:
+  common:
+    session-base64: false
+  flume:
+    enable: true
+    channel-type: memory
+    capacity: 200000
+    sink-type: database
+    databases:
+      - url: jdbc:mysql://${MYSQL_HOST:192.168.119.213}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:mysql}
+      - url: jdbc:mysql://${MYSQL_HOST:192.168.119.213}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:mysql}
+    driver: com.mysql.cj.jdbc.Driver
+    insert-sql: insert into sys_log (id, request_ip,type, user_id, user_name, organization_name, description, request_url, request_time, request_method, method_name, bean_name, params_value, response_result, login_type, role_name,request_page_uri,request_page_title) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+  swagger:
+    enabled: true
+    title: api-data接口文档
+    description: api-data接口文档
+    base-package: com.vrv.vap.data
+    version: 1.0.2
+
+mybatis:
+  mapper-locations: classpath*:mappers/*.xml
+mapper:
+  mappers: com.vrv.vap.base.BaseMapper
+
+kafka:
+  topic: ${KAFKA_TOPIC:logstash-elk}
+  bootstrap:
+    servers : ${KAFKA_URL:192.168.119.213}:${KAFKA_PORT:9092}
+  consumer:
+    servers: ${KAFKA_URL:192.168.119.213}:${KAFKA_PORT:9092}
+    concurrency: 10
+    maxPollRecordsConfig: 100
+    group:
+      id: test-consumer-group
+    session:
+      timeout: 15000
+    enable:
+      auto:
+        commit: false
+    auto:
+      offset:
+        reset: latest
+      commit:
+        interval: 100
+  userName: admin
+  password: admin-2019
+
+logging:
+  level:
+    com.vrv.vap: DEBUG
+    root: error
+    org.springframework.cloud.sleuth: error
+screen-capturer:
+  url: http://${LOCAL_SERVER_IP:192.168.119.213}:8080
+  file-path: /opt/SecAudit/vrv/vap/screencapturer/pdf
+  code-convert: "{enterprise_project: 18,enterprise_person: 19}"

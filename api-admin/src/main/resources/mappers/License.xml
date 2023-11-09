@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.LicenseMapper">
+
+    <select id="queryResources"  parameterType="java.util.List" resultType="Map">
+        select uid from resource_module WHERE  module_id  in
+        <foreach collection="modules" item="module" close=")" open="(" separator=",">
+            #{module}
+        </foreach>
+    </select>
+
+    <update id="updateResources" parameterType="java.util.List">
+        update resource set disabled = 2 where uid in
+        <foreach collection="uids" item="uid" close=")" open="(" separator=",">
+            #{uid}
+        </foreach>
+   </update>
+
+    <update id="freeResource">
+        update resource set disabled = 0 where disabled = 2
+   </update>
+
+
+    <update id="forbiddenResource">
+        update resource set disabled = 2 where disabled = 0
+   </update>
+
+    <delete id="deleteLicenseInfo">
+        delete from  license  where 1=1
+   </delete>
+
+</mapper>

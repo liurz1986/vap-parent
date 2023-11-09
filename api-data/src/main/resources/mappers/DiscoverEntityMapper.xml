@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.data.mapper.DiscoverEntityMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.data.model.DiscoverEntity">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="tip" jdbcType="VARCHAR" property="tip"/>
+        <result column="reg" jdbcType="VARCHAR" property="reg"/>
+        <result column="built_in_type" jdbcType="TINYINT" property="builtInType"/>
+    </resultMap>
+</mapper>

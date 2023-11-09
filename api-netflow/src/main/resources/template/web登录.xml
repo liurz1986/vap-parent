@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>dev_ip</field>
+		<field>dev_id</field>
+		<field>event_time</field>
+		<field>username</field>
+		<field>auth_ip</field>
+		<field>op_result</field>
+		<field>authuser_name</field>
+		<field>app_name</field>
+		<field>op_type</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>139.211.222.235</value>
+		<value>8a:51:3a:aa:a7:bc</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>wz</value>
+		<value>139.211.222.235</value>
+		<value>0</value>
+		<value>admin</value>
+		<value>主审</value>
+		<value>0</value>
+		<value>DT022</value>
+	</log>
+</data>

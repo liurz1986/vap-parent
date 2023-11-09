@@ -1,0 +1,267 @@
+{
+	"order": 0,
+	"index_patterns": [
+	  "alarmeventmanagement*"
+	],
+	"settings": {
+	  "index": {
+        "refresh_interval": "10s",
+		"number_of_shards": "3",
+        "number_of_replicas": "0",
+        "translog": {
+            "flush_threshold_size": "1gb",
+            "sync_interval": "30s",
+            "durability": "async"
+          }
+
+	  }
+	},
+	"mappings": {
+	  "properties": {
+		"alarmRiskLevel": {
+		  "type": "integer"
+		},
+		"isSupervise": {
+		  "type": "boolean"
+		},
+		"eventVersion": {
+		  "type": "keyword"
+		},
+		"dstIps": {
+		  "type": "keyword"
+		},
+		"isRead": {
+		  "type": "boolean"
+		},
+		"staffNum": {
+		  "type": "integer"
+		},
+		"fileCount": {
+		  "type": "integer"
+		},
+		"authorization": {
+            "properties": {
+                "canOperateRole": {
+                    "properties": {
+                        "name": {
+                            "type": "keyword"
+                        },
+                        "guid": {
+                            "type": "keyword"
+                        }
+                    }
+                }
+            }
+		},
+		"staffInfos": {
+            "properties": {
+                "staffRole": {
+                    "type": "keyword"
+                },
+                "staffNo": {
+                    "type": "keyword"
+                },
+                "staffPost": {
+                    "type": "keyword"
+                },
+                "staffAccount": {
+                    "type": "keyword"
+                },
+                "staffName": {
+                    "type": "keyword"
+                },
+                "isRelation": {
+                    "type": "keyword"
+                },
+                "staffDepartment": {
+                    "type": "keyword"
+                },
+                "staffLevel": {
+                    "type": "keyword"
+                }
+            }
+		},
+		"eventKind": {
+		  "type": "integer"
+		},
+		"principalIp": {
+		  "type": "keyword"
+        },
+        "principalName": {
+            "type": "keyword"
+          },
+		"eventName": {
+		  "type": "keyword"
+		},
+		"ruleName": {
+		  "type": "keyword"
+		},
+		"srcIps": {
+		  "type": "keyword"
+		},
+		"unitInfo": {
+            "properties": {
+                "unitIdent": {
+                    "type": "keyword"
+                },
+                "unitDepartSubCode": {
+                    "type": "keyword"
+                },
+                "unitName": {
+                    "type": "keyword"
+                },
+                "unitDepartName": {
+                    "type": "keyword"
+                },
+                "unitGeoIdent": {
+                    "type": "keyword"
+                }
+            }
+		},
+		"ruleId": {
+		  "type": "keyword"
+		},
+		"logs": {
+            "properties": {
+                "eventTableGuid": {
+                    "type": "keyword"
+                },
+                "logGuids": {
+                    "type": "keyword"
+                },
+                "indexName": {
+                    "type": "keyword"
+                },
+                "ids": {
+                    "type": "keyword"
+                },
+                "eventTableName": {
+                    "type": "keyword"
+                }
+            }
+		},
+		"deviceInfos": {
+            "properties": {
+                "deviceType": {
+                    "type": "keyword"
+                },
+                "deviceIp": {
+                    "type": "keyword"
+                },
+                "orgName": {
+                    "type": "keyword"
+                },
+                "deviceSecurityDomain": {
+                    "type": "keyword"
+                },
+                "deviceOs": {
+                    "type": "keyword"
+                },
+                "deviceVersion": {
+                    "type": "keyword"
+                },
+                "deviceName": {
+                    "type": "keyword"
+                },
+                "deviceNetTime": {
+                    "type": "keyword"
+                },
+                "orgCode": {
+                    "type": "keyword"
+                },
+                "personLiable": {
+                    "properties": {
+                        "personLiableRole": {
+                            "type": "keyword"
+                        },"personLiableCode": {
+                            "type": "keyword"
+                        },"personLiableName": {
+                            "type": "keyword"
+                        },"personLiableOrg": {
+                            "type": "keyword"
+                        }
+                    }
+                },
+                "deviceLevel": {
+                    "type": "keyword"
+                },
+                "deviceMac": {
+                    "type": "keyword"
+                },
+                "deviceModel": {
+                    "type": "keyword"
+                },
+                "deviceDiskSeq": {
+                    "type": "keyword"
+                },
+                "deviceBrand": {
+                    "type": "keyword"
+                }
+            }
+		},
+		"eventId": {
+		  "type": "keyword"
+		},
+		"alarmDealState": {
+		  "type": "integer"
+		},
+		"deviceCount": {
+		  "type": "integer"
+		},
+		"eventType": {
+		  "type": "integer"
+		},
+		"isUrge": {
+		  "type": "boolean"
+		},
+		"relatedStaffInfos": {
+            "properties": {
+                "staffRole": {
+                    "type": "keyword"
+                },
+                "staffNo": {
+                    "type": "keyword"
+                },
+                "staffPost": {
+                    "type": "keyword"
+                },
+                "staffAccount": {
+                    "type": "keyword"
+                },
+                "staffName": {
+                    "type": "keyword"
+                },
+                "isRelation": {
+                    "type": "keyword"
+                },
+                "staffDepartment": {
+                    "type": "keyword"
+                },
+                "staffLevel": {
+                    "type": "keyword"
+                }
+            }
+		},
+		"eventCode": {
+		  "type": "keyword"
+		},
+		"eventDetails": {
+		  "type": "keyword"
+		},
+		"deviceAppCount": {
+		  "type": "integer"
+		},
+		"eventCreattime": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+		},
+		"dataSource": {
+		  "type": "keyword"
+		},
+		"categoryId": {
+		  "type": "keyword"
+		}
+	  }
+	},
+	"aliases": {}
+  }

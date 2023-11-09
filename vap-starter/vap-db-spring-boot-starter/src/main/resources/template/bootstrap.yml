@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: api-vaptest
+  profiles:
+    active: dev
+  boot:
+    admin:
+      ui:
+        title: "多数据项目测试"

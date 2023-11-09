@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.core.AppBusinessHisMapper">
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO rpt_app_business_his
+        (id,ip,file_name,file_level,file_business,`count`,data_time,`time`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},
+            #{item.ip},
+            #{item.fileName},
+            #{item.fileLevel},
+            #{item.fileBusiness},
+            #{item.count},
+            DATE_FORMAT(date_sub(NOW(),interval 1 day),'%Y-%m-%d'),
+            CURRENT_TIMESTAMP)
+        </foreach>
+    </insert>
+
+
+    <select id="countAll" resultType="com.vrv.vap.xc.pojo.AppBusinessTotal">
+        SELECT
+            ip ip,
+            file_name fileName,
+            file_level fileLevel,
+            GROUP_CONCAT(file_business) fileBusiness,
+            sum( count ) count,
+	CURRENT_TIMESTAMP time
+        FROM
+            (
+            SELECT
+            ip,
+            file_name,
+            file_level,
+            file_business,
+            `count`
+            FROM
+            rpt_app_business_his
+            WHERE
+            data_time = DATE_FORMAT( date_sub( NOW(), INTERVAL 1 DAY ), '%Y-%m-%d' ) UNION ALL
+            SELECT
+            ip,
+            file_name,
+            file_level,
+            file_business,
+            `count`
+            count
+            FROM
+            rpt_app_business_total
+            ) a
+        GROUP BY
+            ip,
+            file_name
+    </select>
+
+</mapper>

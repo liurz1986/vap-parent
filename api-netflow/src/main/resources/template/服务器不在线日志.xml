@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>dev_ip</field>
+		<field>event_time</field>
+		<field>op_description</field>
+		<field>dev_id</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>139.211.222.235</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>设备不在线</value>
+		<value>6724-4187-8f5f</value>
+		<value>DT001</value>
+	</log>
+</data>

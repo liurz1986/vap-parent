@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.data.mapper.ReportThemeMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.data.model.ReportTheme">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="size" jdbcType="VARCHAR" property="size" />
+    <result column="margin" jdbcType="TINYINT" property="margin" />
+    <result column="background" jdbcType="VARCHAR" property="background" />
+    <result column="logo" jdbcType="VARCHAR" property="logo" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="sub_title" jdbcType="VARCHAR" property="subTitle" />
+    <result column="topic" jdbcType="VARCHAR" property="topic" />
+    <result column="sign" jdbcType="VARCHAR" property="sign" />
+    <result column="header" jdbcType="VARCHAR" property="header" />
+    <result column="footer" jdbcType="VARCHAR" property="footer" />
+  </resultMap>
+</mapper>

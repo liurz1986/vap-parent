@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.data.mapper.SourceMonitorMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.data.model.SourceMonitor">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="source_id" jdbcType="INTEGER" property="sourceId" />
+    <result column="health" jdbcType="TINYINT" property="health" />
+    <result column="data_count" jdbcType="BIGINT" property="dataCount" />
+    <result column="data_size" jdbcType="BIGINT" property="dataSize" />
+    <result column="index_size" jdbcType="BIGINT" property="indexSize" />
+    <result column="shards" jdbcType="INTEGER" property="shards" />
+    <result column="indices" jdbcType="INTEGER" property="indices" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+  </resultMap>
+</mapper>

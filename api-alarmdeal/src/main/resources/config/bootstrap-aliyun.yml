@@ -1,0 +1,42 @@
+server:
+  port: 9420
+
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://${EUREKA_HOST:106.15.159.105}:${EUREKA_PORT:8761}/eureka/
+  instance:
+    preferIpAddress: true
+    statusPageUrlPath: /info
+    healthCheckUrlPath: /health
+    lease-renewal-interval-in-seconds: 1
+    lease-expiration-duration-in-seconds: 2
+
+
+spring:
+  cloud:
+    config:
+      profile: ${SPRING_PROFILE_ACTIVE:aliyun}
+      discovery:
+        enabled: true
+        serviceId: SERVER-CONFIG
+
+ribbon:
+  eureka:
+    enabled: true
+management:
+  security:
+    enabled: false
+endpoints:
+  jmx:
+    enabled: true
+  health:
+    sensitive: false
+  trace:
+    enabled: true
+    sensitive: false
+feign:
+ hystrix:
+  enabled: true

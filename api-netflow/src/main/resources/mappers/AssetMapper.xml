@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.netflow.mapper.AssetMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.netflow.model.Asset">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="Guid" jdbcType="VARCHAR" property="guid" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
+    <result column="Name_en" jdbcType="VARCHAR" property="nameEn" />
+    <result column="IP" jdbcType="VARCHAR" property="ip" />
+    <result column="securityGuid" jdbcType="VARCHAR" property="securityguid" />
+    <result column="ipNum" jdbcType="BIGINT" property="ipnum" />
+    <result column="Type_Guid" jdbcType="VARCHAR" property="typeGuid" />
+    <result column="Type_Sno_Guid" jdbcType="VARCHAR" property="typeSnoGuid" />
+    <result column="Version_info" jdbcType="VARCHAR" property="versionInfo" />
+    <result column="Tags" jdbcType="VARCHAR" property="tags" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="typeUnicode" jdbcType="VARCHAR" property="typeunicode" />
+    <result column="snoUnicode" jdbcType="VARCHAR" property="snounicode" />
+    <result column="mac" jdbcType="VARCHAR" property="mac" />
+    <result column="employee_Code1" jdbcType="VARCHAR" property="employeeCode1" />
+    <result column="employee_Code2" jdbcType="VARCHAR" property="employeeCode2" />
+    <result column="monitor" jdbcType="VARCHAR" property="monitor" />
+    <result column="special" jdbcType="VARCHAR" property="special" />
+    <result column="canMonitor" jdbcType="VARCHAR" property="canmonitor" />
+    <result column="canRCtrl" jdbcType="VARCHAR" property="canrctrl" />
+    <result column="worth" jdbcType="VARCHAR" property="worth" />
+    <result column="secrecy" jdbcType="VARCHAR" property="secrecy" />
+    <result column="integrity" jdbcType="VARCHAR" property="integrity" />
+    <result column="availability" jdbcType="VARCHAR" property="availability" />
+    <result column="protocol" jdbcType="VARCHAR" property="protocol" />
+    <result column="assetNum" jdbcType="VARCHAR" property="assetnum" />
+    <result column="assetUse" jdbcType="VARCHAR" property="assetuse" />
+    <result column="location" jdbcType="VARCHAR" property="location" />
+    <result column="AssetDescribe" jdbcType="VARCHAR" property="assetdescribe" />
+    <result column="cabinetGuid" jdbcType="VARCHAR" property="cabinetguid" />
+    <result column="marginBottom" jdbcType="INTEGER" property="marginbottom" />
+    <result column="height" jdbcType="INTEGER" property="height" />
+    <result column="lng" jdbcType="DECIMAL" property="lng" />
+    <result column="lat" jdbcType="DECIMAL" property="lat" />
+    <result column="gatewayName" jdbcType="VARCHAR" property="gatewayname" />
+    <result column="gatewayNum" jdbcType="VARCHAR" property="gatewaynum" />
+    <result column="gatewayUser" jdbcType="VARCHAR" property="gatewayuser" />
+    <result column="gatewayDepartment" jdbcType="VARCHAR" property="gatewaydepartment" />
+    <result column="phoneNum" jdbcType="VARCHAR" property="phonenum" />
+    <result column="remarkInfo" jdbcType="VARCHAR" property="remarkinfo" />
+    <result column="org" jdbcType="VARCHAR" property="org" />
+    <result column="core" jdbcType="BIT" property="core" />
+    <result column="app_id" jdbcType="VARCHAR" property="appId" />
+    <result column="app_name" jdbcType="VARCHAR" property="appName" />
+    <result column="labels" jdbcType="VARCHAR" property="labels" />
+    <result column="employee_guid" jdbcType="VARCHAR" property="employeeGuid" />
+    <result column="domain_sub_code" jdbcType="VARCHAR" property="domainSubCode" />
+    <result column="equipment_intensive" jdbcType="INTEGER" property="equipmentIntensive" />
+    <result column="serial_number" jdbcType="VARCHAR" property="serialNumber" />
+    <result column="term_type" jdbcType="INTEGER" property="termType" />
+  </resultMap>
+
+  <select id="findAllAsset" resultType="com.vrv.vap.netflow.vo.AssetVo"  >
+    select a.*,atg.name as groupName,t.`Name` as typeName,atg.treeCode as treeCode from (
+          SELECT
+          s.*,
+          b.extendInfos as assetExtendInfo,
+          d.domain_name domainName
+          FROM
+          asset s
+          LEFT JOIN asset_extend b ON s.Guid = b.assetGuid
+          LEFT JOIN base_security_domain d ON s.securityGuid = d.code
+    ) a, asset_type t, asset_type_group atg
+    where a.Type_Guid = t.Guid and t.TreeCode like concat(atg.TreeCode,'%');
+  </select>
+</mapper>

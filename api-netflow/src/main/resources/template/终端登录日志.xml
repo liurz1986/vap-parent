@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>username</field>
+		<field>dev_id</field>
+		<field>ukey_type</field>
+		<field>ukey_user_name</field>
+		<field>ukey_department</field>
+		<field>dev_ip</field>
+		<field>key_id</field>
+		<field>op_type</field>
+		<field>login_time</field>
+		<field>op_result</field>
+		<field>op_description</field>
+		<field>data_source</field>
+		<field>event_time</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>secadm</value>
+		<value>131312</value>
+		<value>普通用户</value>
+		<value>wz</value>
+		<value>cs</value>
+		<value>139.211.222.235</value>
+		<value>202002125532</value>
+		<value>1</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>0</value>
+		<value>非当前用户key,登录失败！</value>
+		<value>主审</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>DT008</value>
+	</log>
+</data>

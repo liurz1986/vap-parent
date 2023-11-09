@@ -1,0 +1,9 @@
+spring:
+ application:
+    name:  api-netflow
+ sleuth:
+    sampler:
+      percentage: 1.0
+ profiles:
+   active: dev
+

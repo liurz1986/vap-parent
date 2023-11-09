@@ -1,0 +1,29 @@
+REDIS_PORT: 6379
+REDIS_PWD: vrv@1234
+REDIS_HOST: 192.168.120.152
+KAFKA_URL: 192.168.120.152
+KAFKA_PORT: 9092
+topic_producer_name: flink-wiki-demo
+side_output_name: test-side-out-name
+jdbc_driveClass: com.mysql.jdbc.Driver
+MYSQL_HOST: 192.168.120.152
+MYSQL_USER: root
+MYSQL_PASSWORD: mysql
+MYSQL_PORT: 3306
+MYSQL_DBNAME: ajb_vap
+
+
+KAFKA_AUTH_USERNAME: admin
+KAFKA_AUTH_PASSWORD: admin-2019
+
+
+ES_SIZE: 5000
+ES_CLUSTER_HOST: 192.168.120.152
+ELASTICSEARCH_PORT: 9200
+ES_CLUSTER_UNAME: admin
+ES_CLUSTER_PWD: vrv@12345
+
+
+
+
+ 

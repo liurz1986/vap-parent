@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BaseOrgIpSegmentMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.BaseOrgIpSegment">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result property="areaCode" jdbcType="VARCHAR" column="area_code" />
+    <result property="areaName" jdbcType="VARCHAR" column="area_name" />
+    <result property="departmentCode" jdbcType="VARCHAR" column="department_code" />
+    <result property="departmentName" jdbcType="VARCHAR" column="department_name" />
+    <result property="parentCode" jdbcType="VARCHAR" column="parent_code" />
+    <result property="areaIdentiCode" jdbcType="INTEGER" column="area_identi_code" />
+    <result property="netPartitionCode" jdbcType="INTEGER" column="net_partition_code" />
+    <result property="startIpSegment" jdbcType="VARCHAR" column="start_ip_segment" />
+    <result property="endIpSegment" jdbcType="VARCHAR" column="end_ip_segment" />
+    <result property="startIpNum" jdbcType="INTEGER" column="start_ip_num" />
+    <result property="endIpNum" jdbcType="INTEGER" column="end_ip_num" />
+    <result property="subnetMask" jdbcType="TINYINT" column="subnet_mask" />
+    <result property="ipType" jdbcType="TINYINT" column="ip_type" />
+    <result property="ipUse" jdbcType="TINYINT" column="ip_use" />
+    <result property="description" jdbcType="VARCHAR" column="description" />
+    <result property="isDelete" jdbcType="TINYINT" column="is_delete" />
+    <result property="modifierId" jdbcType="VARCHAR" column="modifier_id" />
+    <result property="modifierName" jdbcType="VARCHAR" column="modifier_name" />
+  </resultMap>
+
+
+</mapper>
+

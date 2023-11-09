@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BaseSecurityDomainMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.BaseSecurityDomain">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="domain_name" jdbcType="VARCHAR" property="domainName"/>
+        <result column="parent_code" jdbcType="VARCHAR" property="parentCode"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+    </resultMap>
+
+
+    <select id="findSubDomainByCode" resultType="com.vrv.vap.admin.model.BaseSecurityDomain">
+        select * from base_security_domain t where
+        <if test="code == null || code == ''">
+            t.parent_code is null or t.parent_code = ''
+        </if>
+        <if test="code != null and code != ''">
+            t.parent_code = #{code}
+        </if>
+    </select>
+
+    <select id="domainByTenant" resultType="com.vrv.vap.admin.model.BaseSecurityDomain">
+        SELECT DISTINCT b.*
+        from base_security_domain b
+                 LEFT JOIN user_domain u on b.code = u.domain_code
+                 LEFT JOIN
+             user_role r on u.user_id = r.user_id
+        where r.role_id = #{roleId}
+    </select>
+
+
+    <select id="findTenantByCode" resultType="com.vrv.vap.admin.model.User">
+        select *
+        from user
+        where id in (select t0.user_id
+                     from (select distinct a.user_id from user_role a where a.role_id = #{roleId}) t0,
+                          (select distinct b.user_id from user_domain b where b.domain_code = #{code}) t1
+                     where t0.user_id = t1.user_id)
+    </select>
+
+    <select id="findTenantByCode" resultType="com.vrv.vap.admin.model.User" databaseId="dm">
+        select *
+        from "user"
+        where id in (select t0.user_id
+                     from (select distinct a.user_id from user_role a where a.role_id = #{roleId}) t0,
+                          (select distinct b.user_id from user_domain b where b.domain_code = #{code}) t1
+                     where t0.user_id = t1.user_id)
+    </select>
+
+    <select id="getDomainIpSegmentTop" resultType="map">
+        select count(*) ipSegmentNum, t.code, d.domain_name domainName
+        from base_security_domain_ip_segment t
+                 left join base_security_domain d on d.code = t.code
+        group by t.code
+        order by ipSegmentNum desc limit 10
+    </select>
+    <select id="getDomainBySecretLevel" resultType="map">
+        select d1.code_value as name, count(*) as count
+        from base_security_domain a
+            LEFT JOIN base_dict_all d1
+        on a.secret_level=d1.code
+            LEFT JOIN base_dict_all d2 on d1.parent_type=d2.type
+        WHERE d2.code_value='zjg-保密等级' and a.parent_code is not null
+        GROUP BY secret_level
+    </select>
+    <select id="getDomainPage" resultType="com.vrv.vap.admin.vo.BaseSecurityDomainInfo">
+        select b.id,b.code ,b.domain_name as domainName,b.responsible_name as responsibleName ,b.org_name as
+        orgName,b.secret_level as
+        secretLevel,a.steal_leak_value as stealLeakValue from base_security_domain b left join
+            (SELECT * FROM app_steal_leak_value where type=1 ) a
+        on a.app_id=b.id
+        where  b.parent_code is not null
+        <if test="domainQuery.domainName != null and domainQuery.domainName != '' ">
+            AND `b`.domain_name like
+            CONCAT('%',#{domainQuery.domainName},'%')
+        </if>
+        <if test="domainQuery.secretLevel != null and domainQuery.secretLevel != ''">
+            AND `b`.secret_level = #{domainQuery.secretLevel}
+        </if>
+        <if test="domainQuery.orgName != null and domainQuery.orgName != ''">
+            AND `b`.org_name like CONCAT('%',#{domainQuery.orgName},'%')
+        </if>
+        <if test="domainQuery.responsibleName != null and domainQuery.responsibleName != ''">
+            AND `b`.responsible_name like CONCAT('%',#{domainQuery.responsibleName},'%')
+        </if>
+        <if test="domainQuery.beginValue != null and domainQuery.beginValue != ''">
+            AND `a`.steal_leak_value >= #{domainQuery.beginValue}
+        </if>
+        <if test="domainQuery.endValue != null and domainQuery.endValue != ''">
+            AND `a`.steal_leak_value  <![CDATA[ <= ]]>  #{domainQuery.endValue}
+        </if>
+        <if test="domainQuery.codes != null and  domainQuery.codes!= ''">
+            AND `b`.code in
+            <foreach collection="domainQuery.codes" open="(" close=")" separator=","
+                     item="code">
+                #{code}
+            </foreach>
+        </if>
+        <if test="domainQuery.ids != null and  domainQuery.ids!= ''">
+            AND `b`.id in
+            <foreach collection="domainQuery.ids" open="(" close=")" separator=","
+                     item="id">
+                #{id}
+            </foreach>
+        </if>
+        order by a.steal_leak_value desc LIMIT #{domainQuery.start_},#{domainQuery.count_}
+    </select>
+    <select id="getDomainPageCount" resultType="java.lang.Integer">
+        select count(*) from base_security_domain b  left join
+            (SELECT * FROM app_steal_leak_value where type=1 ) a on a.app_id=b.id
+        where  b.parent_code is not null
+        <if test="domainQuery.domainName != null and domainQuery.domainName != '' ">
+            AND `b`.domain_name like
+            CONCAT('%',#{domainQuery.domainName},'%')
+        </if>
+        <if test="domainQuery.secretLevel != null and domainQuery.secretLevel != ''">
+            AND `b`.secret_level = #{domainQuery.secretLevel}
+        </if>
+        <if test="domainQuery.orgName != null and domainQuery.orgName != ''">
+            AND `b`.org_name like CONCAT('%',#{domainQuery.orgName},'%')
+        </if>
+        <if test="domainQuery.responsibleName != null and domainQuery.responsibleName != ''">
+            AND `b`.responsible_name like CONCAT('%',#{domainQuery.responsibleName},'%')
+        </if>
+        <if test="domainQuery.beginValue != null and domainQuery.beginValue != ''">
+            AND `a`.steal_leak_value >= #{domainQuery.beginValue}
+        </if>
+        <if test="domainQuery.endValue != null and domainQuery.endValue != ''">
+            AND `a`.steal_leak_value  <![CDATA[ <= ]]>  #{domainQuery.endValue}
+        </if>
+        <if test="domainQuery.codes != null and  domainQuery.codes!= ''">
+            AND `b`.code in
+            <foreach collection="domainQuery.codes" open="(" close=")" separator=","
+                     item="code">
+                #{code}
+            </foreach>
+        </if>
+        <if test="domainQuery.ids != null and  domainQuery.ids!= ''">
+            AND `b`.id in
+            <foreach collection="domainQuery.ids" open="(" close=")" separator=","
+                     item="id">
+                #{id}
+            </foreach>
+        </if>
+        order by a.steal_leak_value desc
+    </select>
+</mapper>

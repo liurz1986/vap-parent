@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.SysLogMapper">
+
+
+    <sql id="queryCondition">
+        <if test="listSysLogQuery.eventType!=null and listSysLogQuery.eventType!=''">
+            <choose>
+                <when test="listSysLogQuery.eventType == '系统事件'">
+                    and  (user_name = "secrecy" or user_name = "sysadmin")
+                </when>
+                <otherwise>
+                    and user_name = "auditor"
+                </otherwise>
+            </choose>
+        </if>
+        <if test="listSysLogQuery.requestIp!=null and listSysLogQuery.requestIp!=''">
+            and request_ip like CONCAT('%',#{listSysLogQuery.requestIp},'%')
+        </if>
+        <if test="listSysLogQuery.organizationName!=null and listSysLogQuery.organizationName!=''">
+            and organization_name = #{listSysLogQuery.organizationName}
+        </if>
+        <if test="listSysLogQuery.loginType!=null">
+            and login_type = #{listSysLogQuery.loginType}
+        </if>
+        <if test="listSysLogQuery.type!=null ">
+            and type = #{listSysLogQuery.type}
+        </if>
+        <if test="listSysLogQuery.description!=null and listSysLogQuery.description!=''">
+            and description like CONCAT('%',#{listSysLogQuery.description},'%')
+        </if>
+        <if test="listSysLogQuery.requestMethod!=null and listSysLogQuery.requestMethod!=''">
+            and request_method = #{listSysLogQuery.requestMethod}
+        </if>
+        <if test="listSysLogQuery.methodName!=null and listSysLogQuery.methodName!=''">
+            and method_name = #{listSysLogQuery.methodName}
+        </if>
+        <if test="listSysLogQuery.userName!=null and listSysLogQuery.userName!=''">
+            and user_name like CONCAT('%',#{listSysLogQuery.userName},'%')
+        </if>
+        <if test="listSysLogQuery.responseResult!=null">
+            and response_result = #{listSysLogQuery.responseResult}
+        </if>
+        <if test="orgNameList!=null and orgNameList.size>0">
+            and organization_name in
+            <foreach collection="orgNameList" item="orgName" close=")" open="(" separator=",">
+                #{orgName}
+            </foreach>
+        </if>
+        <if test="listSysLogQuery.requestEndTime!=null">
+            and  DATE_FORMAT(#{listSysLogQuery.requestEndTime},'%Y-%m-%d %H:%i:%S') <![CDATA[>=]]> request_time
+        </if>
+        <if test="listSysLogQuery.requestStartTime!=null">
+            and  DATE_FORMAT(#{listSysLogQuery.requestStartTime},'%Y-%m-%d %H:%i:%S') <![CDATA[<=]]> request_time
+        </if>
+    </sql>
+
+
+    <select id="querySysLog"  parameterType="com.vrv.vap.admin.vo.ListSysLogQuery" resultType="com.vrv.vap.admin.model.SysLog">
+        SELECT * FROM sys_log WHERE 1=1
+        <include refid="queryCondition"></include>
+        order by ${listSysLogQuery.order_} ${listSysLogQuery.by_}
+         limit #{listSysLogQuery.start_},#{listSysLogQuery.count_}
+    </select>
+
+    <select id="querySysLogCount" resultType="Long">
+        SELECT COUNT(*)  FROM sys_log WHERE 1=1
+        <include refid="queryCondition"></include>
+    </select>
+
+    <select id="loginThirtyDay" resultType="com.vrv.vap.admin.vo.LoginThirtyDayVO">
+        SELECT DATE(request_time) AS date, COUNT(*) AS login_num
+        FROM sys_log WHERE type=0 and TO_DAYS(NOW()) - TO_DAYS(request_time) <![CDATA[ <= ]]> 30
+        <if test="orgNameList!=null and orgNameList.size>0">
+            and organization_name in
+            <foreach collection="orgNameList" item="orgName" close=")" open="(" separator=",">
+                #{orgName}
+            </foreach>
+        </if>
+        <if test="roleNameList!=null and roleNameList.size>0">
+            and role_name in
+            <foreach collection="roleNameList" item="roleName" close=")" open="(" separator=",">
+                #{roleName}
+            </foreach>
+        </if>
+        GROUP BY date ORDER BY date
+    </select>
+
+    <select id="getActiceUserCount" resultType="Long">
+        select count(DISTINCT(user_name))
+        from sys_log
+        where DATE_FORMAT(request_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d') and user_name is not null;
+    </select>
+
+    <select id="getLoginCount" resultType="Map">
+        select count(*) as count,user_name from sys_log where type = '0'
+        <include refid="roleCodeCondition"></include>
+        and TO_DAYS(NOW()) - TO_DAYS(request_time) <![CDATA[ < ]]> #{day}
+        GROUP BY user_name order by count desc LIMIT 10;
+    </select>
+
+    <select id="loginTrend" resultType="Map">
+        SELECT DATE(request_time) AS date, COUNT(*) AS login_num,user_name FROM sys_log WHERE type = '0'
+        <include refid="roleCodeCondition"></include>
+        and TO_DAYS(NOW()) - TO_DAYS(request_time) <![CDATA[ < ]]> #{day}
+        GROUP BY date,user_name ORDER BY date,user_name
+    </select>
+
+    <select id="getResponsResultCount" resultType="Map">
+        select count(*) as count,response_result from sys_log WHERE 1=1
+        <include refid="roleCodeCondition"></include>
+         GROUP BY response_result order by count desc;
+    </select>
+
+    <select id="getCommonVisitPageCount" resultType="Map">
+        select count(*) as count,request_page_title as title from sys_log where request_page_title is not null and request_page_title != ''
+        <include refid="roleCodeCondition"></include>
+        and TO_DAYS(NOW()) - TO_DAYS(request_time) <![CDATA[ < ]]> #{day}
+         GROUP BY title order by count desc LIMIT 10;
+    </select>
+
+    <select id="getUnCommonVisitPageCount" resultType="Map">
+        select count(*) as count,request_page_title as title from sys_log where request_page_title is not null and request_page_title != ''
+        <include refid="roleCodeCondition"></include>
+        and TO_DAYS(NOW()) - TO_DAYS(request_time) <![CDATA[ < ]]> #{day}
+        GROUP BY title order by count asc LIMIT 10;
+    </select>
+
+    <select id="getResponseErrorCount" resultType="Map">
+        select count(*) as count,request_page_title as title from sys_log where request_page_title is not null and request_page_title != '' and response_result = 0
+        <include refid="roleCodeCondition"></include>
+        and TO_DAYS(NOW()) - TO_DAYS(request_time) <![CDATA[ < ]]> #{day}
+        GROUP BY title order by count asc LIMIT 10;
+    </select>
+
+    <select id="getOperateTypeCount" resultType="Map">
+        select count(*) as count,type from sys_log where 1=1 and request_page_title is not null and request_page_title != ''
+        <include refid="roleCodeCondition"></include>
+        and TO_DAYS(NOW()) - TO_DAYS(request_time) <![CDATA[ < ]]> #{day}
+        GROUP BY type order by count asc LIMIT 10;
+    </select>
+
+    <select id="getOperateTypeDetail" resultType="Map">
+        select count(*) as count,request_page_title as title from sys_log where 1=1 and request_page_title is not null and request_page_title != '' and type = #{type}
+        <include refid="roleCodeCondition"></include>
+        and TO_DAYS(NOW()) - TO_DAYS(request_time) <![CDATA[ < ]]> #{day}
+        GROUP BY request_page_title;
+    </select>
+
+    <sql id="roleCodeCondition">
+        <if test="roleCode!=null and roleCode!=''">
+            <choose>
+                <when test="roleCode == 'audAdmin'">
+                    and role_name in ('系统管理员','安全管理员')
+                </when>
+                <when test="roleCode == 'secAdmin'">
+                    and role_name in ('安全审计员','保密主管','业务主管','运维主管')
+                </when>
+                <when test="roleCode == 'secretMgr'">
+                    and role_name in ('保密主管','业务主管','运维主管')
+                </when>
+                <when test="roleCode == 'admin'">
+
+                </when>
+                <otherwise>
+                    and role_name = '未分配角色'
+                </otherwise>
+            </choose>
+        </if>
+    </sql>
+</mapper>

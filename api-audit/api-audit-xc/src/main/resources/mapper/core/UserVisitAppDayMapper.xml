@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.core.UserVisitAppDayMapper">
+
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO rpt_user_visit_app_day
+        (id,user_no,user_name,device_ip,depart_no,depart_name,app_no,app_name,`count`,data_time,`time`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},
+            #{item.userNo},
+            #{item.userName},
+            #{item.deviceIp},
+            #{item.departNo},
+            #{item.departName},
+            #{item.appNo},
+            #{item.appName},
+            #{item.count},
+            DATE_FORMAT(date_sub(NOW(),interval 1 day),'%Y-%m-%d'),
+            CURRENT_TIMESTAMP)
+        </foreach>
+    </insert>
+
+    <select id="countAll" resultType="com.vrv.vap.xc.pojo.UserVisitAppTotal">
+        SELECT
+            user_no userNo,
+            user_name useName,
+            device_ip deviceIp,
+            depart_no departNo,
+            depart_name departName,
+            app_no appNo,
+            app_name appName,
+            sum( count ) count,
+	DATE_FORMAT( NOW(), '%Y%m%d%H' ) version,
+	CURRENT_TIMESTAMP time
+        FROM
+            (
+            SELECT
+            user_no,
+            user_name,
+            device_ip,
+            depart_no,
+            depart_name,
+            app_no,
+            app_name,
+            count
+            FROM
+            rpt_user_visit_app_day
+            WHERE
+            data_time = DATE_FORMAT( date_sub( NOW(), INTERVAL 1 DAY ), '%Y-%m-%d' ) UNION ALL
+            SELECT
+            user_no,
+            user_name,
+            device_ip,
+            depart_no,
+            depart_name,
+            app_no,
+            app_name,
+            count
+            FROM
+            rpt_user_visit_app_total
+            ) a
+        GROUP BY
+            device_ip,
+            app_no
+    </select>
+
+    <select id="countDepart" resultType="com.vrv.vap.xc.pojo.DepartVisitAppTotal">
+        SELECT
+            depart_no departNo,
+            depart_name departName,
+            COUNT( app_no ) appCount,
+            sum( count ) visitNum,
+	DATE_FORMAT( NOW(), '%Y%m%d%H' ) version,
+	CURRENT_TIMESTAMP time
+        FROM
+            (
+            SELECT
+            depart_no,
+            depart_name,
+            app_no,
+            sum( count ) count
+            FROM
+            (
+            SELECT
+            user_no,
+            user_name,
+            device_ip,
+            depart_no,
+            depart_name,
+            app_no,
+            app_name,
+            count
+            FROM
+            rpt_user_visit_app_day
+            WHERE
+            data_time = DATE_FORMAT( date_sub( NOW(), INTERVAL 1 DAY ), '%Y-%m-%d' ) UNION ALL
+            SELECT
+            user_no,
+            user_name,
+            device_ip,
+            depart_no,
+            depart_name,
+            app_no,
+            app_name,
+            count
+            FROM
+            rpt_user_visit_app_total
+            ) a
+            GROUP BY
+            depart_no,
+            app_no
+            ) b
+        GROUP BY
+            depart_no
+    </select>
+
+</mapper>

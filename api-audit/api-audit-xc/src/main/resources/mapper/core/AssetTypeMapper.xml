@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.core.AssetTypeMapper">
+    <select id="findAssetTypeByGuidIn" parameterType="java.util.List" resultType="com.vrv.vap.xc.pojo.AssetType">
+        SELECT *
+        FROM asset_type
+        <where>
+            <if test="guidList != null and guidList.size() > 0">
+               Guid IN
+            <foreach collection="guidList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="findAssetExtendByAssetGuidIn" parameterType="java.util.List" resultType="com.vrv.vap.xc.pojo.AssetExtend">
+        SELECT *
+        FROM asset_extend
+        <where>
+            <if test="guidList != null and guidList.size() > 0">
+                assetGuid IN
+                <foreach collection="guidList" separator="," open="(" close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,7 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.vrv.vap.oauth2.config.SecurityPropertiesConfig,\
+com.vrv.vap.oauth2.store.AuthDbTokenStore,\
+com.vrv.vap.oauth2.config.DefaultPasswordEncoderConfig,\
+com.vrv.vap.oauth2.store.AuthRedisTokenStore,\
+com.vrv.vap.oauth2.store.AuthJwtTokenStore,\
+com.vrv.vap.oauth2.store.ResJwtTokenStore

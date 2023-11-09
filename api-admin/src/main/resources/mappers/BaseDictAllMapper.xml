@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BaseDictAllMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.BaseDictAll">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="create_time" jdbcType="DATE" property="createTime" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="code_value" jdbcType="VARCHAR" property="codeValue" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="parent_type" jdbcType="VARCHAR" property="parentType" />
+    <result column="leaf" jdbcType="VARCHAR" property="leaf" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="create_id" jdbcType="VARCHAR" property="createId" />
+    <result column="create_time" jdbcType="VARCHAR" property="createTime" />
+    <result column="update_id" jdbcType="VARCHAR" property="updateId" />
+    <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
+    <result column="sort" jdbcType="VARCHAR" property="sort" />
+  </resultMap>
+
+</mapper>

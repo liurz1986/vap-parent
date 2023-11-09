@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.line.mapper.BaseLineSequenceMapper">
+
+    <select id="groupSequence" resultType="com.vrv.vap.line.model.BaseLineSequence" parameterType="com.vrv.vap.line.model.BaseLineSequence">
+        SELECT role,org,user_ip userIp,sys_id sysId,GROUP_CONCAT(compress separator '#') AS compress FROM base_line_sequence WHERE user_ip <![CDATA[ <> ]]> '' and sys_id <![CDATA[ <> ]]> '' and compress <![CDATA[ <> ]]> ''
+        and data_time >= #{startTime} and data_time  <![CDATA[ <= ]]> #{endTime}
+        GROUP BY user_ip,sys_id
+    </select>
+
+    <select id="groupUserSys" resultType="com.vrv.vap.line.model.BaseLineSequence" parameterType="com.vrv.vap.line.model.BaseLineSequence">
+        <!-- SELECT user_ip userIp,sys_id sysId from base_line_sequence WHERE user_ip <![CDATA[ <> ]]> '' and sys_id <![CDATA[ <> ]]> '' and compress <![CDATA[ <> ]]> ''
+        and data_time = #{startTime}  and data_time  <![CDATA[ <= ]]> #{endTime}
+        GROUP BY user_ip,sys_id -->
+        select a.userIp userIp,a.sysId sysId,b.org org,b.role role
+        from (SELECT user_ip userIp,sys_id sysId,MAX(id) id from base_line_sequence
+        WHERE user_ip <![CDATA[ <> ]]> '' and sys_id <![CDATA[ <> ]]> '' and compress <![CDATA[ <> ]]> ''
+        and data_time = #{startTime} <!-- and data_time  <![CDATA[ <= ]]> #{endTime} -->
+        GROUP BY user_ip,sys_id) a INNER JOIN base_line_sequence b on a.id = b.id
+    </select>
+
+
+
+
+    <select id="queryByUserSys" resultType="string" parameterType="com.vrv.vap.line.model.BaseLineSequence">
+        SELECT compress from base_line_sequence WHERE user_ip = #{userIp} and sys_id = #{sysId} and compress <![CDATA[ <> ]]> ''
+        and data_time >= #{startTime} and data_time  <![CDATA[ <= ]]> #{endTime}
+    </select>
+
+
+
+</mapper>

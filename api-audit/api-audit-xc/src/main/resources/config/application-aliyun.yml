@@ -1,0 +1,30 @@
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+rds:
+  datasource:
+#    username: '{cipher}380c9e54416502028056a57bcecabc1619ac17da752035b7dc61473349370f7b'
+#    password: '{cipher}4f3e03882b05a2e1008a6311d134d9092b77ff82887ab82bb65a60a1bf4e8e37'
+    username: ${MYSQL_USER:ajdsjpt_rds}
+    password: ${MYSQL_PASSWORD:ajdsjpt_rds_123456}
+    driver-class-name: com.mysql.jdbc.Driver
+    jdbc-url:  jdbc:mysql://vrvrds001.mysql.rds.aliyuncs.com:3306/ajb_vap?useSSL=false
+drds:
+  datasource:
+#    username: '{cipher}380c9e54416502028056a57bcecabc1619ac17da752035b7dc61473349370f7b'
+#    password: '{cipher}4f3e03882b05a2e1008a6311d134d9092b77ff82887ab82bb65a60a1bf4e8e37'
+    username: root
+    password: vrv@123456
+    driver-class-name: com.mysql.jdbc.Driver
+    jdbc-url: jdbc:mysql://vrvrds001.mysql.rds.aliyuncs.com:3306/ajb_vap?useSSL=false
+ads:
+  datasource:
+#    username: '{cipher}d01aeb339c40ec896af0b24d1f08e39b2d2bdb6a4d6121642825b6835cd607a914a8e205ff3283d5151ffab8874da227'
+#    password: '{cipher}9bc8bd409296b4572d11a8677710c541466811dcf6beb99cb8859206ca53ba5af4ab5ba42c387716568db8849beb515e'
+    username: ${ADS_USER:LTAITaxPoeugNsYm}
+    password: ${ADS_PASSWORD:3KGbiCy2d0hJoSqnm93K84mYErQQtK}
+    driver-class-name: com.mysql.jdbc.Driver
+    jdbc-url: jdbc:mysql://vrv-ads-94a6514a.cn-shanghai-1.ads.aliyuncs.com:10059/vrv_ads
+dir:
+  base: /vap_server_dir
+  upload: /upload
+  tmp: /tmp

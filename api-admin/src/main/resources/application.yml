@@ -1,0 +1,586 @@
+DATABASE_URL: jdbc:mysql://${MYSQL_HOST:192.168.120.201}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&allowMultiQueries=true
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:mysql}
+    driver-class-name: ${DATABASE_DRIVER:com.mysql.cj.jdbc.Driver}
+    url: ${DATABASE_URL:jdbc:mysql://192.168.120.201:3306/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8}
+    hikari:
+      minimum-idle: 5
+      idle-timeout: 600000
+      maximum-pool-size: 15
+      auto-commit: true
+      pool-name: MyHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  jpa:
+      generate-ddl: false
+      show-sql: true
+      hibernate:
+        ddl-auto: none
+  session:
+    store-type: redis
+    timeout: 1800 #session超时时间配置
+  redis:
+    host: ${REDIS_HOST:192.168.120.201}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:vrv@1234}
+    pool:
+      max-active: -1 # 连接池最大连接数（使用负值表示没有限制）
+      max-wait: 10000 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      max-idle:  16 # 连接池中的最大空闲连接
+      min-idle: 0 # 连接池中的最小空闲连接
+    timeout: 10000  # 连接超时时间（毫秒）
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:192.168.119.213}:${KAFKA_PORT:9092}
+    producer:
+      bootstrap-servers: ${KAFKA_URL:192.168.119.213}:${KAFKA_PORT:9092}
+    listener:
+      concurrency: 3
+    template:
+      default-topic: test10
+  servlet:
+    multipart:
+      max-file-size: 300MB      # Max file size，默认1M
+      max-request-size: 300MB   # Max request size，默认10M
+    
+server:
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    port-header: X-Forwarded-Port
+    use-forward-headers: true
+    basedir: /data/vap/temp
+sso:
+  timeout: 600000
+pkiUrl: https://192.168.118.127:444/pki
+licence:
+  enable: true
+  validateUrl: /hardware/?__hide=true#/authorizationfInfo
+  imported: true #授权文件是否是手工导入（true为手工导入）
+  httpLicenseUrl: ${auth.cemsAddress:https://192.168.118.211}/CEMS/cascade/cascadeTerminalAwarenessAction_authenticationCheck.do   #通过接口获取授权文件地址
+  httpLicenseModule: CEMS
+collector:
+  configPath: ${VAP_WORK_DIR:/usr/local/vap}/flume/file/default
+licensePath: ${VAP_WORK_DIR:/usr/local/vap}/hardware/Authorization/files
+role:
+  signIn: app-admin-user-sign-in
+sms:
+  username: demo
+  password: 123456
+  sendUrl: http://ga.is11.com:62001/sms/smsclient.asmx #调用接口形式发送短信接口地址
+  retryTime: 0 #重试次数
+  sleepTime: 1000 #重试等待时间（毫秒）
+site:
+  version: gab
+  release: V0.03.180928A
+  message: false
+  orgRoot: "000000000000"
+  theme: default
+  title: 安全监测大数据平台
+  subTitle: SECURITY MONITORING BIG DATA PLATFORM
+  #    portalt版本 ，支持 portal1 ,portal2
+  services:
+    - { service: [api-admin,app-portal], name : 基础服务, version : V0.03.180928A }
+    - { service: [api-search,app-search], name : 全网搜索, version : V0.03.180928A }
+    - { service: [app-audit,api-audit-business,api-audit-es,api-audit-bigdata,api-audit-schedular], name : 安全审计, version : V0.03.180928A }
+    - { service: [api-asset,app-asset], name : 资产管理中心, version : V0.11.01.180703A }
+    - { service: [api-ticket,app-ticket], name : 应急与通报处置系统, version : V0.11.01.180703A }
+    - { service: [api-report,app-report], name : 综合报表, version : V0.11.01.180703A }
+    - { service: [api-safetycheck,app-safetycheck], name : 安全考核, version : V0.11.01.180703A }
+    - { service: [api-alarmdeal,app-alarmdeal], name : 告警中心, version : V0.02.01.180924B }
+    - { service: [api-weak,app-weak], name : 脆弱性态势, version : V0.07.01.180718A }
+    - { service: [api-sap,app-sap], name : 态势感知, version : V0.10.02.180926A }
+    - { service: [api-ip,app-ip], name : IP资产管理, version : V0.13.05.181023A }
+    - { service: [api-flow,app-flow], name : 通用工单, version : V0.16.02.180922A }
+    - { service: [api-admin,app-portal], name : 基础服务, version : V0.03.180928A }
+    - { service: [api-safetycheck], name : 业务安全, version : V0.03.01.180709A }
+  captcha:
+    # 是否开启验证码
+    enable: false
+    # 验证码图片宽度
+    width: 140
+    # 验证码图片高度
+    height: 50
+    # 验证码长度，默认为4 ，如果设置为 arithmetic，则会强制转为 2
+    length: 4
+    # 字体： 每次随机选择，用逗号分开
+    fontFamily: 1,2,3,6,9
+    # 字体大小
+    fontSize: 32
+    # png :普通（默认） | gif : 动画  | arithmetic :算术
+    type: gif
+    # default : 数字和字母 | number-upper : 数字和大写字母 |  number: 纯数字 | char : 纯字母 | upper : 纯大写字母 | lower: 纯小写字母
+    mode: default
+
+fastdfs:
+  prefix: http://${FASTDFS_PREFIX_IP:192.168.119.208}:${FASTDFS_PREFIX_PORT:8888}/
+fdfs:
+  so-timeout: 1501
+  connect-timeout: 601
+  tracker-list:
+    - ${FDFS_TRACKER_0_IP:192.168.119.208}:${FDFS_TRACKER_0_PORT:22122}
+    - ${FDFS_TRACKER_1_IP:192.168.119.209}:${FDFS_TRACKER_1_PORT:22122}
+  pool:
+    jmx-enabled: false
+# type为 fastdfs 或者 local
+fileupload:
+  type: local
+  path: ${FILE_SAVE_DIR:/opt/file}
+kafka:
+  topic: ${KAFKA_TOPIC:logstash-elk}
+  bootstrap:
+    servers : ${KAFKA_URL:192.168.120.201}:${KAFKA_PORT:9092}
+  consumer:
+    servers: ${KAFKA_URL:192.168.120.201}:${KAFKA_PORT:9092}
+    concurrency: 10
+    maxPollRecordsConfig: 100
+    group:
+      id: test-consumer-group
+    session:
+      timeout: 15000
+    enable:
+      auto:
+        commit: false
+    auto:
+      offset:
+        reset: latest
+      commit:
+        interval: 100
+  userName: admin
+  password: admin-2019
+# 在默认情况下 spring cloud feign在进行各个子服务之间的调用时，http组件使用的是jdk的HttpURLConnection，没有使用线程池。
+# 有2种可选的线程池：HttpClient和OKHttp
+# 比较推荐OKHttp，请求封装的非常简单易用，性能也很ok。
+feign:
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+    max-connections: 1000
+    max-connections-per-route: 100
+  compression:
+    request:
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+      enabled: true
+    response:
+      enabled: true
+  hystrix:
+    enabled: true
+
+#  熔断器并发调优,修改熔断器的线程数量，注意线程数不是越多越好
+hystrix:
+  threadpool:
+    default:
+      coreSize: 100
+      maximumSize: 2000
+      allowMaximumSizeToDivergeFromCoreSize: true
+      maxQueueSize: -1
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 10000
+
+# 主要调整请求的超时时间，是否重试
+ribbon:
+  ConnectTimeout: 30000
+  ServerListRefreshInterval: 15000
+  MaxAutoRetriesNextServer: 0
+  ReadTimeout: 30000
+
+
+logging:
+  level:
+    com.vrv.vap: info
+    root: info
+    org.springframework.cloud.sleuth: ERROR
+    com.alibaba.nacos: ERROR
+
+
+
+info:
+  app:
+    name: "api-admin"
+    description: "用户登录、用户管理、权限管理等模块"
+    version: "2.2-SNAPSHOT"
+    spring-boot-version: "1.5.19-Release"
+liquibase:
+  enabled: false
+  change-log: classpath:sql/changelog-master.xml
+
+pki:
+  authURL: http://10.64.28.146:6180/MessageService  #认证地址
+  appId: testApp  #应用标识,根据实际情况修改，与网关中配置的应用标识一致
+  randomFrom: 1  #调用应用服务器或网关生成原文标志 1：调用应用服务器 2：调用网关,默认为1
+  accessControl: false   #是否检查访问控制状态，当设置为“true”时，网关检查用户是否允许访问此应用，并在报文中给出相应的信息，默认为false
+
+auth:
+  #0 本系统权限认证 1 ISC  2中海油 3 CEMS
+  type: 0
+  iscAddress: https://192.168.120.188:8443
+  cemsAddress: https://192.168.118.211
+  ctyAddress: http://10.0.4.45:9016
+  uiasLoginAddress: http://192.168.119.213:8080
+  uiasLogoutAddress: http://192.168.119.213:9090
+
+iscconfig:
+  home: https://${LOCAL_SERVER_IP:192.168.119.217}/
+  login: ${auth.cemsAddress:https://192.168.118.211}/CEMS/welcomeAction_welcomeForIscCems.do?request_locale=zh_CN
+  cems: ${auth.cemsAddress:https://192.168.118.211}/CEMS/cascade/cascadeTerminalAwarenessAction_authenticationTicket.do?token=
+  url: ${auth.iscAddress:https://192.168.120.188:8443}/isc_frontmv_serv/
+  appid: ff8080816cd7d5ed016cd7e2638a0004
+  authorization: isc_manage
+  resourceId: ff8080816cd7d5ed016cdb4d2af301d8
+  managePaths: /alarmdeal/,/search/main/,/terminal/, /admin/
+
+project:
+  version: xc
+  logPath: ${VAP_WORK_DIR:/opt/test}/cloud/logs/
+
+vap:
+  common:
+    session-base64: false
+  guowang:
+     cmesAuthenticationToken: ${auth.cemsAddress:https://192.168.118.211}/CEMS/cascade/cascadeTerminalAwarenessAction_authenticationGwTicket?token=
+     vapGwDefaultScreen: https://${LOCAL_SERVER_IP:192.168.120.234}/bigScreen/
+     vapGwDefaultAudit: https://${LOCAL_SERVER_IP:192.168.118.207}/terminal/#/audit
+     cemsLoginPage: ${auth.cemsAddress:https://192.168.118.211}/CEMS
+     cemsHomePage: ${auth.cemsAddress:https://192.168.118.211}/
+     defaultUser: admin
+     vapToCmesAuthentication: ${auth.cemsAddress:https://192.168.118.211}/CEMS/cascade/cascadeTokenLoginAction_login.do?account=secrecy&pwd=f0aa3a980f66c53777f7888968bba378
+     vapToCmesAuthenticationToken: ${auth.cemsAddress:https://192.168.118.211}/CEMS/cascade/cascadeTokenLoginAction_authenticationToken.do?token=
+  cems:
+     syncDataUrl: ${auth.cemsAddress:https://192.168.118.211}/CEMS-SERVICE-SOC/comm/generalDataMethod
+     authTokenUrl: ${auth.cemsAddress:https://192.168.118.211}/CEMS-SERVICE-SOC/auth/token
+     uname: admin
+     pcode: vrv@123456
+     checkTokenUrl: ${auth.cemsAddress:https://192.168.118.211}/CEMS/checkToken
+     home: https://${LOCAL_SERVER_IP:192.168.119.209}
+  cty:
+    ctyToVap: https://${LOCAL_SERVER_IP:192.168.169.2}/admin/#/workbench
+    token: 8c9c7199200e0655f793a8c523a11d2a
+    userUrl: ${auth.ctyAddress:http://10.0.4.45:9016}/v1/api/admin/users
+    organizationUrl: ${auth.ctyAddress:http://10.0.4.45:9016}/v1/api/admin/organizations
+    userUrl_zh: ${auth.ctyAddress:http://10.0.4.45:9016}/v1/api/admin/sys_users
+    pmUrl: ${auth.ctyAddress:http://10.0.4.45:9016}/v1/api/admin/pm
+    vmUrl: ${auth.ctyAddress:http://10.0.4.45:9016}/v1/api/admin/vm
+    tmUrl: ${auth.ctyAddress:http://10.0.4.45:9016}/v1/api/admin/apps
+    monitor_url: ${auth.ctyAddress:http://10.0.4.45:9016}/v1/api/admin/app_monitor_urls
+    tenant_roleCode: 200
+    monitor_roleCode: monitorCode
+  xinjiang:
+    thirdPlatformLogin: ${auth.uiasLoginAddress:http://192.168.119.213:8080}/uias/uias/isAgainAuth4Client.do
+    thirdPlatformLogOut: ${auth.uiasLogoutAddress:http://192.168.119.213:9090}/uias/uias/shotOff
+    codeToToken: ${auth.uiasLoginAddress:http://192.168.119.213:8080}/uias/oauth/token
+    tokenToUser: ${auth.uiasLoginAddress:http://192.168.119.213:8080}/uias/unity/user_info
+    client_id: Oauth1123
+    client_secret: Oauth1123
+    pkiLogin_enable: true
+  register:
+    name: vrv
+    manufacturer: vrv
+    device_type: vap
+    service_type: vap
+    username: admin
+    security_key: vrv@123
+    token_url: https://${LOCAL_SERVER_IP:192.168.119.213}/api-common/user/getLoginToken
+    login_url: https://${LOCAL_SERVER_IP:192.168.119.213}/api-common/user/tokenLogin
+    online_url: https://${LOCAL_SERVER_IP:192.168.119.213}/api-common/system/config/safety
+    register_url: https://ip/public_sec/registry_services
+    client_id: Oauth1123
+    client_secret: Oauth1123
+  xc:
+    protocol: wss
+    wsUri: 192.168.119.213:2355
+    appName: 北信源安全审计管理平台
+    appId: vrv
+    action: getTokenByAppInfo
+    validateTokenUrl: https://192.168.119.213/
+  flume:
+    enable: true
+    channel-type: memory
+    capacity: 200000
+    sink-type: database
+    databases:
+      - url: ${DATABASE_URL:jdbc:mysql://192.168.120.201:3306/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8}
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:mysql}
+      - url: ${DATABASE_URL:jdbc:mysql://192.168.120.201:3306/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8}
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:mysql}
+    driver: ${DATABASE_DRIVER:com.mysql.jdbc.Driver}
+    insert-sql: insert into sys_log (id, request_ip,type, user_id, user_name, organization_name, description, request_url, request_time, request_method, method_name, bean_name, params_value, response_result, login_type, role_name,request_page_uri,request_page_title) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+  zjg:
+    data-batch:
+      batch-time: 60000 #最长处理时间(毫秒)
+      batch-capability: 10000 #最大处理条数
+      file-folder: /vrv/netflow #数据落地目录
+      sub-folder-size: 100
+      file-suffix: txt #写入完成文件后缀
+      tmp-file-suffix: temp #写入是临时文件后缀
+      log-type-dic: 1,DT012;2,DT013;3,DT014;4,DT015;5,DT016;6,DT017;7,DT018;9,DT019;10,DT020;11,DT021;
+      dev-type-dic: 终端,0;服务器,1;安全保密产品,2;应用,3;网络设备,4;通用办公设备,5
+      level-type-dic: 绝密,0;机密,1;秘密,2;内部,3;公开,4
+    monitor:
+      reportInterval: 5 #监测器上报时间间隔（分钟）
+    backup:
+      filePath: /opt/file/backup
+    syncBaseData:
+      org:
+        root: 1
+      kit:
+        key: 3KW7H85U93N0EY60
+        reqID: 1
+  swagger:
+    enabled: true
+    title: api-admin接口文档
+    description: api-admin接口文档
+    base-package: com.vrv.vap.admin
+    version: 2.5.4
+
+database:
+  dbType: ${DB_TYPE:mysql}
+
+webinfo:
+  jnaPath: /opt/SFGL/VRV/lib/jna/x86_64
+  libPath: /opt/XGSY/lib
+  systemName: 北信源安全审计基础平台
+  secmark: 秘密
+  serverGLnet:
+    ip: 10.20.0.95
+    mac:
+  serverBMnet:
+    ip: 10.20.0.95
+    mac:
+  serverYWnet:
+  systype: 2
+  serviceport: 3306,6000,6001,6002,6003,6004,6005,6006,6007,7000,8009,8080,8443
+  appSingleLoginPath: http://10.30.0.95:8888/core
+
+vap.pushUrl: https://${LOCAL_SERVER_IP:192.168.119.213}:8780/push/user
+
+
+elk:
+  cluster:
+    name: ${ES_CLUSTER_NAME:elasticsearch-cluster}
+  ip: ${ES_CLUSTER_HOST:192.168.119.213}
+  xpack:
+    security:
+      user: ${ES_CLUSTER_UNAME:admin}
+      ppp: ${ES_CLUSTER_PWD:vrv@12345}
+  port: ${ES_CLUSTER_PORT_REST:9200}
+  vap:
+    index: .vap
+    indexPattern: index-pattern
+    searchType: search
+    config: config
+    dic: dic
+    entity: entity
+    edge: edge
+    visual: visualization
+    version: vap3.0
+  total: 10000
+  max: 10000
+  segmentDay: 7
+  zipPwd: 123qwe
+index:
+  format: "[*NAME*]-[*TIME*]"
+  timeformat: "yyyy.MM.dd"
+  monthformat: "yyyy.MM"
+  startTime: 2010/01/01
+  indices:
+    - not-catch-events
+    - print-audit
+    - process-audit
+    - file-audit
+    - net-virus
+    - sem-log
+    - mb-log
+    - terminal-login
+    - software-audit
+    - omms-log
+    - netflow-app-file
+    - netflow-db
+    - netflow-dns
+    - netflow-email
+    - netflow-file
+    - netflow-http
+    - netflow-login
+    - netflow-ssl
+    - netflow-tcp
+    - netflow-udp
+
+  ref:
+    name: copy:\u590d\u5236\u7c98\u8d34,moveablestorage:\u79fb\u52a8\u5b58\u50a8,net:\u4e0a\u7f51,netflow:\u7f51\u7edc\u4f1a\u8bdd,pki:PKI,pro:\u8fdb\u7a0b,screenshots:\u622a\u5c4f,startshutdown:\u5f00\u5173\u673a,wangkang:\u7f51\u5eb7,yysj-julongv2.1:\u5de8\u9f99,pic:\u7ec8\u7aef\u622a\u5c4f,third:\u7b2c\u4e09\u65b9\u5e94\u7528,ruixing:\u745e\u661f,dongxu-trojan:\u4e1c\u5dfd\u75c5\u6bd2,dongxu-file:\u4e1c\u5dfd\u6587\u4ef6,dongxu-web:\u4e1c\u5dfdweb
+des:
+  key: 123456
+upload: upload
+system:
+  download:
+    path: /vrv/downloadFiles
+
+auto-alias:
+  default-time-field: event_time
+  default-time-format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+  #只创建当月
+  current-month: false
+  indices:
+    - not-catch-events
+    - netflow-app-file,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - netflow-db,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - netflow-dns
+    - netflow-email,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - netflow-file,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - netflow-http
+    - netflow-login,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - netflow-ssl
+    - netflow-tcp
+    - netflow-udp
+    - netflow-other-prot,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - netflow-control-command,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - summary-admin-file-copy-audit,data_time,yyyy-MM-dd,year
+    - summary-person-business-audit,data_time,yyyy-MM-dd,year
+    - summary-print-file-fre-audit,data_time,yyyy-MM-dd,year
+    - summary-print-file-type-audit,data_time,yyyy-MM-dd,year
+    - summary-print-file-size-audit,data_time,yyyy-MM-dd,year
+    - summary-app-protocol-audit,data_time,yyyy-MM-dd,year
+    - summary-file-in-relative-audit,data_time,yyyy-MM-dd,year
+    - summary-admin-file-burn-audit,data_time,yyyy-MM-dd,year
+    - summary-app-port-audit,data_time,yyyy-MM-dd,year
+    - summary-ip-pair-audit,data_time,yyyy-MM-dd,year
+    - summary-file-download-audit,data_time,yyyy-MM-dd,year
+    - summary-print-audit,data_time,yyyy-MM-dd,year
+    - summary-print-un-ip-audit,data_time,yyyy-MM-dd,year
+    - summary-admin-port-audit,data_time,yyyy-MM-dd,year
+    - summary-app-ua-visit,data_time,yyyy-MM-dd,year
+    - summary-print-file-brand-audit,data_time,yyyy-MM-dd,year
+    - summary-port-relative-audit,data_time,yyyy-MM-dd,year
+    - summary-protocol-relative-audit,data_time,yyyy-MM-dd,year
+    - summary-app-business-audit,data_time,yyyy-MM-dd,year
+    - summary-admin-protocol-audit,data_time,yyyy-MM-dd,year
+    - base-line-print-file-type,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-dev-ip,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-app-business,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-admin-file-burn,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-print-file-brand,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-admin-port,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-admin-protocol,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-app-protocol,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-print-file-size,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-user-business,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-app-ua-visit,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-ip-protocol-relative,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-ip-pair,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-admin-file-copy,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-app-port,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-file-in-out-business,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-ip-port-relative,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-print-burn,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-print-file-fre,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - base-line-user-file-download,insert_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - operation-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - rayscan-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - terminal-login,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - adm-operate,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - specialUdisk-use,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - changestrategy-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - print-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - file-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - mb-log,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - process-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - service-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - software-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - share-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - hardware-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - client-offline,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - omms-log,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - device-startorshut,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - net-virus,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - sem-log,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - violationoutreach-log,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - sa-log,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - weblogin-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - client-logininout,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - alarm-item-collection,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - specialudisk-use,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+    - attack-audit,event_time,yyyy-MM-dd'T'HH:mm:ss.SSS'Z',year
+
+display:
+  order: list,chart,export   #搜索结果操作按钮顺序，list：列表，table：表格，chart：图形，export：导出
+  frozen:
+    enabled: true
+    columns: 3
+  days: 7
+
+summarise:
+  total: 50
+  refresh: 300000  #页面刷新间隔
+
+dir:
+  base: /home/vapfile
+  upload: /upload
+  tmp: /tmp
+#屏幕抓取导出相关配置
+screen-capturer:
+  url: http://${LOCAL_SERVER_IP:192.168.119.213}:8080
+  file-path: F:\\test
+  code-convert: "{enterprise_project: 18,enterprise_person: 19}"
+  report-type: java
+
+pushUrl: https://${LOCAL_SERVER_IP:192.168.119.213}:8780/push/user
+
+kafka.jmx.url: service:jmx:rmi:///jndi/rmi://${LOCAL_SERVER_IP:192.168.119.213}:29999/jmxrmi
+
+
+linkShare:
+  username: linkshare
+  password: linkshare
+
+
+#mybatis
+mybatis:
+  mapper-locations: classpath*:mappers/*.xml
+#mappers 多个接口时逗号隔开
+mapper:
+  mappers: com.vrv.vap.base.BaseMapper
+# sa-token配置
+sa-token: 
+    # token名称 (同时也是cookie名称)
+    token-name: satoken-server
+    # OAuth2.0 配置 
+    oauth2: 
+        is-code: true
+        is-implicit: true
+        is-password: true
+        is-client: true
+
+security:
+  basic:
+    enabled: false
+#打开所有 Actuator 服务
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+    jmx:
+      exposure:
+        include: '*'
+  # include: health,inf
+  endpoint:
+    health:
+      show-details: always
+  # 名称定义
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  security:
+    enabled: false
+
+#debug: true

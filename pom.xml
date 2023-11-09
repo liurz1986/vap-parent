@@ -1,0 +1,667 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>2.3.8.RELEASE</version>
+    </parent>
+    <groupId>com.vrv.vap</groupId>
+    <artifactId>vap-parent</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+    <name>vap-parent</name>
+    <properties>
+        <revision>4.22.0-SNAPSHOT</revision>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <!--  spring  -->
+        <spring-boot.version>2.3.8.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
+        <alibaba-cloud.version>2.2.5.RELEASE</alibaba-cloud.version>
+        <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
+        <!--  prometheus监控  -->
+        <registry-prometheus.version>1.6.6</registry-prometheus.version>
+        <!--  redis 分布式锁  -->
+        <redisson-starter.version>3.16.6</redisson-starter.version>
+        <!--  mybatis  -->
+        <mapper-spring-boot.version>2.1.5</mapper-spring-boot.version>
+        <!-- 更新 -->
+        <pagehelper-spring-boot.version>1.3.0</pagehelper-spring-boot.version>
+        <!-- 更新 -->
+        <dynamic-ds.version>3.5.0</dynamic-ds.version>
+        <mybatis.version>3.5.7</mybatis.version>
+        <mapper.version>4.1.5</mapper.version>
+        <!--  升级druid漏洞  -->
+        <druid.version>1.2.8</druid.version>
+        <mysql-connector-java.version>8.0.29</mysql-connector-java.version>
+        <easyexcel.version>2.1.4</easyexcel.version>
+        <!--  修复log4j2漏洞  -->
+        <log4j2.version>2.18.0</log4j2.version>
+        <log4j-api.version>2.18.0</log4j-api.version>
+        <log4j-core.version>2.18.0</log4j-core.version>
+        <log4j-to-slf4j.version>2.18.0</log4j-to-slf4j.version>
+        <!--  swagger ui  -->
+        <springfox-swagger2.version>2.9.2</springfox-swagger2.version>
+        <swagger-ui.version>1.9.6</swagger-ui.version>
+        <swagger-models.version>1.5.22</swagger-models.version>
+        <commons.io.version>2.5</commons.io.version>
+        <commons-fileupload.version>1.3.3</commons-fileupload.version>
+        <velocity.version>1.7</velocity.version>
+        <xxljob-core.version>2.3.0</xxljob-core.version>
+        <commons-codec.version>1.9</commons-codec.version>
+        <gson.version>2.8.2</gson.version>
+        <hutool.version>4.1.19</hutool.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <fastjson2.version>2.0.13</fastjson2.version>
+        <jackson-databind.version>2.13.3</jackson-databind.version>
+        <reflections.verison>0.9.12</reflections.verison>
+        <knife4j.version>2.0.5</knife4j.version>
+        <hibernate-validator.version>6.2.0.Final</hibernate-validator.version>
+        <!-- 6.2.0.Final 变更到 8.0.0.Final， 变更后需要jdk11的版本 -->
+        <!-- 6.2.0.Final 变更到 6.2.5.Final， jdk11版本不变更 -->
+        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
+        <validation-api.version>2.0.1.Final</validation-api.version>
+        <jakarta.validation-api.vesion>3.0.2</jakarta.validation-api.vesion>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+
+        <jedis.version>3.5.2</jedis.version>
+        <common-pool.version>2.6.2</common-pool.version>
+        <jsoup.version>1.13.1</jsoup.version>
+        <guava.version>26.0-jre</guava.version>
+        <lombok.version>1.18.4</lombok.version>
+        <jna-platform.version>5.5.0</jna-platform.version>
+        <jna.version>5.5.0</jna.version>
+        <jasypt.version>3.0.4</jasypt.version>
+        <xtool.version>1.0.0</xtool.version>
+        <security-oauth2.version>2.3.8.RELEASE</security-oauth2.version>
+        <security-jwt.version>1.1.0.RELEASE</security-jwt.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <spring-data-redis.version>1.8.10.RELEASE</spring-data-redis.version>
+        <poi.version>5.0.0</poi.version>
+        <poi-ooxml.version>5.0.0</poi-ooxml.version>
+        <logstash-logback-encoder.verion>5.0</logstash-logback-encoder.verion>
+        <!--  vap服务依赖  -->
+      <!--  <vap-service.version>3.2.0-SNAPSHOT</vap-service.version>
+        <vap-utils.version>3.2.0-SNAPSHOT</vap-utils.version>
+        <vap-syslog.version>3.2.0-SNAPSHOT</vap-syslog.version>
+        <vap-swagger2.version>3.2.0-SNAPSHOT</vap-swagger2.version>
+        <vap-redis.version>3.2.0-SNAPSHOT</vap-redis.version>
+        <vap-prometheus.version>3.2.0-SNAPSHOT</vap-prometheus.version>
+        <vap-db.version>3.2.0-SNAPSHOT</vap-db.version>
+        <vap-oauth-client.version>3.1.0-SNAPSHOT</vap-oauth-client.version>-->
+        <flumeavrostarter.version>1.4.1</flumeavrostarter.version>
+        <vap-jpa.version>3.1</vap-jpa.version>
+        <vap-es.version>3.0</vap-es.version>
+        <vap-export.version>3.2</vap-export.version>
+        <easyjdbc-spring-boot.version>2.0.2</easyjdbc-spring-boot.version>
+        <dynamic-datasource-spring-boot.version>1.0.1</dynamic-datasource-spring-boot.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <modules>
+        <module>vap-common</module>
+        <module>vap-service</module>
+        <module>vap-starter</module>
+        <module>vap-syslog</module>
+        <module>vap-utils</module>
+        <module>api-data</module>
+        <module>api-admin</module>
+        <module>api-alarmdeal</module>
+        <module>api-rule</module>
+        <module>api-netflow</module>
+        <module>api-audit</module>
+        <module>server-zuul</module>
+        <module>server-push</module>
+        <module>vap-monitor</module>
+    </modules>
+
+    <!--  依赖声明  -->
+    <dependencyManagement>
+        <dependencies>
+            <!--  SpringBoot的依赖配置, 可以定义和覆盖父类中的版本号，
+                                例如： redis的版本号父类是1.0， 在此进行定义redis的版本号是2.0，
+                                那么本地就会比父类的版本号低，使用自定义版本号
+                          -->
+            <!--  https://docs.spring.io/spring-boot/docs/2.4.5/maven-plugin/reference/htmlsingle/  -->
+            <!--             <dependency> -->
+            <!--                 <groupId>org.springframework.boot</groupId> -->
+            <!--                 <artifactId>spring-boot-dependencies</artifactId> -->
+            <!--                 <version>${spring-boot.version}</version> -->
+            <!--                 <type>pom</type> -->
+            <!--                 <scope>import</scope> -->
+            <!--             </dependency> -->
+            <!-- cloud  -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- alibaba cloud  -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${alibaba-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--  admin监控  -->
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-dependencies</artifactId>
+                <version>${spring-boot-admin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
+            <!--  prometheus监控  -->
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-registry-prometheus</artifactId>
+                <version>${registry-prometheus.version}</version>
+            </dependency>
+            <!--  在Redis基础上的一个Java实用工具包  -->
+            <!-- <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson-starter.version}</version>
+            </dependency>-->
+            <!--  spring session  -->
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-bom</artifactId>
+                <version>2020.0.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--  log4j 漏洞 https://cert.360.cn/warning/detail?id=d5dd5bbdfbb3d58c3a633e4e105e22bb  -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-to-slf4j</artifactId>
+                <version>${log4j-to-slf4j.version}</version>
+            </dependency>
+            <!--  swagger ui  -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${springfox-swagger2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.swagger</groupId>
+                        <artifactId>swagger-models</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>swagger-annotations</artifactId>
+                        <groupId>io.swagger</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>swagger-bootstrap-ui</artifactId>
+                <version>${swagger-ui.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-models.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-micro-spring-boot-starter -->
+            <!--            <dependency>-->
+            <!--                <groupId>com.github.xiaoymin</groupId>-->
+            <!--                <artifactId>knife4j-micro-spring-boot-starter</artifactId>-->
+            <!--                <version>${knife4j.version}</version>-->
+            <!--            </dependency>-->
+
+            <!--  Dynamic DataSource  -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <version>${dynamic-ds.version}</version>
+            </dependency>
+            <!--  读写分离及分库分表开始 ， 需要vap-service排除druid-spring-boot-starter 如下：
+                        <dependency>
+                            <groupId>com.vrv.vap</groupId>
+                            <artifactId>vap-service</artifactId>
+                            <exclusions>
+                                <exclusion>
+                                    <artifactId>druid-spring-boot-starter</artifactId>
+                                    <groupId>com.alibaba</groupId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                         -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <!--  Mysql驱动包  -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector-java.version}</version>
+            </dependency>
+
+            <!--  读写分离及分库分表结束 -->
+            <!--  excel的导入与导出 同时加入如下依赖 , easyexcel原有的jar依赖版本过低( 有冲突 ，所以排除)，需要升级，所以先使用这个试试 -->
+            <!--
+                            <dependency>
+                                <groupId>org.apache.poi</groupId>
+                                <artifactId>poi-ooxml</artifactId>
+                            </dependency>
+
+                            <dependency>
+                                <groupId>org.apache.poi</groupId>
+                                <artifactId>poi</artifactId>
+                            </dependency>
+                          -->
+            <!--            <dependency>-->
+            <!--                <groupId>com.alibaba</groupId>-->
+            <!--                <artifactId>easyexcel</artifactId>-->
+            <!--                <version>${easyexcel.version}</version>-->
+            <!--                <exclusions>-->
+            <!--                    <exclusion>-->
+            <!--                        <groupId>javax.servlet</groupId>-->
+            <!--                        <artifactId>servlet-api</artifactId>-->
+            <!--                    </exclusion>-->
+            <!--                    <exclusion>-->
+            <!--                        <groupId>org.apache.poi</groupId>-->
+            <!--                        <artifactId>poi</artifactId>-->
+            <!--                    </exclusion>-->
+            <!--                    <exclusion>-->
+            <!--                        <groupId>org.apache.poi</groupId>-->
+            <!--                        <artifactId>poi-ooxml</artifactId>-->
+            <!--                    </exclusion>-->
+            <!--                    <exclusion>-->
+            <!--                        <groupId>org.apache.poi</groupId>-->
+            <!--                        <artifactId>poi-ooxml-schemas</artifactId>-->
+            <!--                    </exclusion>-->
+            <!--                </exclusions>-->
+            <!--            </dependency>-->
+            <!--  mybatis的插件，通用Mapper启动器  -->
+            <dependency>
+                <groupId>tk.mybatis</groupId>
+                <artifactId>mapper-spring-boot-starter</artifactId>
+                <version>${mapper-spring-boot.version}</version>
+            </dependency>
+            <!-- mybatis的插件,分页启动器  -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper-spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tk.mybatis</groupId>
+                <artifactId>mapper</artifactId>
+                <version>${mapper.version}</version>
+            </dependency>
+            <!-- 常用工具类  -->
+            <!--  摘要运算、编码解码的包  -->
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxljob-core.version}</version>
+            </dependency>
+            <!-- io常用工具类  -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <!-- 阿里数据库连接池  -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <!--  JSON 解析器和生成器  -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2 -->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+
+            <!--  公共资源池  -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${common-pool.version}</version>
+            </dependency>
+            <!--            <dependency>-->
+            <!--                <groupId>org.jsoup</groupId>-->
+            <!--                <artifactId>jsoup</artifactId>-->
+            <!--                <version>${jsoup.version}</version>-->
+            <!--            </dependency>-->
+            <!--  JSON工具类  -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-databind.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson-databind.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson-databind.version}</version>
+            </dependency>
+            <!--  类反射  -->
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.verison}</version>
+            </dependency>
+            <!--  工具类  -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+            <!--  文件上传工具类  -->
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons-fileupload.version}</version>
+            </dependency>
+            <!--  代码生成使用模板  -->
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity</artifactId>
+                <version>${velocity.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-collections</groupId>
+                        <artifactId>commons-collections</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--  自定义校验注解  -->
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate-validator.version}</version>
+            </dependency>
+            <!--  excel工具  -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi-ooxml.version}</version>
+            </dependency>
+            <!--  请求返回体及查询, 统一封装   -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>vap-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+
+            <!--  统一日志收集， logstash格式化  -->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback-encoder.verion}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>jackson-databind</artifactId>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--  springboot框架自身携带的版本  -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-logging</artifactId>
+                <version>${spring-boot.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-to-slf4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--  mybatis 统一封装  -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>vap-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!--  vap服务依赖包  -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>vap-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>vap-swagger2-spring-boot-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>vap-redis-spring-boot-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>vap-prometheus-spring-boot-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>monitoring-agent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>monitoring-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>monitoring-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.vrv.vap.flumeavrostarter</groupId>
+                <artifactId>flume-avro-starter</artifactId>
+                <version>${flumeavrostarter.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.thrift</groupId>
+                        <artifactId>libthrift</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.zookeeper</groupId>
+                        <artifactId>zookeeper</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-databind</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>jetty</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>jetty-util</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.velocity</groupId>
+                        <artifactId>velocity</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.vrv.vap</groupId>
+                <artifactId>vap-syslog</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna-platform</artifactId>
+                <version>${jna-platform.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId>
+                <version>${jasypt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.xphsc</groupId>
+                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <version>${dynamic-datasource-spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vrv.vap</groupId>
+                <artifactId>vap-es</artifactId>
+                <version>${vap-es.version}</version>
+            </dependency>
+            <!--            <dependency>-->
+            <!--                <groupId>com.vrv.vap</groupId>-->
+            <!--                <artifactId>vap-export</artifactId>-->
+            <!--                <version>${vap-export.version}</version>-->
+            <!--            </dependency>-->
+            <dependency>
+                <groupId>com.vrv.vap</groupId>
+                <artifactId>vap-jpa</artifactId>
+                <version>${vap-jpa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.xphsc</groupId>
+                <artifactId>xtool</artifactId>
+                <version>${xtool.version}</version>
+            </dependency>
+            <!--  加入spring security spring security oauth2的处理  -->
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${security-oauth2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-jwt</artifactId>
+                <version>${security-jwt.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>http://192.168.119.24:18081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://192.168.119.24:18081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>

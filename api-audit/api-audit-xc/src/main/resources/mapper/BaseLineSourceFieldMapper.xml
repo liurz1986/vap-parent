@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.BaseLineSourceFieldMapper">
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO base_line_source_field
+        (id,source_id,field,`name`,`type`,format,alias)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.sourceId},
+            #{item.field},
+            #{item.name},
+            #{item.type},
+            #{item.format},
+            #{item.alias}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BaseReportInterfaceMapper">
+
+
+    <insert id="batchReplaceInto" parameterType="java.util.List">
+        REPLACE INTO base_report_interface
+        (id,`name`,`url`,`type`,result_info,field_info,params,md5,`time`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.name},
+            #{item.url},
+            #{item.type},
+            #{item.resultInfo},
+            #{item.fieldInfo},
+            #{item.params},
+            #{item.md5},
+            #{item.time}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

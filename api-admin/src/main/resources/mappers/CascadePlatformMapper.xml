@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.CascadePlatformMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.CascadePlatform">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="platform_name" jdbcType="VARCHAR" property="platformName" />
+    <result column="platform_id" jdbcType="VARCHAR" property="platformId" />
+    <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="port" jdbcType="INTEGER" property="port" />
+    <result column="token" jdbcType="VARCHAR" property="token" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="local" jdbcType="INTEGER" property="local" />
+    <result column="security_classification" jdbcType="VARCHAR" property="securityClassification" />
+  </resultMap>
+</mapper>

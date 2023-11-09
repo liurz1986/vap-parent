@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.core.RptUserLoginHisMapper">
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO rpt_user_login_his
+        (key_id,dev_ip,login_hour,login_count,data_time,insert_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.keyId}, #{item.devIp}, #{item.eventTime}, #{item.count}, DATE_FORMAT(date_sub(NOW(),interval 1 day),'%Y-%m-%d'), CURRENT_TIMESTAMP)
+        </foreach>
+    </insert>
+
+    <select id="countAll" resultType="com.vrv.vap.xc.pojo.RptUserLogin">
+        select key_id keyId,dev_ip devIp,login_hour,sum(login_count) login_count from (
+            SELECT key_id,dev_ip,login_hour,login_count FROM rpt_user_login_his where data_time = DATE_FORMAT(date_sub(NOW(),interval 1 day),'%Y-%m-%d')
+            union all
+            SELECT key_id,dev_ip,login_hour,login_count FROM rpt_user_login
+        ) a group by key_id,dev_ip,login_hour
+    </select>
+
+</mapper>

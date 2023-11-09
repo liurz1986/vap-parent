@@ -1,0 +1,11 @@
+server:
+  session:
+    cookie:
+      max-age: 18000
+  port: 443
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: 123456
+    keyStoreType: PKCS12
+    keyAlias: tomcat

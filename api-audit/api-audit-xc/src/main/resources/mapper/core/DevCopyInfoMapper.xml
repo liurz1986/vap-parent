@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.core.DevCopyInfoMapper">
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO rpt_dev_copy_info
+        (user_key,dst_ip,`count`,data_time,`time`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userKey},
+            #{item.dstIp},
+            #{item.count},
+            DATE_FORMAT(date_sub(NOW(),interval 1 day),'%Y-%m-%d'),
+            CURRENT_TIMESTAMP)
+        </foreach>
+    </insert>
+</mapper>

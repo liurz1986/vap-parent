@@ -1,0 +1,299 @@
+server:
+  port: 9420
+  connection-timeout: 10000 # 连接超时
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 1000
+    max-connections: 2000
+    accept-count: 1000
+    min-spare-threads: 300
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    port-header: X-Forwarded-Port
+spring:
+  datasource:
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:mysql}
+    url: jdbc:mysql://${MYSQL_HOST:192.168.120.106}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        enable_lazy_load_on_trans : true
+  main:
+    show-banner: false
+  data:
+    elasticsearch:
+      cluster-name: ${ES_CLUSTER_NAME:elasticsearch-cluster}
+      cluster-client-nodes: ${ES_CLUSTER_HOST:192.168.120.106}:${ES_CLUSTER_PORT:9200}
+      http:
+        username: ${ES_CLUSTER_UNAME:admin}
+        password: ${ES_CLUSTER_PWD:vrv@12345}
+        maxConnectNum: 100
+        maxConnectPerRoute: 100
+  session:
+    store-type: redis
+  redis:
+    database: 0
+    host: ${REDIS_HOST:192.168.120.106}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:vrv@1234}
+    pool:
+      max-active: -1 # 连接池最大连接数（使用负值表示没有限制）
+      max-wait: 10000 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      max-idle:  50 # 连接池中的最大空闲连接
+      min-idle: 0 # 连接池中的最小空闲连接
+    timeout: 10000  # 连接超时时间（毫秒）
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:192.168.120.106}:9092
+    consumer:
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="${KAFKA_PWD:admin-2019}";
+      enable-auto-commit: false
+      group-id: alarmdeal-consumer-group-1
+      auto-commit-interval: 100
+      auto-offset-reset: latest
+      max-poll-records: 1000
+      fetch-max-wait: 400 #最大等待时间
+      fetch-min-size: 1 #最小消费字节数
+    producer:
+      enable-auto-commit: false # 是否自动提交offset
+      retries: 0 # 重试次数
+      acks: all # 应答级别:多少个分区副本备份完成时向生产者发送ack确认(可选0、1、all/-1)
+      batch-size: 16384 # 批量大小
+      buffer-memory: 33554432 # 生产端缓冲区大小
+      properties:
+        sasl.mechanism: PLAIN
+        security.protocol: SASL_PLAINTEXT
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="${KAFKA_PWD:admin-2019}";
+    listener:
+      concurrency: 3
+  servlet:
+    multipart:
+        enabled: true
+        max-file-size: 500MB
+        max-request-size: 500MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  #activiti不读取resource下processes文件
+  activiti:
+    check-process-definitions: false
+dataflag: es
+version: chutian
+file:
+   filePath: /usr/local/vap/cloud
+   superviseFilePath: /opt/file/superviseTask #预警、协办二进制反转为文件后存放在服务器端的目录
+   transform:
+     charSet: utf-8
+   fileName: rule.xml
+   threatLibraryName: 威胁库管理.xlsx
+   threatInfoName: 威胁管理.xlsx
+   cvsFilePath: ${vap_work_dir:/opt/test}/flume/file/default/
+   cvsFileName: baseinfo_dev.csv
+   cvsFileServerName: baseinfo_server.csv
+   filePathFlow: /usr/local/vap/cloud
+   fileNameFlow: flow.txt
+   zipNameFlow: flow.zip
+   tempModelPath: /usr/local/vap/cloud/modelmanage/temp
+   runModelPath: /usr/local/vap/cloud/modelmanage/run
+   assetOnLinePath: /usr/local/vap/cloud/online
+   asset: /usr/local/vap/cloud/asset
+ribbon:
+  okhttp:
+    enabled: true
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
+springfox:
+  name: 北信源武汉分公司
+  title: 告警等模块
+  description: admin相关接口文档
+liquibase:
+  enabled: true
+  change-log: classpath:sql/changelog-master.xml    
+flink:    
+  flink_home_path: /opt/test/flink/
+  flink_jar_path: /opt/test/cloud/api-rule.jar
+  remote_flag: false
+  remote_ip: 192.168.120.106
+  remote_user: root
+  slots: 100
+  solt_allot: 20
+
+
+es:
+  shardCount: 5
+  repliceCount: 0
+
+
+jasypt:
+  encryptor:
+    password: salt
+
+vap:
+  flume:
+    enable: true
+    channel-type: memory 
+    capacity: 200000   
+    sink-type: database
+    databases:
+      - url: jdbc:mysql://${MYSQL_HOST:192.168.120.106}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:mysql}
+      - url: jdbc:mysql://${MYSQL_HOST:192.168.120.106}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:mysql}
+    driver: ${DATABASE_DRIVER:com.mysql.jdbc.Driver}
+    insert-sql: insert into sys_log (id, request_ip,type, user_id, user_name, organization_name, description, request_url, request_time, request_method, method_name, bean_name, params_value, response_result, login_type, role_name,request_page_uri,request_page_title) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+  swagger:
+    enabled: true
+    title: api-alarmdeal接口文档
+    description: api-接口文档
+    base-package: com.vrv.vap.alarmdeal
+    version: 2.5.4
+
+
+security:
+ basic:
+  enabled: false
+
+asset_file_path: /opt/test/flume/file/00/assets.yml
+#打开所有 Actuator 服务
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+    jmx:
+      exposure:
+        include: '*'
+  # include: health,inf
+  endpoint:
+    health:
+      show-details: always
+  # 名称定义
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  security:
+cliperType: "AES"
+
+# 自动配置
+debug: true
+
+feign:
+  okhttp:
+    enabled: true
+  client:
+    config:
+      default:                          # 服务名，填写 default 为所有服务，或者指定某服务，例如：annoroad-beta
+        connectTimeout: 10000           # 连接超时，10秒
+        readTimeout: 20000              # 读取超时，20秒
+  httpclient:
+    enabled: false
+    max-connections: 1000               # 连接池连接最大闲置数，缺省值是 200
+    connection-timeout: 3000            # 连接超时，单位为毫秒，缺省值是 3000毫秒（3秒）
+    time-to-live: 900                   # 连接最大闲置时间，单位为秒，缺省值是 900秒（15分钟）
+    max-connections-per-route: 100
+  compression:
+    request:
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+      enabled: true
+    response:
+      enabled: true
+  hystrix:
+    enabled: true
+#################ntds资产主审统计和策略执行统计配置
+ntds:
+  tryCount: 3  #接口调用失败后重新尝试次数
+  asset: ##所有终端设备同步
+    url: http://192.168.119.7/NTDS/WebServer/AssetManagement.asmx/GetDeviceAll
+    cron: 0 0 4 * * ?
+  login:
+    url: http://192.168.119.7/NTDS/VrvWebServer.asmx/Login
+    userName: web_soc
+  simpleSearch:  ###策略统计
+    url: http://192.168.119.7/NTDS/VrvWebServer.asmx/SimpleSearch
+    cron: 0 0 5 * * ?
+  getStaticsIndexNum:   ###获取已经注册的设备数量（策略补齐数据接口，不用定时，策略什么开始，它就什么执行）
+    url: http://192.168.119.7/NTDS/WebServer/SimpleQueryModuleService.asmx/GetStatisticsIndexNum
+
+delete:
+  flink:
+    process:
+      time: 0 0 3 * * ?
+
+
+
+logging:
+  level:
+    com.vrv.vap.common: error
+    com.vrv.vap: info
+    root: warn
+    org:
+      elasticsearch:
+          client:
+            RestClient: error
+      apache:
+        kafka:
+          clients:
+            consumer:
+              ConsumerConfig: error
+            producer:
+              ProducerConfig: error
+#防护等级
+protectionLevel:
+    parentType:
+       internetInfo: f5a4ae5b-3cee-a84f-7471-8f23ezjg1200  #互联信息
+       network: f5a4ae5b-3cee-a84f-7471-8f23ezjg1200  #网络信息
+#涉密等级配置
+classifiedLevel:
+  parentType:
+    asset:   f5a4ae5b-3cee-a84f-7471-8f23ezjg0400  #资产管理
+    network: f5a4ae5b-3cee-a84f-7471-8f23ezjg1100  #网络信息
+    app:     f5a4ae5b-3cee-a84f-7471-8f23ezjg1300  #应用系统信息
+    internetInfo: f5a4ae5b-3cee-a84f-7471-8f23ezjg1100 #互联信息
+    dataInfo:    f5a4ae5b-3cee-a84f-7471-8f23ezjg0500 #数据属性信息
+#pmn文件存放地址
+bpmn.filePath: /usr/local/vap/flow/bpmn
+#资产触发告警事件,多个逗号分割
+asset.alarm.config: bxy-zs
+#资产触发告警事件kafkatopic
+asset.alarm.topic: offline-data-collect-common
+#终端统计审计客户端安装情况
+asset.terminal.install.count.topic: asset_terminal_install_count
+#资产在线同步资产变更表处理方式：1.变更表数据只做新增处理，2.变更表数据做删除更新处理
+asset.online.change.setting : 1
+# 资产分析统计定时任务：五分钟执行一次
+asset.analysis.statistics.cron: 0 0/5 * * * ?
+
+dimension:
+  update:
+    time: 00 00 01 * *  ?
+  sync:
+    time: 59 59 23 * *  ?
+#应用系统存在异常入口页面登录，受访序列间隔时间min
+netflowalarm:
+  first: 20
+# 613所报表接口配置查询告警最大数据量
+alarm:
+  query:
+    maxcount: 50

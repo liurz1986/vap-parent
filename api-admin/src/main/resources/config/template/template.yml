@@ -1,0 +1,130 @@
+spring:
+  datasource:
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:mysql}
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+    loginUsername: vap
+    loginPassword: vap
+  jpa:
+      generate-ddl: false
+      show-sql: true
+      hibernate:
+        ddl-auto: update
+  session:
+    store-type: redis
+  redis:
+    host: ${REDIS_HOST:192.168.119.238}
+    port: ${REDIS_PORT:6379}
+    maxidle:  2
+    maxTotal: 10
+    maxWaitMillis : 60000
+  rabbitmq:
+    host:  ${RABBITMQ_HOST:10.3.3.226}
+    port:  ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+    queueName: sys_user_log
+    topicExchange: vap-exchange
+sso:
+  timeout: 600000
+pkiUrl: https://192.168.118.127:444/pki
+
+site:
+  version: gab
+  release: V0.03.180928A
+  message: true
+  orgRoot: "000000000000"
+  theme: default
+  title: 安全监测大数据平台
+  subTitle: SECURITY MONITORING BIG DATA PLATFORM
+  #    portalt版本 ，支持 portal1 ,portal2
+  services:
+    - { service: [api-admin,app-portal], name : 基础服务, version : V0.03.180928A }
+    - { service: [api-search,app-search], name : 全网搜索, version : V0.03.180928A }
+    - { service: [app-audit,api-audit-business,api-audit-es,api-audit-bigdata,api-audit-schedular], name : 安全审计, version : V0.03.180928A }
+    - { service: [api-asset,app-asset], name : 资产管理中心, version : V0.11.01.180703A }
+    - { service: [api-ticket,app-ticket], name : 应急与通报处置系统, version : V0.11.01.180703A }
+    - { service: [api-report,app-report], name : 综合报表, version : V0.11.01.180703A }
+    - { service: [api-safetycheck,app-safetycheck], name : 安全考核, version : V0.11.01.180703A }
+    - { service: [api-alarmdeal,app-alarmdeal], name : 告警中心, version : V0.02.01.180924B }
+    - { service: [api-weak,app-weak], name : 脆弱性态势, version : V0.07.01.180718A }
+    - { service: [api-sap,app-sap], name : 态势感知, version : V0.10.02.180926A }
+    - { service: [api-ip,app-ip], name : IP资产管理, version : V0.13.05.181023A }
+    - { service: [api-flow,app-flow], name : 通用工单, version : V0.16.02.180922A }
+    - { service: [api-admin,app-portal], name : 基础服务, version : V0.03.180928A }
+    - { service: [api-safetycheck], name : 业务安全, version : V0.03.01.180709A }
+
+
+kafka:
+ topic: ${KAFKA_TOPIC:logstash-elk}
+ bootstrap:
+  servers : ${KAFKA_HOST:192.168.118.76}:${KAFKA_POST:9092}
+  
+# 在默认情况下 spring cloud feign在进行各个子服务之间的调用时，http组件使用的是jdk的HttpURLConnection，没有使用线程池。
+# 有2种可选的线程池：HttpClient和OKHttp
+# 比较推荐OKHttp，请求封装的非常简单易用，性能也很ok。    
+feign:
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+    max-connections: 1000
+    max-connections-per-route: 100
+  compression:
+    request:
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+      enabled: true
+    response:
+      enabled: true   
+  hystrix:
+    enabled: true 
+      
+#  熔断器并发调优,修改熔断器的线程数量，注意线程数不是越多越好        
+hystrix:
+  threadpool:
+    default:
+      coreSize: 100
+      maximumSize: 2000
+      allowMaximumSizeToDivergeFromCoreSize: true
+      maxQueueSize: -1
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+# 主要调整请求的超时时间，是否重试
+ribbon:
+  ConnectTimeout: 30000
+  ServerListRefreshInterval: 15000
+  MaxAutoRetriesNextServer: 0
+  ReadTimeout: 30000
+
+info:
+  app:
+    name: "api-admin"
+    description: "用户登录、用户管理、权限管理等模块"
+    version: "2.0-SNAPSHOT"
+    spring-boot-version: "1.5.19-Release"
+liquibase:
+  enabled: true
+  change-log: classpath:sql/changelog-master.xml   
+  
+vap:
+  guowang: 
+     cmesAuthenticationToken: https://192.168.118.207/CEMS/cascade/cascadeTerminalAwarenessAction_authenticationTicket?ticket=
+     vapGwDefaultScreen: https://192.168.120.234/bigScreen/

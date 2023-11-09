@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.line.mapper.JUserLogsMapper">
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO j_user_logs
+        (
+        `user_key`,
+        `size`,
+        `query_time`,
+        `split_time`,
+        `analysis_time`,
+        `filter_time`,
+        `save_time`,
+        `type`
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.userKey},
+            #{item.size},
+            #{item.queryTime},
+            #{item.splitTime},
+            #{item.analysisTime},
+            #{item.filterTime},
+            #{item.saveTime},
+            #{item.type}
+            )
+        </foreach>
+    </insert>
+</mapper>

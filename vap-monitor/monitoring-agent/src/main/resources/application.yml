@@ -1,0 +1,36 @@
+server:
+  port: 9910
+spring:
+  application:
+    name: monitoring-agent
+#日志文件输出路径
+logging:
+  level:
+    com.vrv.vap: ERROR
+    root: ERROR
+  file:
+    name: agent.log
+    path: ${VAP_WORK_DIR:/opt/test}/monitor/logs/
+
+#自定义配置参数
+base:
+  #端访问地址
+  url: http://${LOCAL_SERVER_IP:192.168.118.20}:9419/server/cmd
+  send-file-url: http://${LOCAL_SERVER_IP:192.168.118.20}:9419/server/upload
+  #本机ip，不要用localhost或127.0.0.1
+  local-ip: ${LOCAL_SERVER_IP:192.168.118.20}
+  token:
+  #心跳间隔 毫秒
+  beat-interval: 10000
+  data-batch:
+    batch-time: 60000
+    batch-capability: 1000
+    file-folder: /data/monitor
+    file-suffix: txt
+    tmp-file-suffix: tmp
+    max-queue-size: 30000
+
+
+
+
+

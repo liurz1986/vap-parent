@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.core.BaseSecurityDomainIpSegmentMapper">
+    <select id="findIpByCodes" resultType="com.vrv.vap.xc.pojo.BaseSecurityDomainIpSegment" parameterType="java.util.List">
+        SELECT bsd.domain_name AS name, start_ip_num AS startIpNum, end_ip_num AS endIpNum
+        FROM base_security_domain_ip_segment bsdis
+                 LEFT JOIN base_security_domain bsd ON
+            bsdis.code = bsd.code
+        WHERE bsdis.code IN
+        <foreach collection="list" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>username</field>
+		<field>u_vid</field>
+		<field>u_pid</field>
+		<field>u_sn</field>
+		<field>dev_id</field>
+		<field>action_type</field>
+		<field>dev_ip</field>
+		<field>dev_class</field>
+		<field>dev_mac</field>
+		<field>op_code</field>
+		<field>op_description</field>
+		<field>event_time</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>wz</value>
+		<value>aaaa</value>
+		<value>2323</value>
+		<value>w234234z</value>
+		<value>123123</value>
+		<value>接入</value>
+		<value>139.211.222.235</value>
+		<value>0008</value>
+		<value>00:07:3e:96:13:fe</value>
+		<value>违规介质操作</value>
+		<value>无线外设接入</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>DT010</value>
+	</log>
+</data>

@@ -1,0 +1,36 @@
+server:
+  port: 9432
+
+spring:
+  http:
+    multipart:
+      enabled: true
+      max-file-size: 50Mb
+      max-request-size: 50Mb
+  cloud:
+    nacos:
+      config:
+        server-addr: ${SERVER_ADDR}
+        namespace: ${NAMESPACE}
+        file-extension: yml
+        ext-config:
+          - dataId: base-dev.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+      discovery:
+        server-addr: ${SERVER_ADDR}
+        namespace: ${NAMESPACE}
+        enabled: true
+SERVER_ADDR: ${NACOS_HOST:192.168.120.201}:${NACOS_PORT:8848}
+NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+
+logging:
+  config: classpath:logback-spring.xml
+
+debug: true
+
+jasypt:
+  encryptor:
+    password: salt
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator

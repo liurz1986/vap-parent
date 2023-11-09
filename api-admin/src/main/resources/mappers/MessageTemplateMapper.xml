@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.MessageTemplateMapper">
+
+    <sql id="queryCondition">
+        <if test="messageTemplateQuery.guid!=null and messageTemplateQuery.guid!=''">
+            and guid = #{messageTemplateQuery.guid}
+        </if>
+        <if test="messageTemplateQuery.num!=null and messageTemplateQuery.num!=''">
+            and num like CONCAT('%',#{messageTemplateQuery.num},'%')
+        </if>
+        <if test="messageTemplateQuery.name!=null and messageTemplateQuery.name!=''">
+            and name like CONCAT('%',#{messageTemplateQuery.name},'%')
+        </if>
+        <if test="messageTemplateQuery.content!=null and messageTemplateQuery.content!=''">
+            and content like CONCAT('%',#{messageTemplateQuery.content},'%')
+        </if>
+    </sql>
+
+    <select id="queryMessageTemplate"  parameterType="com.vrv.vap.admin.vo.MessageTemplateQuery" resultType="com.vrv.vap.admin.model.MessageTemplate">
+        SELECT * FROM message_template WHERE 1=1
+        <include refid="queryCondition"></include>
+        order by num desc
+        limit #{messageTemplateQuery.start_},#{messageTemplateQuery.count_}
+    </select>
+
+    <select id="queryMessageTemplateCount" resultType="Long">
+        SELECT COUNT(*)  FROM message_template WHERE 1=1
+        <include refid="queryCondition"></include>
+    </select>
+
+    <delete id="deleteMessageTemplateByGuid">
+        delete from  message_template  where guid = #{guid}
+   </delete>
+
+
+    <update id="updateMessageTemplate">
+        UPDATE message_template SET
+        <if test="messageTemplate.num!=null and messageTemplate.num!=''">
+          num = #{messageTemplate.num},
+        </if>
+        name = #{messageTemplate.name}, content = #{messageTemplate.content} WHERE guid = #{messageTemplate.guid}
+    </update>
+
+    <select id="findAll" resultType="com.vrv.vap.admin.model.MessageTemplate">
+       select * from message_template
+    </select>
+
+    <insert id="saveMssageTemplate" >
+      insert into message_template(guid, num, content,name)  values(#{messageTemplate.guid},#{messageTemplate.num},#{messageTemplate.content},#{messageTemplate.name})
+    </insert>
+
+</mapper>

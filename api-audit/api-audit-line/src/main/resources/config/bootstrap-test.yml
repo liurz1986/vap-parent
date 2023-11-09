@@ -1,0 +1,19 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_HOST:vap}:${EUREKA_PORT:8761}/eureka/
+server:
+  port: 9431
+
+spring:
+  cloud:
+    config:
+      profile: ${SPRING_PROFILE_ACTIVE:dev}
+      discovery:
+        enabled: true
+        serviceId: SERVER-CONFIG
+
+logging:
+  config: classpath:logback-spring.xml
+  
+debug: true

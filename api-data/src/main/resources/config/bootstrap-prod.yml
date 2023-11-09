@@ -1,0 +1,65 @@
+server:
+  port: 9450
+eureka:
+   client:
+     serviceUrl:
+       defaultZone: http://peer1:8761/eureka/,http://peer2:8762/eureka/
+
+spring:
+  application:
+    name:  api-admin
+  cloud:
+    config:
+      enabled: true
+      uri: http://${http.config.uri}:8888
+      profile: ${http.config.profile}
+
+http:
+ config:
+   uri: peer1,peer2
+   profile: dev
+management:
+  security:
+    enabled: false
+endpoints:
+  health:
+    sensitive: false
+  trace:
+    enabled: true
+    sensitive: false
+info:
+  app:
+    name: "api-admin"
+    description: "搜索应用模块"
+    version: "1.9-SNAPSHOT"
+    spring-boot-version: "1.9-SNAPSHOT"
+
+elk:
+  cluster:
+    name: elasticsearch-cluster
+  ip: 192.168.119.215,192.168.119.216,192.168.119.217
+  port: 9300
+  vap:
+    index: .vap
+    indexPattern: index-pattern
+    searchType: search
+    config: config
+    dic: dic
+    entity: entity
+    edge: edge
+    version: vap3.0
+  total: 10000
+  max: 500000
+index:
+  format: "[*NAME*]_[*TIME*]"
+  timeformat: "yyyy.MM.dd"
+  monthformat: "yyyy.MM"
+  startTime: 2010/01/01
+  ref:
+    name: copy:\u590d\u5236\u7c98\u8d34,moveablestorage:\u79fb\u52a8\u5b58\u50a8,net:\u4e0a\u7f51,netflow:\u7f51\u7edc\u4f1a\u8bdd,pki:PKI,pro:\u8fdb\u7a0b,screenshots:\u622a\u5c4f,startshutdown:\u5f00\u5173\u673a,wangkang:\u7f51\u5eb7,yysj-julongv2.1:\u5de8\u9f99,pic:\u7ec8\u7aef\u622a\u5c4f,third:\u7b2c\u4e09\u65b9\u5e94\u7528,ruixing:\u745e\u661f,dongxu-trojan:\u4e1c\u5dfd\u75c5\u6bd2,dongxu-file:\u4e1c\u5dfd\u6587\u4ef6,dongxu-web:\u4e1c\u5dfdweb
+des:
+  key: 123456
+upload: upload
+system:
+  download:
+    path: /vrv/downloadFiles

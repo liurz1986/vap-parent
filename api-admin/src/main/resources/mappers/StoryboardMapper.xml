@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.StoryboardMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.Storyboard">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="image_id" jdbcType="INTEGER" property="imageId" />
+    <result column="first_flag" jdbcType="INTEGER" property="firstFlag" />
+    <result column="ui_json" jdbcType="VARCHAR" property="uiJson" />
+  </resultMap>
+
+    <update id="cancelFirstPage">
+       update visual_storyboard
+       set first_flag = 0
+       where 1=1;
+    </update>
+</mapper>

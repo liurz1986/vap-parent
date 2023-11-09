@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.EdgeMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.Edge">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="index_name" jdbcType="VARCHAR" property="indexName" />
+    <result column="time_field" jdbcType="VARCHAR" property="timeField" />
+    <result column="search_field" jdbcType="VARCHAR" property="searchField" />
+    <result column="search_entity_id" jdbcType="INTEGER" property="searchEntityId" />
+    <result column="goal_field" jdbcType="VARCHAR" property="goalField" />
+    <result column="goal_entity_id" jdbcType="INTEGER" property="goalEntityId" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="ico_id" jdbcType="VARCHAR" property="icoId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+
+  <select id="queryEdgeBySearchEntityId" parameterType="int" resultMap="BaseResultMap">
+	  select * from discover_edge t
+		where t.search_entity_id = #{entityId}
+  </select>
+</mapper>

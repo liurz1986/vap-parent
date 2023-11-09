@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>data_source</field>
+		<field>username</field>
+		<field>dev_ip</field>
+		<field>op_type</field>
+		<field>src_file_dir</field>
+		<field>src_file_name</field>
+		<field>file_size</field>
+		<field>dst_file_dir</field>
+		<field>dst_file_name</field>
+		<field>file_level</field>
+		<field>file_type</field>
+		<field>business_list</field>
+		<field>md5</field>
+		<field>event_time</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>主审</value>
+		<value>secadm</value>
+		<value>139.211.222.235</value>
+		<value>0</value>
+		<value>/root/test/a.txt</value>
+		<value>a.txt</value>
+		<value>32</value>
+		<value>/root/test/a.txt</value>
+		<value>a.txt</value>
+		<value>0</value>
+		<value>txt</value>
+		<value></value>
+		<value>d41d8cd98f00b204e9800998ecf8427e</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>DT002</value>
+	</log>
+</data>

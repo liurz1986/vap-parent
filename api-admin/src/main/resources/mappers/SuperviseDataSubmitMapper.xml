@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.SuperviseDataSubmitMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.SuperviseDataSubmit">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="guid" jdbcType="VARCHAR" property="guid" />
+    <result column="data_type" jdbcType="INTEGER" property="dataType" />
+    <result column="create_time" jdbcType="DATE" property="createTime" />
+    <result column="submit_status" jdbcType="INTEGER" property="submitStatus" />
+    <result column="submit_time" jdbcType="DATE" property="submitTime" />
+    <result column="data" jdbcType="LONGVARCHAR" property="data" />
+    <result column="online_submit_result" jdbcType="LONGVARCHAR" property="onlineSubmitResult" />
+  </resultMap>
+</mapper>

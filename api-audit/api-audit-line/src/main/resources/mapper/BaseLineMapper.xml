@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.line.mapper.BaseLineMapper">
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO base_line
+        (
+        `name`,
+        `config`,
+        `type`,
+        `open_group`,
+        `days`,
+        `alias`,
+        `label`,
+        `multiple`,
+        `save_index`,
+        `save_columns`,
+        `time_slot`,
+        `cron`,
+        `status`,
+        `description`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.name},
+            #{item.config},
+            #{item.type},
+            #{item.openGroup},
+            #{item.days},
+            #{item.alias},
+            #{item.label},
+            #{item.multiple},
+            #{item.saveIndex},
+            #{item.saveColumns},
+            #{item.timeSlot},
+            #{item.cron},
+            #{item.status},
+            #{item.description}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectLineData" parameterType="map" resultType="map">
+        select * from ${table} where insert_time >= #{startTime} and insert_time <![CDATA[ <= ]]> #{endTime}
+    </select>
+
+    <select id="countData" parameterType="map" resultType="int">
+        select count(id) from ${table} where data_time = #{dataTime}
+    </select>
+
+    <select id="queryMaxSummary" parameterType="map" resultType="int">
+        SELECT IFNULL(MAX(summary_num),0) from ${table}
+        <if test="where !='' and where != null">
+            ${where}
+        </if>
+    </select>
+
+    <update id="updateSummary" parameterType="map">
+        UPDATE ${table} SET summary_num = summary_num + ${gap}
+        <if test="where !='' and where != null">
+            ${where}
+        </if>
+    </update>
+</mapper>

@@ -1,0 +1,50 @@
+#eureka:
+#  client:
+#    registerWithEureka: true
+#    fetchRegistry: true
+#    serviceUrl:
+#      defaultZone: http://${EUREKA_HOST:vap}:${EUREKA_PORT:8761}/eureka/
+#  instance:
+#    preferIpAddress: true
+#    statusPageUrlPath: /info
+#    healthCheckUrlPath: /health
+#    lease-renewal-interval-in-seconds: 1
+#    lease-expiration-duration-in-seconds: 2
+
+server:
+  port: 9430
+
+spring:
+  http:
+      multipart:
+        enabled: true
+        max-file-size: 200Mb
+        max-request-size: 200Mb
+  cloud:
+    nacos:
+      config:
+        server-addr: ${SERVER_ADDR}
+        namespace: ${NAMESPACE}
+        file-extension: yml
+        ext-config:
+          - dataId: base-dev.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+      discovery:
+        server-addr: ${SERVER_ADDR}
+        namespace: ${NAMESPACE}
+        enabled: true
+SERVER_ADDR: ${NACOS_HOST:192.168.120.153}:${NACOS_PORT:8848}
+NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+
+
+logging:
+  config: classpath:logback-spring.xml
+      
+debug: false
+
+jasypt:
+  encryptor:
+    password: salt
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>data_source</field>
+		<field>username</field>
+		<field>dev_id</field>
+		<field>dev_ip</field>
+		<field>prev_status</field>
+		<field>cur_status</field>
+		<field>op_code</field>
+		<field>op_description</field>
+		<field>event_time</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>主审</value>
+		<value>wz</value>
+		<value>1312321</value>
+		<value>139.211.222.235</value>
+		<value>0</value>
+		<value>1</value>
+		<value>IO管控策略修改</value>
+		<value>禁用串口设备</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>DT026</value>
+	</log>
+</data>

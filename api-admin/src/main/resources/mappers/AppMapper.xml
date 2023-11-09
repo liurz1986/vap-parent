@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.AppMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.App">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="client_id" jdbcType="VARCHAR" property="clientid"/>
+        <result column="client_secret" jdbcType="VARCHAR" property="clientsecret"/>
+        <result column="scope" jdbcType="VARCHAR" property="scope"/>
+        <result column="authorized_grant_types" jdbcType="VARCHAR" property="authorizedgranttypes"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="third" jdbcType="TINYINT" property="third"/>
+        <result column="folder" jdbcType="TINYINT" property="folder"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="createTime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="updateTime" jdbcType="TIMESTAMP" property="updatetime"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="folder" jdbcType="TINYINT" property="folder"/>
+    </resultMap>
+
+    <select id="getAll" resultType="com.vrv.vap.admin.model.App">
+        SELECT * from app where app.status = 0
+    </select>
+
+    <select id="getAppsByRoleId" parameterType="INTEGER" resultType="com.vrv.vap.admin.model.AppSort">
+        SELECT a.*, r.sort FROM app a INNER JOIN app_role r ON a.id = r.app_id AND r.role_id = #{role_id} AND a.status = 0
+    </select>
+
+    <select id="getAppsByRoleIds" parameterType="java.util.List" resultType="com.vrv.vap.admin.model.AppSort">
+        SELECT a.*, r.sort FROM app a INNER JOIN app_role r ON a.id = r.app_id AND r.role_id in <foreach collection="roleIds" item="roleId" close=")" open="(" separator=",">
+          #{roleId}
+        </foreach> AND a.status = 0
+    </select>
+
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>username</field>
+		<field>dev_ip</field>
+		<field>op_code</field>
+		<field>file_name</field>
+		<field>file_level</field>
+		<field>file_size</field>
+		<field>file_type</field>
+		<field>event_time</field>
+		<field>md5</field>
+		<field>business_list</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>wz</value>
+		<value>139.211.222.235</value>
+		<value>1</value>
+		<value>a.txt</value>
+		<value>0</value>
+		<value>15</value>
+		<value>txt</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>1231231</value>
+		<value>无该字段</value>
+		<value>DT007</value>
+	</log>
+</data>

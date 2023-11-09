@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.RoleResourceMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.RoleResource">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="resource_id" jdbcType="INTEGER" property="resourceId" />
+  </resultMap>
+
+  <select id="queryRoleApps"  parameterType="java.util.List" resultType="com.vrv.vap.admin.model.App">
+    SELECT DISTINCT a.* FROM app AS a INNER JOIN app_role AS ar ON a.id = ar.app_id WHERE ar.role_id in
+    <foreach collection="roleIds" item="roleId" close=")" open="(" separator=",">
+      #{roleId}
+    </foreach>
+  </select>
+
+  <select id="queryRoleRules"  parameterType="java.util.List" resultType="com.vrv.vap.admin.model.Resource">
+    SELECT DISTINCT r.* FROM resource r INNER JOIN role_resource rr ON r.id = rr.resource_id WHERE  rr.role_id in
+    <foreach collection="roleIds" item="roleId" close=")" open="(" separator=",">
+      #{roleId}
+    </foreach> AND r.type=3
+  </select>
+
+  <select id="queryRoleWidgets"  parameterType="java.util.List" resultType="com.vrv.vap.admin.model.Resource">
+    SELECT DISTINCT r.* FROM resource r INNER JOIN role_resource rr ON r.id = rr.resource_id WHERE  rr.role_id in
+    <foreach collection="roleIds" item="roleId" close=")" open="(" separator=",">
+      #{roleId}
+    </foreach> AND r.type=4
+  </select>
+
+
+  <select id="queryCountByResource" parameterType="java.util.List" resultType="INTEGER">
+    select count(*) from role_resource where resource_id in
+    <foreach collection="resourceIds" open="(" close=")" separator="," item="role">
+      #{role}
+    </foreach>
+  </select>
+
+</mapper>

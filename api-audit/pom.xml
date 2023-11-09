@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>api-audit</artifactId>
+    <packaging>pom</packaging>
+    <name>api-audit</name>
+
+    <parent>
+        <groupId>com.vrv.vap</groupId>
+        <artifactId>vap-parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <release.dir>../release/package</release.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <es.version>7.14.0</es.version>
+        <search-guard-ssl.version>5.5.3-23</search-guard-ssl.version>
+        <search-guard-5.version>5.5.3-16</search-guard-5.version>
+<!--        <vap.toolkit.version>zjg-1.0-SNAPSHOT</vap.toolkit.version>-->
+        <spring-cloud.version>Hoxton.SR11</spring-cloud.version>
+        <swagger2.version>2.9.2</swagger2.version>
+        <swagger-bootstrap-ui.version>1.8.3</swagger-bootstrap-ui.version>
+        <commons-lang3.version>3.4</commons-lang3.version>
+        <commons-io.version>2.3</commons-io.version>
+        <commons-net.version>3.5</commons-net.version>
+        <poi.version>3.13</poi.version>
+        <alibaba-cloud.version>2.2.5.RELEASE</alibaba-cloud.version>
+        <nacos-client.version>1.3.1</nacos-client.version>
+        <alibaba-nacos.version>2.2.5.RELEASE</alibaba-nacos.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <mybatis-plus.version>3.4.2</mybatis-plus.version>
+        <dynamic-datasource.version>3.3.6</dynamic-datasource.version>
+        <mybatis.version>3.5.5</mybatis.version>
+        <mybatis-spring-boot.version>2.1.3</mybatis-spring-boot.version>
+        <zip4j.version>1.3.2</zip4j.version>
+        <fastdfs-client.version>1.27</fastdfs-client.version>
+        <dom4j.version>1.6.1</dom4j.version>
+        <kingbase8.version>8.2.0</kingbase8.version>
+        <hbase-client.version>1.3.0</hbase-client.version>
+        <fastjson.version>1.2.47</fastjson.version>
+        <quartz.version>2.2.1</quartz.version>
+        <cpdetector.version>1.0.7</cpdetector.version>
+        <antlr.version>2.7.7</antlr.version>
+        <jchardet.version>1.0</jchardet.version>
+        <gson.version>2.8.6</gson.version>
+        <flume-avro.version>1.4.0</flume-avro.version>
+        <joda-time.version>2.10.10</joda-time.version>
+        <xtool.version>1.0.0</xtool.version>
+        <druid.version>1.2.16</druid.version>
+        <minio.version>7.1.0</minio.version>
+        <jasypt.version>3.0.3</jasypt.version>
+        <logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
+        <log4j.version>2.17.0</log4j.version>
+    </properties>
+
+    <modules>
+        <module>vap-audit-toolkit</module>
+        <module>api-audit-xc</module>
+        <module>api-audit-line</module>
+        <module>generator</module>
+        <module>api-audit-monitor</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-to-slf4j</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat -->
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </dependency>-->
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.springframework/spring-webmvc &ndash;&gt;
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+            <version>${alibaba-nacos.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+            <version>${alibaba-nacos.version}</version>
+        </dependency>
+        <!--		&lt;!&ndash; https://mvnrepository.com/artifact/com.alibaba/fastjson &ndash;&gt;-->
+        <!--		<dependency>-->
+        <!--			<groupId>com.alibaba</groupId>-->
+        <!--			<artifactId>fastjson</artifactId>-->
+        <!--			<version>1.2.76</version>-->
+        <!--		</dependency>-->
+
+        <!--<dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+            <version>${nacos-client.version}</version>
+        </dependency>-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vrv.vap.flumeavrostarter</groupId>
+            <artifactId>flume-avro-starter</artifactId>
+            <version>${flume-avro.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!-- 不使用这个底层调用sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1523-->
+        <!-- https://blog.csdn.net/Thinkingcao/article/details/109161139 -->
+        <!--原来feign采用jdk原生HttpURLConnection向下游服务发起http请求-->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
+        </dependency>
+
+        <!-- 手动写的， 自定义start -->
+        <!--<dependency>
+            <groupId>com.vrv.vap</groupId>
+            <artifactId>prometheus-springboot-starter</artifactId>
+            <version>0.0.1</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>${commons-beanutils.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash-logback-encoder.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--alibaba cloud -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${alibaba-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>vap-audit-toolkit</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${es.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gson.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>swagger-bootstrap-ui</artifactId>
+                <version>${swagger-bootstrap-ui.version}</version>
+            </dependency>
+            <!-- Mybatis-Plus依赖 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 配置部署的远程仓库，mvn下执行 mvn deploy,测试通过 -->
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>http://192.168.119.24:18081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://192.168.119.24:18081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+        <!--	<repository>
+                <id>releases</id>
+                <url>http://2900vw4281.wicp.vip:23919/repository/maven-releases/</url>
+            </repository>
+            <snapshotRepository>
+                <id>snapshots</id>
+                <url>http://2900vw4281.wicp.vip:23919/repository/maven-snapshots/</url>
+            </snapshotRepository>-->
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <configuration>
+                    <imageName>${project.name}:${project.version}</imageName>
+                    <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+                    <skipDockerBuild>false</skipDockerBuild>
+                    <dockerHost>http://192.168.119.218:2375</dockerHost>
+                    <resources>
+                        <resource>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.SysAppPrivilegeMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.SysAppPrivilege">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="app_id" jdbcType="INTEGER" property="appId"/>
+        <result column="privilege_id" jdbcType="INTEGER" property="privilegeId"/>
+    </resultMap>
+
+    <select id="insertBuiltIn" parameterType="INTEGER" resultType="INTEGER">
+        INSERT INTO sys_app_privilege (privilege_id,app_id)  SELECT id AS privilege_id, #{appId} AS app_id FROM sys_privilege WHERE  def_allow=1
+    </select>
+
+</mapper>

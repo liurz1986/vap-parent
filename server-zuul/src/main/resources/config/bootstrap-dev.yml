@@ -1,0 +1,22 @@
+spring:
+  cloud:
+     nacos:
+       config:
+         server-addr: ${SERVER_ADDR}
+         namespace: ${NAMESPACE}
+         file-extension: yml
+         ext-config:
+           dataId: base-dev.yaml
+           group: DEFAULT_GROUP
+           refresh: true
+       discovery:
+         server-addr: ${SERVER_ADDR}
+         namespace: ${NAMESPACE}
+         enabled: true
+#         ip: 106.12.19.29
+#         port: 443
+
+SERVER_ADDR: ${NACOS_HOST:192.168.120.152}:${NACOS_PORT:8848}
+NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+
+

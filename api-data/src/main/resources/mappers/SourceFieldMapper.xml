@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.data.mapper.SourceFieldMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.data.model.SourceField">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="source_id" jdbcType="INTEGER" property="sourceId"/>
+        <result column="field" jdbcType="VARCHAR" property="field"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="origin" jdbcType="VARCHAR" property="origin"/>
+        <result column="dict" jdbcType="VARCHAR" property="dict"/>
+        <result column="link" jdbcType="VARCHAR" property="link"/>
+        <result column="unit" jdbcType="VARCHAR" property="unit"/>
+        <result column="show" jdbcType="BIT" property="show"/>
+        <result column="sorter" jdbcType="BIT" property="sorter"/>
+        <result column="filter" jdbcType="BIT" property="filter"/>
+        <result column="tag" jdbcType="BIT" property="tag"/>
+        <result column="sort" jdbcType="SMALLINT" property="sort"/>
+    </resultMap>
+</mapper>

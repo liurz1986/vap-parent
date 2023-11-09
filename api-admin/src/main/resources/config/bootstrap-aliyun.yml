@@ -1,0 +1,54 @@
+server:
+  port: 9410
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://${EUREKA_HOST:106.15.159.105}:${EUREKA_PORT:8761}/eureka/
+  instance:
+    preferIpAddress: false
+    statusPageUrlPath: /info
+    healthCheckUrlPath: /health
+    lease-renewal-interval-in-seconds: 1
+    lease-expiration-duration-in-seconds: 2
+
+
+spring:
+  cloud:
+    config:
+      profile: ${SPRING_PROFILE_ACTIVE:aliyun}
+      discovery:
+        enabled: true
+        serviceId: SERVER-CONFIG
+
+ribbon:
+  eureka:
+    enabled: true
+management:
+  security:
+    enabled: false
+endpoints:
+  jmx:
+    enabled: true
+  health:
+    sensitive: false
+  trace:
+    enabled: true
+    sensitive: false
+feign:
+ hystrix:
+  enabled: true
+info:
+  app:
+    name: "api-admin"
+    description: "用户登录、用户管理、权限管理等模块"
+    version: "1.9-SNAPSHOT"
+    spring-boot-version: "1.9-SNAPSHOT"
+
+
+logging:
+  level:
+    com.vrv.vap: debug
+    root: ERROR
+    org.springframework.cloud.sleuth: DEBUG

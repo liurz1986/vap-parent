@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BaseKoalOrgMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.BaseKoalOrg">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="uuId" jdbcType="INTEGER" property="uu_id" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="parentCode" jdbcType="VARCHAR" property="parent_code" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="shortName" jdbcType="VARCHAR" property="short_name" />
+    <result column="otherName" jdbcType="VARCHAR" property="other_name" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="oldCode" jdbcType="VARCHAR" property="old_code" />
+    <result column="startDate" jdbcType="VARCHAR" property="start_date" />
+    <result column="endDate" jdbcType="VARCHAR" property="end_date" />
+    <result column="oldCodeEnd" jdbcType="VARCHAR" property="old_code_end" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="update_time" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="orghierarchy" jdbcType="TINYINT" property="org_hierarchy" />
+    <result column="businessline" jdbcType="VARCHAR" property="business_line" />
+  </resultMap>
+
+  <select id="findByIpNum"  resultType="com.vrv.vap.admin.model.BaseKoalOrg">
+    SELECT o.* FROM base_org_ip_segment AS oi
+    INNER JOIN base_koal_org AS o ON oi.area_code = o.`code`
+    WHERE oi.start_ip_num &lt;=   #{ipNum} AND oi.end_ip_num &gt;=  #{ipNum}
+    <if test="orgHierarchy != '' and orgHierarchy != null">
+      AND o.org_hierarchy = #{orgHierarchy}
+    </if>
+    <if test="code != '' and code != null">
+      AND o.`code` = #{code}
+    </if>
+    ORDER BY oi.start_ip_num DESC,oi.end_ip_num ASC
+    LIMIT 0,1
+  </select>
+
+    <select id="findAll"  resultType="com.vrv.vap.admin.vo.BaseKoalOrgVO">
+        SELECT o.uu_id as uuId,o.code,o.parent_code as parentCode,o.type,o.name,o.short_name as shortName,
+        o.other_name as otherName,o.status,o.old_code as oldCode,o.start_date as startDate,
+        o.end_date as endDate,o.old_code_end as oldCodeEnd,o.update_time as updatetime,
+        o.sort,o.org_hierarchy as orghierarchy,o.business_line as businessline,o.secret_level as secretLevel,o.secret_qualifications as secretQualifications,o.org_type as orgType,o.protection_level as protectionLevel,
+        oi.start_ip_num as startIpNum,oi.end_ip_num as endIpNum FROM base_koal_org AS o
+        left join  base_org_ip_segment AS oi ON oi.area_code = o.`code`
+        ORDER BY oi.start_ip_num DESC,oi.end_ip_num ASC
+    </select>
+
+
+  <!--<select id="queryOrgUsers" parameterType="com.vrv.vap.admin.vo.OrgUserQuery" resultType="com.vrv.vap.admin.vo.OrgMember">-->
+    <!--SELECT ou.id,ou.is_leader as isLeader,u.name,u.role_id AS roleId,u.account,u.idcard,u.phone,u.email,u.id AS userId-->
+    <!--FROM user AS u-->
+    <!--INNER JOIN base_org_user AS ou ON u.id = ou.user_id-->
+    <!--WHERE 1=1-->
+    <!--<if test="param.code != null and param.code != ''">-->
+     <!--AND ou.department_code = #{param.code}-->
+    <!--</if>-->
+    <!--<if test="param.userName != null and param.userName != ''">-->
+      <!--AND u.name LIKE  CONCAT('%',#{param.userName },'%')-->
+    <!--</if>-->
+
+  <!--</select>-->
+
+
+  <!--<select id="queryMembers" parameterType="com.vrv.vap.admin.vo.OrgLeaderQuery" resultType="com.vrv.vap.admin.vo.OrgMember">-->
+      <!--SELECT ou.id,ou.is_leader as isLeader,u.id as userId,u.name,u.account,u.role_id AS roleId,u.idcard,u.phone,u.email-->
+      <!--FROM base_koal_org AS o-->
+      <!--INNER JOIN base_org_user AS ou ON o.`code` = ou.department_code-->
+      <!--INNER JOIN user AS u ON u.id = ou.user_id-->
+      <!--WHERE o.code = #{param.code}-->
+    <!--<if test="param.isLeader != null ">-->
+      <!--AND ou.is_leader =  #{param.isLeader }-->
+    <!--</if>-->
+  <!--</select>-->
+
+
+  <!--<select id="queryUpMembers" parameterType="com.vrv.vap.admin.vo.OrgLeaderQuery" resultType="com.vrv.vap.admin.vo.OrgMember">-->
+    <!--SELECT ou.id,ou.is_leader as isLeader,ou.user_id as userId,u.name,u.account,u.role_id as roleId,u.idcard,u.phone,u.email-->
+    <!--FROM (SELECT `code` FROM base_koal_org  WHERE `code` = (SELECT parent_code  FROM base_koal_org WHERE `code` = #{param.code} )) AS o-->
+    <!--INNER JOIN base_org_user AS ou ON o.`code` = ou.department_code-->
+    <!--INNER JOIN user AS u ON u.id = ou.user_id-->
+    <!--<if test="param.isLeader != null">-->
+      <!--WHERE ou.is_leader =  #{param.isLeader }-->
+    <!--</if>-->
+  <!--</select>-->
+
+  <select id="findAllHasUser"  resultType="com.vrv.vap.admin.model.BaseKoalOrg">
+    SELECT bko.* FROM base_koal_org AS bko
+      INNER JOIN (SELECT DISTINCT(org_code) AS code FROM user) AS bou on bko.`code` = bou.`code`
+  </select>
+
+
+  <select id="getAllProvinceIp"  resultType="com.vrv.vap.admin.model.BaseOrgIpSegment">
+    SELECT bois.* FROM base_org_ip_segment AS bois
+    INNER JOIN base_koal_org AS bko ON bois.area_code = bko.code
+    WHERE bko.org_hierarchy=1
+  </select>
+
+
+  <sql id="queryCondition">
+    <if test="userQuery.roleId!=null and userQuery.roleId!=''">
+      and u.role_id in
+      <foreach collection="userQuery.roleIds" item="roleId" close=")" open="(" separator=",">
+       #{roleId}
+      </foreach>
+    </if>
+    <if test="userQuery.creator!=null and userQuery.creator!=''">
+      and u.creator = #{userQuery.creator}
+    </if>
+    <if test="userQuery.status!=null">
+      and u.status = #{userQuery.status}
+    </if>
+    <if test="userQuery.name!=null and userQuery.name!=''">
+      and u.name like CONCAT('%',#{userQuery.name},'%')
+    </if>
+    <if test="userQuery.account!=null and userQuery.account!=''">
+      and u.account like CONCAT('%',#{userQuery.account},'%')
+    </if>
+    <if test="userQuery.domainCode!=null and userQuery.domainCode!=''">
+      and u.domain_code like CONCAT('%',#{userQuery.domainCode},'%')
+    </if>
+  </sql>
+
+  <select id="queryUsers"  parameterType="com.vrv.vap.admin.vo.UserQuery" resultType="com.vrv.vap.admin.model.User">
+    <choose>
+      <when test="userQuery.orgCode!=null and userQuery.orgCode!=''">
+        select * from user u inner join (select code from base_koal_org where sub_code  like  CONCAT(#{userQuery.subCode},'%'))b
+        on u.org_code = b.code where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+        order by ${userQuery.order_} ${userQuery.by_}
+        limit #{userQuery.start_},#{userQuery.count_}
+      </when>
+      <otherwise>
+        select * from user u  where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+        order by ${userQuery.order_} ${userQuery.by_}
+        limit #{userQuery.start_},#{userQuery.count_}
+      </otherwise>
+    </choose>
+  </select>
+
+  <select id="queryUsers"  parameterType="com.vrv.vap.admin.vo.UserQuery" resultType="com.vrv.vap.admin.model.User" databaseId="dm">
+    <choose>
+      <when test="userQuery.orgCode!=null and userQuery.orgCode!=''">
+        select * from "user" u inner join (select code from base_koal_org where sub_code  like  CONCAT(#{userQuery.subCode},'%'))b
+        on u.org_code = b.code where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+        order by ${userQuery.order_} ${userQuery.by_}
+        limit #{userQuery.start_},#{userQuery.count_}
+      </when>
+      <otherwise>
+        select * from "user" u  where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+        order by ${userQuery.order_} ${userQuery.by_}
+        limit #{userQuery.start_},#{userQuery.count_}
+      </otherwise>
+    </choose>
+  </select>
+
+  <select id="queryUsersCount" resultType="Long">
+    <choose>
+      <when test="userQuery.orgCode!=null and userQuery.orgCode!=''">
+        select COUNT(*) from user u inner join (select code from base_koal_org where sub_code  like  CONCAT(#{userQuery.subCode},'%'))b
+        on u.org_code = b.code where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+      </when>
+      <otherwise>
+        select COUNT(*) from user u  where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+      </otherwise>
+    </choose>
+  </select>
+
+  <select id="queryUsersCount" resultType="Long" databaseId="dm">
+    <choose>
+      <when test="userQuery.orgCode!=null and userQuery.orgCode!=''">
+        select COUNT(*) from "user" u inner join (select code from base_koal_org where sub_code  like  CONCAT(#{userQuery.subCode},'%'))b
+        on u.org_code = b.code where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+      </when>
+      <otherwise>
+        select COUNT(*) from "user" u  where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+      </otherwise>
+    </choose>
+  </select>
+
+  <select id="queryUsersKey"  parameterType="com.vrv.vap.admin.vo.UserQuery" resultType="com.vrv.vap.admin.vo.UserKeyVo">
+        select u.*,uk.serial,uk.public_key as publicKey from user u left join user_ukey uk on u.id = uk.user_id where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+        order by ${userQuery.order_} ${userQuery.by_}
+        limit #{userQuery.start_},#{userQuery.count_}
+  </select>
+
+  <select id="queryUsersKey"  parameterType="com.vrv.vap.admin.vo.UserQuery" resultType="com.vrv.vap.admin.vo.UserKeyVo" databaseId="dm">
+    select u.*,uk.serial,uk.public_key as publicKey from "user" u left join user_ukey uk on u.id = uk.user_id where u.status <![CDATA[<>]]> 2
+    <include refid="queryCondition"></include>
+    order by ${userQuery.order_} ${userQuery.by_}
+    limit #{userQuery.start_},#{userQuery.count_}
+  </select>
+
+  <select id="queryUsersKeyCount" resultType="Long">
+        select COUNT(*) from user u left join user_ukey uk on u.id = uk.user_id  where u.status <![CDATA[<>]]> 2
+        <include refid="queryCondition"></include>
+  </select>
+
+  <select id="queryUsersKeyCount" resultType="Long" databaseId="dm">
+    select COUNT(*) from "user" u left join user_ukey uk on u.id = uk.user_id  where u.status <![CDATA[<>]]> 2
+    <include refid="queryCondition"></include>
+  </select>
+</mapper>

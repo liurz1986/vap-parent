@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.AppRoleMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.AppRole">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="app_id" jdbcType="INTEGER" property="appid" />
+    <result column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="sort" jdbcType="SMALLINT" property="sort" />
+  </resultMap>
+
+</mapper>

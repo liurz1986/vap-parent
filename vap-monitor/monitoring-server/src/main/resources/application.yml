@@ -1,0 +1,326 @@
+server:
+  port: 9419
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    port-header: X-Forwarded-Port
+    use-forward-headers: true
+  #    basedir: /data/sa/temp
+  multipart:
+    max-file-size: 100MB
+    max-request-size: 100MB
+
+DATABASE_URL: jdbc:mysql://${MYSQL_HOST:192.168.121.249}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:mysql}
+    driver-class-name: ${DATABASE_DRIVER:com.mysql.jdbc.Driver}
+    url: ${DATABASE_URL:jdbc:mysql://192.168.121.249:3306/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8}
+    hikari:
+      minimum-idle: 5
+      idle-timeout: 600000
+      maximum-pool-size: 15
+      auto-commit: true
+      pool-name: MyHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  servlet:
+    multipart:
+      enabled: true #默认支持文件上传
+      max-file-size: 100MB # 最大支持文件大小
+      max-request-size: 100MB # 最大支持请求大小
+  redis:
+    host: ${REDIS_HOST:192.168.121.21}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:vrv@1234}
+    pool:
+      max-active: -1 # 连接池最大连接数（使用负值表示没有限制）
+      max-wait: 10000 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      max-idle:  16 # 连接池中的最大空闲连接
+      min-idle: 0 # 连接池中的最小空闲连接
+    timeout: 10000  # 连接超时时间（毫秒）
+
+logging:
+  level:
+    com.vrv.vap: ERROR
+    root: info
+    org.springframework.cloud.sleuth: ERROR
+    com.alibaba.nacos: ERROR
+
+vap:
+  common:
+    session-base64: false
+    monitor:
+      local-ip: ${LOCAL_SERVER_IP:192.168.118.20}
+      open: true
+      offline-interval: 30000 #毫秒，计算操作时间未发心跳，则判定下线
+      max-restart-wait: 300000
+      backup-file-path: /opt/file/backup
+      log-file-path: /opt/file/log
+      components:
+        #数据库监控
+        mysql:
+          name: mysql
+          cron: 10 */3 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true
+          log: false
+          group: db  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: DatabaseMonitor
+          monitor-type: one
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            datasource:
+              type: com.zaxxer.hikari.HikariDataSource
+              username: ${MYSQL_USER:root}
+              password: ${MYSQL_PASSWORD:mysql}
+              driver-class-name: ${DATABASE_DRIVER:com.mysql.jdbc.Driver}
+              url: ${DATABASE_URL:jdbc:mysql://192.168.121.249:3306/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8}
+        elasticsearch:
+          name: elasticsearch
+          cron: 20 */3 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true
+          log: true
+          group: db  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: ElasticMonitor
+          monitor-type: one
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            elk:
+              cluster:
+                name: ${ES_CLUSTER_NAME:elasticsearch-cluster}
+              ip: ${ES_CLUSTER_HOST:192.168.121.249}
+              xpack:
+                security:
+                  user: ${ES_CLUSTER_UNAME:admin}
+                  ppp: ${ES_CLUSTER_PWD:vrv@12345}
+              port: ${ES_CLUSTER_PORT:9200}
+          log-address: /data/elasticsearch/logs/elasticsearch-cluster.log
+        kafka:
+          name: kafka
+          cron: 30 */3 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true  #支持重启
+          log: true  #支持下载日志
+          group: db  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: KafkaMonitor
+          monitor-type: one
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            kafka:
+              bootstrap:
+                servers: ${KAFKA_URL:192.168.120.153}:${KAFKA_PORT:9092}
+              #    servers : 192.168.120.153:9092
+              userName: admin
+              password: admin-2019
+          log-address: ${VAP_WORK_DIR:/opt/test}/kafka/logs/server.log
+        redis:
+          name: redis
+          cron: 15 */2 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true  #支持重启
+          log: false  #支持下载日志
+          group: db  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: RedisMonitor
+          monitor-type: one
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            redis:
+              host: ${REDIS_HOST:192.168.121.249}
+              port: ${REDIS_PORT:6379}
+              password: ${REDIS_PWD:vrv@1234}
+        collector:
+          name: collector
+          cron: 0 */5 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: false  #支持重启
+          log: false  #支持下载日志
+          module: CollectorMonitor
+          monitor-type: one
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            report-interval: 5 #监测器上报时间间隔（分钟）:
+        system:
+          name: system
+          cron: 0 */1 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: false  #支持重启
+          log: false  #支持下载日志
+          module: SystemMonitor
+          monitor-type: one
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            report-interval: 5 #监测器上报时间间隔（分钟）:
+        api-netflow:
+          name: api-netflow
+          cron: 40 */5 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true  #支持重启
+          log: true  #支持下载日志
+          group: receive  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: ReceiveMonitor
+          monitor-type: multiple
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            checkNetflowUrl: :9412/V1
+          log-address: ${VAP_WORK_DIR:/opt/test}/cloud/logs/api-netflow.log
+        flume:
+          name: flume
+          cron: 40 */5 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: false  #支持重启
+          log: true  #支持下载日志
+          group: receive  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: ReceiveMonitor
+          monitor-type: multiple
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            cids:
+              - a2f22a9a557e235301d0331240d6b2aa,流量日志接入-入kafka
+              - 34e8627173686d9960832aa144498a3d,流量日志采集-kafka入es
+          log-address: /var/log/vap-flume/flume-ui2.log
+        api-admin:
+          name: api-admin
+          cron: 35 */2 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true  #支持重启
+          log: true  #支持下载日志
+          group: web  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: webMonitor
+          monitor-type: multiple
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            SERVER_ADDR: ${NACOS_HOST:192.168.121.249}:${NACOS_PORT:8848}
+            NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+          log-address: ${VAP_WORK_DIR:/opt/test}/cloud/logs/api-admin.log
+        server-zuul:
+          name: server-zuul
+          cron: 35 */2 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true  #支持重启
+          log: true  #支持下载日志
+          group: web  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: webMonitor
+          monitor-type: multiple
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            SERVER_ADDR: ${NACOS_HOST:192.168.121.249}:${NACOS_PORT:8848}
+            NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+          log-address: ${VAP_WORK_DIR:/opt/test}/cloud/logs/server-zuul.log
+        nacos:
+          name: nacos
+          cron: 35 */2 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true  #支持重启
+          log: true  #支持下载日志
+          module: webMonitor
+          group: web  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          monitor-type: multiple
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            flume: /flume/flume
+          log-address: ${VAP_WORK_DIR:/opt/test}/nacos/logs/nacos.log
+        api-alarmdeal:
+          name: api-alarmdeal
+          cron: 55 */3 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true  #支持重启
+          log: true  #支持下载日志
+          group: analysis  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: AnalyseMonitor
+          monitor-type: multiple
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            SERVER_ADDR: ${NACOS_HOST:192.168.121.249}:${NACOS_PORT:8848}
+            NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+          log-address: ${VAP_WORK_DIR:/opt/test}/cloud/logs/api-alarmdeal.log
+        api-audit-xc:
+          name: api-audit-xc
+          cron: 55 */3 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: true  #支持重启
+          log: true  #支持下载日志
+          group: analysis  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: AnalyseMonitor
+          monitor-type: multiple
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            SERVER_ADDR: ${NACOS_HOST:192.168.121.249}:${NACOS_PORT:8848}
+            NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+          log-address: ${VAP_WORK_DIR:/opt/test}/cloud/logs/api-audit-xc.log
+        flink:
+          name: flink
+          cron: 55 */3 * * * ? #发送周期
+          metric: true
+          alarm: true
+          handler: true
+          restart: false  #支持重启
+          log: true  #支持下载日志
+          group: analysis  # db 数据存储， receive 数据接入， analysis 分组组件 web 平台组件
+          module: AnalyseMonitor
+          monitor-type: multiple
+          nodes: ${LOCAL_SERVER_IP:192.168.118.20}
+          connect-config:
+            flume: /flume/flume
+          log-address: ${VAP_WORK_DIR:/opt/test}/flink/log/flink-root-client-vap.kafka.com.cn.log
+  flume:
+      enable: true
+      channel-type: memory
+      capacity: 200000
+      sink-type: database
+      databases:
+        - url: ${DATABASE_URL:jdbc:mysql://192.168.119.213:3306/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8}
+          username: ${MYSQL_USER:root}
+          password: ${MYSQL_PASSWORD:mysql}
+        - url: ${DATABASE_URL:jdbc:mysql://192.168.119.213:3306/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8}
+          username: ${MYSQL_USER:root}
+          password: ${MYSQL_PASSWORD:mysql}
+      driver: ${DATABASE_DRIVER:com.mysql.jdbc.Driver}
+      insert-sql: insert into sys_log (id, request_ip,type, user_id, user_name, organization_name, description, request_url, request_time, request_method, method_name, bean_name, params_value, response_result, login_type, role_name,request_page_uri,request_page_title) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+  swagger:
+    enabled: true
+    title: monitoring-server接口文档
+    description: monitoring-server接口文档
+    base-package: com.vrv.vap.monitor.server
+    version: 1.0
+
+
+
+
+database:
+  dbType: ${DB_TYPE:mysql}
+
+mybatis:
+  mapper-locations: classpath*:mappers/*.xml
+mapper:
+  mappers: com.vrv.vap.base.BaseMapper

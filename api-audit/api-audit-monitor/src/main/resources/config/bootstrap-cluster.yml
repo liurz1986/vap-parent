@@ -1,0 +1,54 @@
+
+#  单机与集群的server_addr 不一样， NACOS_CLUSTER  与  NACOS_HOST 区别
+# cluster新增了nacos的相关的用户和密码认证的相关参数
+
+server:
+  port: 9051
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  http:
+    multipart:
+      enabled: true
+      max-file-size: 200Mb
+      max-request-size: 200Mb
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  cloud:
+    nacos:
+      config:
+        enabled: ${NACOS_CONFIG:true}
+        server-addr: ${SERVER_ADDR}
+        namespace:   ${NAMESPACE}
+        file-extension: yml
+        shared-dataids: base-dev.yaml
+        refreshable-dataids: base-dev.yaml
+        username: ${NACOS_USERNAME:}
+        password: ${NACOS_PWD:}
+      discovery:
+        username: ${NACOS_USERNAME:}
+        password: ${NACOS_PWD:}
+        server-addr: ${SERVER_ADDR}
+        namespace: ${NAMESPACE}
+        enabled: true
+SERVER_ADDR: ${NACOS_CLUSTER:192.168.119.213:8848}
+NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+
+logging:
+  config: classpath:logback-spring.xml
+
+debug: false
+
+# jasypt的参数配置
+jasypt:
+  encryptor:
+    algorithm: ${ENC_ALGORITHM:PBEWITHHMACSHA512ANDAES_256}
+    password: ${ENC_SALT:fada6bd719ec7d2befe1986a02661b23}
+    iv-generator-classname: ${ENC_IV_CLASS:org.jasypt.iv.RandomIvGenerator}
+    salt-generator-classname: ${ENC_SLAT_CLASS:org.jasypt.salt.RandomSaltGenerator}
+    poolSize: 3
+    keyObtentionIterations: 1000
+

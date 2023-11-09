@@ -1,0 +1,172 @@
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+# spring 数据库连接配置
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        loginUsername: admin
+        loginPassword: 123456
+    dynamic:
+      primary: master   # 设置默认的数据库 master
+      strict: false    #  严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
+      druid:
+        initial-size: 5
+        min-idle: 5
+        maxActive: 20
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        filters: stat,wall,slf4j
+        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      datasource:
+        # 主库数据源
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: ${MYSQL_USER:root}
+          password: ${MYSQL_PASSWORD:123456}
+          seata: false
+       # 从库数据源
+        slave:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/slave?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: ${MYSQL_USER:root}
+          password: ${MYSQL_PASSWORD:123456}
+          seata: false
+
+  session:
+    store-type: redis
+  redis:
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:vrv@1234}
+    timeout: 6000ms
+    lettuce:
+      pool:
+        max-active: 1000
+        max-wait: -1ms
+        max-idle: 10
+        min-idle: 10
+    connect-timeout: 10000
+# 方式一，采用发送的方式 ，
+#  方式二，使用注册中心注册的方式，可以不用配置url的属性
+#  boot:
+#    admin:
+#      client:
+#        enabled: true
+#        url: http://${HOST_ADMIN:localhost}:18769
+
+mybatis:
+  mapper-locations: classpath:mappers/*.xml
+  type-aliases-package: com.vrv.vap.*.model
+  configuration:
+    map-underscore-to-camel-case: true
+
+mapper:
+  mappers: com.vrv.vap.base.BaseMapper
+  not-empty: false
+  identity: MYSQL
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+
+# 打开所有 Actuator 服务, 并使用prometheus进行监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  # include: health,info
+  endpoint:
+    health:
+      show-details: always
+  # 名称定义
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+seata:
+  enabled: false # 是否开启开关
+  application-id: ${spring.application.name}
+  tx-service-group: my_test_tx_group
+  enable-auto-data-source-proxy: false   # 一定要是false
+  service:
+    vgroup-mapping:
+      my_test_tx_group: default  #key与上面的tx-service-group的值对应
+    grouplist:
+      default: ${SERVER_HOST:127.0.0.1}:${SERVER_PORT:8091}   #seata-server地址仅file注册中心需要
+  config:
+    type: file
+  registry:
+    type: file
+vap:
+  flume:
+    enable: true
+    channel-type: memory
+    capacity: 200000
+    sink-type: database
+    databases:
+      - url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:123456}
+      - url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:123456}
+    driver: com.mysql.jdbc.Driver
+    insert-sql: insert into sys_log (id, request_ip,type, user_id, user_name, organization_name, description, request_url, request_time,request_method, method_name, bean_name, params_value, response_result, login_type, role_name,operationObject,bz1) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+
+  swagger:
+    enabled: true
+    title: 事务管理工程项目
+    description: 项目升级springboot版本
+    base-package: com.vrv.vap.transaction.controller
+    version: 0.1-SNAPSHOT
+
+feign:
+  okhttp:
+    enabled: true
+  client:
+    config:
+      default:                          # 服务名，填写 default 为所有服务，或者指定某服务，例如：annoroad-beta
+        connectTimeout: 10000           # 连接超时，10秒
+        readTimeout: 20000              # 读取超时，20秒
+  httpclient:
+    enabled: false
+    max-connections: 1000               # 连接池连接最大闲置数，缺省值是 200
+    connection-timeout: 3000            # 连接超时，单位为毫秒，缺省值是 3000毫秒（3秒）
+    time-to-live: 900                   # 连接最大闲置时间，单位为秒，缺省值是 900秒（15分钟）
+    max-connections-per-route: 100
+  compression:
+    request:
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+      enabled: true
+    response:
+      enabled: true
+  hystrix:
+    enabled: true
+
+ribbon:
+  okhttp:
+    enabled: true
+
+logging:
+  level:
+    com.vrv.vap: debug
+    root: info
+    com.alibaba.nacos: ERROR
+    com.vrv.vap.transaction.mapper: debug
+    org.springframework: warn

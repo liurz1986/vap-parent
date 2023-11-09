@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.data.mapper.SearchTopicMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.data.model.SearchTopic">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="source_ids" jdbcType="VARCHAR" property="sourceIds"/>
+        <result column="sort" jdbcType="SMALLINT" property="sort"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="role_ids" jdbcType="VARCHAR" property="roleIds"/>
+        <result column="filter" jdbcType="LONGVARCHAR" property="filter"/>
+    </resultMap>
+</mapper>

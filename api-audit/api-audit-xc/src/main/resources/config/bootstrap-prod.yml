@@ -1,0 +1,25 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_HOST:vap}:${EUREKA_PORT:8761}/eureka/
+
+server:
+  port: 9430
+
+spring:
+  cloud:
+    config:
+      profile: ${SPRING_PROFILE_ACTIVE:dev}
+      discovery:
+        enabled: true
+        serviceId: SERVER-CONFIG
+  http:
+    multipart:
+      enabled: true
+      max-file-size: 50Mb
+      max-request-size: 50Mb
+      
+logging:
+  config: classpath:logback-spring.xml
+      
+debug: false

@@ -1,0 +1,30 @@
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+jasypt:
+  encryptor:
+    password: salt
+
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: ${SERVER_ADDR}
+        namespace:   ${NAMESPACE}
+        file-extension: yml
+        shared-dataids: base-dev.yaml
+        refreshable-dataids: base-dev.yaml
+      discovery:
+        server-addr: ${SERVER_ADDR}
+        namespace: ${NAMESPACE}
+        enabled: true
+#        ip: 106.12.19.29
+#        port: 59101
+SERVER_ADDR: ${NACOS_HOST:192.168.121.249}:${NACOS_PORT:8848}
+NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.netflow.mapper.NetworkMonitorAuditedMapper">
+
+    <select id="getUnAuditList"  resultType="com.vrv.vap.netflow.model.NetworkMonitor">
+        select monitor_new.*  from
+        (
+        select network_monitor.*
+        from
+        (
+        select  network_monitor.`device_id`,max(network_monitor.`id`)  red_id from  network_monitor group by   network_monitor.`device_id`
+        ) monitor
+        inner join network_monitor on  network_monitor.`id` =monitor.red_id
+        ) monitor_new
+        left join
+        (
+        select  `network_monitor_reg_audit_log`.*
+        from
+        (
+        select `network_monitor_reg_audit_log`.`device_id`,max(`network_monitor_reg_audit_log`.`id`) AS 'id'
+        from `network_monitor_reg_audit_log` group by `network_monitor_reg_audit_log`.`device_id`
+        ) audit
+        inner join `network_monitor_reg_audit_log` on `network_monitor_reg_audit_log`.id=audit.id
+        ) audit_new on audit_new.reg_id=monitor_new.id
+        where audit_new.id is null
+    </select>
+  <!--  or  audit_new.audit_result=0-->
+    <select id="getUnauditCount"  resultType="int">
+        select count(monitor_new.id) as 'count'  from
+        (
+        select network_monitor.*
+        from
+        (
+        select  network_monitor.`device_id`,max(network_monitor.`id`)  red_id from  network_monitor group by   network_monitor.`device_id`
+        ) monitor
+        inner join network_monitor on  network_monitor.`id` =monitor.red_id
+        ) monitor_new
+        left join
+        (
+        select  `network_monitor_reg_audit_log`.*
+        from
+        (
+        select `network_monitor_reg_audit_log`.`device_id`,max(`network_monitor_reg_audit_log`.`id`) AS 'id'
+        from `network_monitor_reg_audit_log` group by `network_monitor_reg_audit_log`.`device_id`
+        ) audit
+        inner join `network_monitor_reg_audit_log` on `network_monitor_reg_audit_log`.id=audit.id
+        ) audit_new on audit_new.reg_id=monitor_new.id
+        where audit_new.id is null
+    </select>
+<!--    or  audit_new.audit_result=0-->
+</mapper>

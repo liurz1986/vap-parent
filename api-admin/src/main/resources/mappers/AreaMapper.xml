@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BaseAreaMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.BaseArea">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="area_code" jdbcType="VARCHAR" property="areaCode" />
+    <result column="area_name" jdbcType="VARCHAR" property="areaName" />
+    <result column="ip_range" jdbcType="VARCHAR" property="ipRange" />
+    <result column="parent_code" jdbcType="VARCHAR" property="parentCode" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="area_code_sub" jdbcType="VARCHAR" property="areaCodeSub" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+  </resultMap>
+
+
+  <select id="findSubAreaByCode" resultType="com.vrv.vap.admin.model.BaseArea">
+      select * from base_area t where
+      <if test = "areaCode == null || areaCode == ''">
+          t.parent_code is null or t.parent_code = ''
+      </if>
+      <if test = "areaCode != null and areaCode != ''">
+          t.parent_code =  #{areaCode}
+      </if>
+
+  </select>
+
+
+</mapper>

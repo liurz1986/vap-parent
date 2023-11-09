@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.core.AssetMapper">
+    <!--按资产一级分类统计各资产的数量-->
+    <select id="countByAssetType" resultType="com.vrv.vap.xc.model.AssetCountModel" parameterType="com.vrv.vap.xc.model.ReportParam">
+        SELECT SUBSTRING_INDEX(at.TreeCode, '-', 2) AS code, atg.Name AS name,COUNT(1) AS count
+        FROM asset a
+                 LEFT JOIN asset_type at ON a.Type_Guid = at.Guid
+                 LEFT JOIN asset_type_group atg ON SUBSTRING_INDEX(at.TreeCode, '-', 2) = atg.TreeCode
+        <if test="params != null and params != ''">
+            <where>
+                a.CreateTime BETWEEN #{params.startTime} AND #{params.endTime}
+            </where>
+        </if>
+        GROUP BY code
+    </select>
+
+    <select id="getOrgNameByIpList" parameterType="java.util.List" resultType="com.vrv.vap.xc.model.AssetModel">
+        SELECT org_name AS name, IP AS ip
+        FROM asset
+        <where>
+            <if  test="ipList != null and ipList.size() > 0">
+                ip IN
+                <foreach collection="ipList" separator="," open="(" close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="findAssetStealLeakValue" parameterType="com.vrv.vap.xc.model.AssetTypeModel" resultType="com.vrv.vap.xc.vo.AssetVO">
+        SELECT a.*,aslv.steal_leak_value AS assetStealLeakValue
+        FROM asset a
+                 LEFT JOIN asset_steal_leak_value aslv ON a.IP = aslv.ip
+        <where>
+            <if test="model.focusAssetsList !=null and model.focusAssetsList.size() > 0">
+                AND aslv.ip IN
+                <foreach collection="model.focusAssetsList" separator="," open="(" close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="model.equipmentIntensive !=null and model.equipmentIntensive !=''">
+                AND a.equipment_intensive = #{model.equipmentIntensive}
+            </if>
+            <if test="model.responsibleName !=null and model.responsibleName !=''">
+                AND a.responsible_name LIKE CONCAT('%',#{model.responsibleName},'%')
+            </if>
+            <if test="model.orgName !=null and model.orgName !=''">
+                AND a.org_name LIKE CONCAT('%',#{model.orgName},'%')
+            </if>
+            <if test="model.assetInfo !=null and model.assetInfo != ''">
+                AND (a.Name LIKE CONCAT('%',#{model.assetInfo},'%') OR a.IP LIKE CONCAT('%',#{model.assetInfo},'%') OR mac LIKE CONCAT('%',#{model.assetInfo},'%'))
+            </if>
+            <if test="model.beginValue !=null">
+                AND aslv.steal_leak_value <![CDATA[ > ]]>#{model.beginValue}
+            </if>
+            <if test="model.endValue !=null">
+                AND aslv.steal_leak_value <![CDATA[ < ]]>#{model.endValue}
+            </if>
+            <if test="model.beginValue !=null and model.endValue">
+                AND aslv.steal_leak_value <![CDATA[ > ]]>#{model.beginValue} AND aslv.steal_leak_value <![CDATA[ < ]]>#{model.endValue}
+            </if>
+            <if test="model.guidList != null and model.guidList.size() > 0">
+                AND a.Type_Guid IN
+                <foreach collection="model.guidList" separator="," open="(" close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

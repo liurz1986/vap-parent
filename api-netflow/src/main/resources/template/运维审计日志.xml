@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>user_account</field>
+		<field>operation_type</field>
+		<field>client_ip</field>
+		<field>client_opt</field>
+		<field>session_id</field>
+		<field>event_time</field>
+		<field>resource_account</field>
+		<field>resource_ip</field>
+		<field>resource_opt</field>
+		<field>opt_detail</field>
+		<field>opt_result</field>
+		<field>conn_type</field>
+		<field>conn_port</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>wz</value>
+		<value>1</value>
+		<value>1.1.1.1</value>
+		<value>0</value>
+		<value>12323</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>root</value>
+		<value>1.1.1.2</value>
+		<value>0</value>
+		<value>cd</value>
+		<value>成功</value>
+		<value>ssh</value>
+		<value>90</value>
+		<value>DT006</value>
+	</log>
+</data>

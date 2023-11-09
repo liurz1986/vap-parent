@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>dev_ip</field>
+		<field>dev_id</field>
+		<field>event_time</field>
+		<field>process_name</field>
+		<field>op_type</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>139.211.222.235</value>
+		<value>8a:51:3a:aa:a7:bc</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>打刻系统</value>
+		<value>0</value>
+		<value>DT003</value>
+	</log>
+</data>

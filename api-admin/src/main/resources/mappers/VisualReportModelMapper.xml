@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.VisualReportModelMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.VisualReportModel">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="template_name" jdbcType="VARCHAR" property="templateName" />
+    <result column="data_id" jdbcType="VARCHAR" property="dataId" />
+    <result column="template_type" jdbcType="INTEGER" property="templateType" />
+  </resultMap>
+</mapper>

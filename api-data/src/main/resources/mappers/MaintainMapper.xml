@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.data.mapper.MaintainMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.data.model.Maintain">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="source_id" jdbcType="INTEGER" property="sourceId"/>
+        <result column="primary_key" jdbcType="VARCHAR" property="primaryKey"/>
+        <result column="name_field" jdbcType="VARCHAR" property="nameField"/>
+        <result column="columns" jdbcType="LONGVARCHAR" property="columns"/>
+        <result column="filter" jdbcType="LONGVARCHAR" property="filter"/>
+        <result column="chmod" jdbcType="INTEGER" property="chmod"/>
+    </resultMap>
+</mapper>

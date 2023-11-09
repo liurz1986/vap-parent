@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.UserMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.User">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="account" jdbcType="VARCHAR" property="account" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="role_id" jdbcType="VARCHAR" property="roleId" />
+    <result column="idcard" jdbcType="VARCHAR" property="idcard" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="org_code" jdbcType="VARCHAR" property="orgCode" />
+    <result column="org_name" jdbcType="VARCHAR" property="orgName" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="is_leader" jdbcType="TINYINT" property="isLeader" />
+    <result column="lastpwdupdatetime" jdbcType="DATE" property="lastUpdateTime" />
+    <result column="lastlogintime" jdbcType="DATE" property="lastLoginTime" />
+    <result column="logintimes" jdbcType="INTEGER" property="loginTimes" />
+    <result column="pwd_status" jdbcType="INTEGER" property="pwdStatus" />
+    <result column="salt" jdbcType="VARCHAR" property="salt" />
+  </resultMap>
+
+  <select id="queryUser" resultType="com.vrv.vap.admin.model.User">
+    SELECT u.* FROM `user` AS u
+    INNER JOIN (SELECT DISTINCT(user_id) AS id FROM user_role  WHERE role_id IN    <foreach collection="roleids" separator="," open="(" close=")" item="roleId"> #{roleId}</foreach>) AS ur ON u.id = ur.id
+    WHERE 1 = 1
+    AND u.status != '2'
+    <if test="param.name != null and param.name != ''">
+      AND u.name LIKE CONCAT('%',#{param.name},'%')
+    </if>
+    <if test="param.account != null and param.account != ''">
+      AND u.account LIKE CONCAT('%',#{param.account},'%')
+    </if>
+    <if test="param.idcard != null and param.idcard != ''">
+      AND u.idcard LIKE CONCAT('%',#{param.idcard},'%')
+    </if>
+    <if test="param.email != null and param.email != ''">
+      AND u.email LIKE CONCAT('%',#{param.email},'%')
+    </if>
+    <if test="param.phone != null and param.phone != ''">
+      AND u.phone LIKE CONCAT('%',#{param.phone},'%')
+    </if>
+    <if test="param.orgCode != null and param.orgCode != ''">
+      AND u.org_code = #{param.orgCode}
+    </if>
+    <if test="param.city != null and param.city != ''">
+      AND u.city  = #{param.city}
+    </if>
+    <if test="param.province != null and param.province != ''">
+      AND u.province = #{param.province}
+    </if>
+    <if test="param.orgName != null and param.orgName != ''">
+      AND u.org_name LIKE CONCAT('%',#{param.orgName},'%')
+    </if>
+    <if test="param.status != null and param.status != ''">
+      AND u.status = #{param.status}
+    </if>
+    <if test="param.orgSub != null and param.orgSub != ''">
+      AND u.org_code IN
+      <foreach collection="orgSubs" separator="," open="(" close=")" item="orgSub"> #{orgSub}</foreach>
+    </if>
+    <if test="param.orderBy != null and param.orderBy != ''">
+      ORDER BY #{param.orderBy}
+    </if>
+  </select>
+
+  <select id="queryUser" resultType="com.vrv.vap.admin.model.User" databaseId="dm">
+    SELECT u.* FROM "user" AS u
+    INNER JOIN (SELECT DISTINCT(user_id) AS id FROM user_role  WHERE role_id IN    <foreach collection="roleids" separator="," open="(" close=")" item="roleId"> #{roleId}</foreach>) AS ur ON u.id = ur.id
+    WHERE 1 = 1
+    AND u.status != '2'
+    <if test="param.name != null and param.name != ''">
+      AND u.name LIKE CONCAT('%',#{param.name},'%')
+    </if>
+    <if test="param.account != null and param.account != ''">
+      AND u.account LIKE CONCAT('%',#{param.account},'%')
+    </if>
+    <if test="param.idcard != null and param.idcard != ''">
+      AND u.idcard LIKE CONCAT('%',#{param.idcard},'%')
+    </if>
+    <if test="param.email != null and param.email != ''">
+      AND u.email LIKE CONCAT('%',#{param.email},'%')
+    </if>
+    <if test="param.phone != null and param.phone != ''">
+      AND u.phone LIKE CONCAT('%',#{param.phone},'%')
+    </if>
+    <if test="param.orgCode != null and param.orgCode != ''">
+      AND u.org_code = #{param.orgCode}
+    </if>
+    <if test="param.city != null and param.city != ''">
+      AND u.city  = #{param.city}
+    </if>
+    <if test="param.province != null and param.province != ''">
+      AND u.province = #{param.province}
+    </if>
+    <if test="param.orgName != null and param.orgName != ''">
+      AND u.org_name LIKE CONCAT('%',#{param.orgName},'%')
+    </if>
+    <if test="param.status != null and param.status != ''">
+      AND u.status = #{param.status}
+    </if>
+    <if test="param.orgSub != null and param.orgSub != ''">
+      AND u.org_code IN
+      <foreach collection="orgSubs" separator="," open="(" close=")" item="orgSub"> #{orgSub}</foreach>
+    </if>
+    <if test="param.orderBy != null and param.orderBy != ''">
+      ORDER BY #{param.orderBy}
+    </if>
+  </select>
+
+
+  <update id="updateOrg">
+    UPDATE `user` SET
+    org_code = org.code,
+    org_name = org.name,
+    is_leader = 0,
+    province = LEFT(org.code,2),
+    city = LEFT(org.code,4)
+    WHERE id IN  <foreach item="id"  collection="ids" open="(" separator="," close=")">
+        #{id}
+  </foreach>
+  </update>
+
+  <update id="updateOrg" databaseId="dm">
+    UPDATE "user" SET
+    org_code = org.code,
+    org_name = org.name,
+    is_leader = 0,
+    province = LEFT(org.code,2),
+    city = LEFT(org.code,4)
+    WHERE id IN  <foreach item="id"  collection="ids" open="(" separator="," close=")">
+    #{id}
+  </foreach>
+  </update>
+
+
+
+  <update id="updateArea">
+    UPDATE `user` SET
+    area_code = area.areaCode,
+    area_name = area.areaName
+    WHERE id IN  <foreach item="id"  collection="ids" open="(" separator="," close=")">
+    #{id}
+  </foreach>
+  </update>
+
+  <update id="updateArea" databaseId="dm">
+    UPDATE "user" SET
+    area_code = area.areaCode,
+    area_name = area.areaName
+    WHERE id IN  <foreach item="id"  collection="ids" open="(" separator="," close=")">
+    #{id}
+  </foreach>
+  </update>
+
+  <select id="queryByCtyId" resultType="com.vrv.vap.admin.model.User">
+       select  * from  user where  cty_id=#{ctyId}
+  </select>
+
+  <select id="queryByCtyId" resultType="com.vrv.vap.admin.model.User" databaseId="dm">
+       select * from "user" where  cty_id=#{ctyId}
+  </select>
+
+  <select id="getUserNotBuildIn" resultType="com.vrv.vap.admin.model.User">
+      SELECT u.* FROM user u WHERE creator IS NOT NULL AND u.id NOT IN
+       ( SELECT DISTINCT ur.user_id FROM user_role ur
+       LEFT JOIN role r ON ur.role_id = r.id
+       WHERE r.code = #{monitorRoleCode}
+      )
+  </select>
+
+  <select id="getUserNotBuildIn" resultType="com.vrv.vap.admin.model.User" databaseId="dm">
+      SELECT u.* FROM "user" u WHERE creator IS NOT NULL AND u.id NOT IN
+       ( SELECT DISTINCT ur.user_id FROM user_role ur
+       LEFT JOIN role r ON ur.role_id = r.id
+       WHERE r.code = #{monitorRoleCode}
+      )
+  </select>
+
+  <select id="queryUserByRoleOrPerson" resultType="com.vrv.vap.admin.model.UserPersonInfo">
+      SELECT  DISTINCT u.*,t.roleName roleName,GROUP_CONCAT(p.user_name) personName from `user` u
+      INNER JOIN
+        (SELECT u.id,GROUP_CONCAT(r.`name`) roleName from `user` u
+         INNER JOIN role r on FIND_IN_SET(r.id,u.role_id)
+         GROUP BY u.id) t on t.id = u.id
+      INNER JOIN base_person_zjg p on u.idcard=p.user_idn_ex
+      WHERE 1=1
+      <if test="param.roleOrPerson != null and param.roleOrPerson != ''">
+        AND (t.roleName like CONCAT('%',#{param.roleOrPerson},'%')
+        OR p.user_name like CONCAT('%',#{param.roleOrPerson},'%'))
+      </if>
+      GROUP BY u.id,t.roleName
+      LIMIT #{param.start_},#{param.count_}
+  </select>
+
+</mapper>

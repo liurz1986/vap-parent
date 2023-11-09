@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.data.mapper.SearchConditionMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.data.model.SearchCondition">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="q" jdbcType="VARCHAR" property="q"/>
+        <result column="start_time" jdbcType="CHAR" property="startTime"/>
+        <result column="end_time" jdbcType="CHAR" property="endTime"/>
+        <result column="topic_id" jdbcType="INTEGER" property="topicId"/>
+        <result column="source_ids" jdbcType="VARCHAR" property="sourceIds"/>
+        <result column="filter" jdbcType="LONGVARCHAR" property="filter"/>
+    </resultMap>
+</mapper>

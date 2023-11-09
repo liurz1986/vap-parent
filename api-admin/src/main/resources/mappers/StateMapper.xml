@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.StateMapper">
+
+  <select id="getOrgInfo" resultType="map">
+    SELECT
+    code org_code, `name` org_name, concat(`type`,'') org_type, concat(secret_qualifications,'') secret_qualification
+    FROM base_koal_org where `type` = 1
+  </select>
+
+  <select id="getPersonInfo" resultType="map">
+    SELECT
+      count(*) person_count_num,
+      SUM(case when secret_level = 3 then 1 else 0 end) nomal_person_num,
+      SUM(case when secret_level = 2 then 1 else 0 end) major_person_num,
+      SUM(case when secret_level = 1 then 1 else 0 end) core_person_num
+    FROM base_person_zjg
+  </select>
+
+  <select id="getMonitorInfo" resultType="map">
+    SELECT device_location
+    FROM network_monitor
+  </select>
+
+  <select id="getInternetOrgInfo" resultType="int">
+    SELECT count(*) from internet_info_manage
+  </select>
+
+  <select id="getNetworkInfo" resultType="map">
+    select n.net_type network_type, concat(n.secret_level,'') secret_level, concat(n.protect_level,'') defend_level,
+    IFNULL(t.num,0) external_org_num,IFNULL(t.internet_name,'') external_org_name, n.domain security_domain_level
+    from net_info_manage n
+    left join
+   (select count(*) num, internet_type, GROUP_CONCAT(internet_name) internet_name from internet_info_manage GROUP BY internet_type) t
+   on n.net_type = t.internet_type
+  </select>
+
+  <select id="getFileInfo" resultType="map">
+    SELECT
+      SUM(case when secret_level &lt; 3 then 1 else 0 end) secret_file_num ,
+      SUM(case when secret_level = 2 then 1 else 0 end) secret_file_mm0_num,
+      SUM(case when secret_level = 1 then 1 else 0 end) secret_file_mm1_num,
+      SUM(case when secret_level = 0 then 1 else 0 end) secret_file_mm2_num
+    FROM data_info_manage
+  </select>
+
+  <select id="getAppInfo" resultType="map">
+    SELECT app_name, concat(secret_level,'') app_secret_level, secret_company app_vendor
+    FROM app_sys_manager where secret_level &lt; 3
+  </select>
+
+  <select id="getTerminalInfo" resultType="map">
+    SELECT
+      SUM(case when term_type = 1 then 1 else 0 end) d_terminal_num,
+      SUM(case when term_type &lt;&gt; 1 then 1 else 0 end) nd_terminal_num,
+      SUM(case when equipment_intensive = 3 then 1 else 0 end) secret_terminal_num,
+      SUM(case when equipment_intensive = 4 then 1 else 0 end) confidentiality_terminal_num,
+      SUM(case when equipment_intensive = 5 then 1 else 0 end) top_secret_terminal_num
+    FROM asset
+  </select>
+
+  <select id="getServerInfo" resultType="map">
+    select
+      SUM(case when term_type = 1 then 1 else 0 end) d_server_num,
+      SUM(case when term_type &lt;&gt; 1 then 1 else 0 end) nd_server_num
+      from
+      (select a.Guid,a.term_type
+       from asset a
+       left join asset_type b on a.type_guid = b.guid
+       left join asset_type_group c on b.TreeCode like CONCAT('%',c.TreeCode,'%')
+       where c.Name LIKE CONCAT('%','服务器','%')) t
+  </select>
+
+  <select id="getAssetInfo" resultType="map">
+    select a.term_type,b.`Name` device_name
+    from asset a
+    left join asset_type b on a.type_guid = b.guid
+  </select>
+
+  <select id="getFirewallInfo" resultType="map">
+    select t1.`Name` as firewall_name,'' as firewall_model,
+    trim('"' from IFNULL(JSON_EXTRACT(t3.extendInfos,'$.extendVersionInfo'),'')) as firewall_version,
+    trim('"' from IFNULL(JSON_EXTRACT(t3.extendInfos,'$.extendTypeSno'),'')) as firewall_vendor,
+    concat(t1.term_type,'') as firewall_type
+    from asset t1
+    left join asset_type t2 on t1.Type_Guid = t2.Guid
+    left join asset_extend t3 on t1.Guid = t3.assetGuid
+    where t2.`Name` like '%防火墙%'
+  </select>
+
+  <select id="getIdsInfo" resultType="map">
+    select t1.`Name` as intrusion_name,'' as intrusion_model,
+	trim('"' from IFNULL(JSON_EXTRACT(t3.extendInfos,'$.extendVersionInfo'),'')) as intrusion_version,
+	trim('"' from IFNULL(JSON_EXTRACT(t3.extendInfos,'$.extendTypeSno'),'')) as intrusion_vendor,
+	concat(t1.term_type,'') as intrusion_type
+    from asset t1
+    left join asset_type t2 on t1.Type_Guid = t2.Guid
+    left join asset_extend t3 on t1.Guid = t3.assetGuid
+    where t2.`Name` like "%IDS%";
+  </select>
+
+  <select id="getGatewayInfo" resultType="map">
+    select t1.`Name` as gateway_name,'' as gateway_model,
+	trim('"' from IFNULL(JSON_EXTRACT(t3.extendInfos,'$.extendVersionInfo'),'')) as gateway_version,
+	trim('"' from IFNULL(JSON_EXTRACT(t3.extendInfos,'$.extendTypeSno'),'')) as gateway_vendor,
+	concat(t1.term_type,'') as gateway_type
+    from asset t1
+    left join asset_type t2 on t1.Type_Guid = t2.Guid
+    left join asset_extend t3 on t1.Guid = t3.assetGuid
+    where t2.`Name` like "%网关%";
+  </select>
+
+  <select id="getScannerInfo" resultType="map">
+    select t1.`Name` as scanner_name,'' as scanner_model,
+	trim('"' from IFNULL(JSON_EXTRACT(t3.extendInfos,'$.extendVersionInfo'),'')) as scanner_version,
+	trim('"' from IFNULL(JSON_EXTRACT(t3.extendInfos,'$.extendTypeSno'),'')) as scanner_vendor,
+	concat(t1.term_type,'') as scanner_type
+    from asset t1
+    left join asset_type t2 on t1.Type_Guid = t2.Guid
+    left join asset_extend t3 on t1.Guid = t3.assetGuid
+    where t2.`Name` like "%漏洞扫描%";
+  </select>
+
+</mapper>

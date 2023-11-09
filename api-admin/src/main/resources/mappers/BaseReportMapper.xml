@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BaseReportMapper">
+
+
+    <insert id="replaceInto" parameterType="com.vrv.vap.admin.model.BaseReport">
+        REPLACE INTO base_report
+        (id,`name`,`title`,sub_title,models,create_time,status,menu_enable)
+        VALUES
+            (
+            #{id},
+            #{name},
+            #{title},
+            #{subTitle},
+            #{models},
+            #{createTime},
+            #{status},
+            #{menuEnable}
+            )
+    </insert>
+
+    <select id="queryPersonByOrg" resultType="map">
+        SELECT b.org_name orgName,count(*) count FROM base_person_zjg b GROUP BY b.org_name
+    </select>
+
+    <select id="queryPersonBySecret" resultType="map">
+        SELECT d1.code_value secretLevel,count(*) count
+        FROM base_person_zjg p
+        LEFT JOIN base_dict_all d1 on p.secret_level=d1.code
+        LEFT JOIN base_dict_all d2 on d1.parent_type=d2.type
+        WHERE d2.code_value='人员信息-人员密级/SM等级'
+        GROUP BY p.secret_level
+    </select>
+
+    <select id="queryMonitorInfo" resultType="map">
+        SELECT
+        n.device_belong,n.login_address,n.device_location,n.device_soft_version,
+        (case n.network_monitor_status
+             when 1 then '在线'
+             when 0 then '离线'
+             else '未知' end) monitor_status
+        FROM network_monitor n
+        WHERE n.status = 0
+    </select>
+
+    <select id="queryOrgBySecret" resultType="map">
+        SELECT d1.code_value secretLevel,count(*) orgNum
+        FROM base_koal_org
+        LEFT JOIN base_dict_all d1 on secret_level=d1.code
+        LEFT JOIN base_dict_all d2 on d1.parent_type=d2.type
+        WHERE d2.code_value='zjg-保密等级'
+        GROUP BY secret_level
+    </select>
+
+</mapper>

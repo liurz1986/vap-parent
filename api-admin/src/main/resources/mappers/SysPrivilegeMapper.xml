@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.SysPrivilegeMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.SysPrivilege">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="client_id" jdbcType="VARCHAR" property="name"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="method" jdbcType="VARCHAR" property="method"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="enabled" jdbcType="TINYINT" property="enabled"/>
+        <result column="def_allow" jdbcType="TINYINT" property="defAllow"/>
+    </resultMap>
+
+</mapper>

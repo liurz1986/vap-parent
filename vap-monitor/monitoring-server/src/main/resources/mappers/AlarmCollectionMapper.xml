@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.AlarmCollectionMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.monitor.server.model.AlarmItem">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="alarm_type" jdbcType="VARCHAR" property="alarmType"/>
+        <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel"/>
+        <result column="alarm_source" jdbcType="VARCHAR" property="alarmSource"/>
+        <result column="alarm_desc" jdbcType="VARCHAR" property="alarmDesc"/>
+        <result column="alarm_status" jdbcType="INTEGER" property="alarmStatus"/>
+        <result column="alarm_time" jdbcType="TIMESTAMP" property="alarmTime"/>
+    </resultMap>
+
+    <select id="getAlarmItemsByGroup" resultType="com.vrv.vap.monitor.server.model.AlarmItemGroup">
+        SELECT
+        count(*) alarmCount,MAX(alarm_time) lastTime,MIN(alarm_time) firstTime
+        FROM alarm_item_collection
+        WHERE alarm_status = 0
+        <if test="alarmItemVO.groupId != null and alarmItemVO.groupId != ''">
+            AND group_id = #{alarmItemVO.groupId}
+        </if>
+        <if test="alarmItemVO.alarmType != null and alarmItemVO.alarmType != ''">
+            AND alarm_type like CONCAT('%',#{alarmItemVO.alarmType},'%')
+        </if>
+        <if test="alarmItemVO.startTime != null and alarmItemVO.startTime != ''">
+            AND alarm_time &gt;= #{alarmItemVO.startTime}
+        </if>
+        <if test="alarmItemVO.endTime != null and alarmItemVO.endTime != ''">
+            AND alarm_time &lt;= #{alarmItemVO.endTime}
+        </if>
+        <if test="alarmItemVO.alarmLevel != null and alarmItemVO.alarmLevel != ''">
+            AND alarm_level like CONCAT('%',#{alarmItemVO.alarmLevel},'%')
+        </if>
+        <if test="alarmItemVO.alarmSource != null and alarmItemVO.alarmSource != ''">
+            AND alarm_source like CONCAT('%',#{alarmItemVO.alarmSource},'%')
+        </if>
+        <if test="alarmItemVO.alarmDesc != null and alarmItemVO.alarmDesc != ''">
+            AND alarm_desc like CONCAT('%',#{alarmItemVO.alarmDesc},'%')
+        </if>
+    </select>
+
+    <update id="updateAlarmItems">
+        UPDATE alarm_item_collection SET alarm_status = #{AlarmItemGroupVO.updateStatus}, update_time = now()
+        WHERE alarm_status = 0
+        <if test="AlarmItemGroupVO.ids != null and AlarmItemGroupVO.ids != ''">
+            AND id in
+            <foreach collection="AlarmItemGroupVO.ids.split(',')" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="AlarmItemGroupVO.alarmType != null and AlarmItemGroupVO.alarmType != ''">
+            AND alarm_type like CONCAT('%',#{AlarmItemGroupVO.alarmType},'%')
+        </if>
+        <if test="AlarmItemGroupVO.alarmLevel != null and AlarmItemGroupVO.alarmLevel != ''">
+            AND alarm_level like CONCAT('%',#{AlarmItemGroupVO.alarmLevel},'%')
+        </if>
+        <if test="AlarmItemGroupVO.alarmSource != null and AlarmItemGroupVO.alarmSource != ''">
+            AND alarm_source like CONCAT('%',#{AlarmItemGroupVO.alarmSource},'%')
+        </if>
+        <if test="AlarmItemGroupVO.alarmDesc != null and AlarmItemGroupVO.alarmDesc != ''">
+            AND alarm_desc like CONCAT('%',#{AlarmItemGroupVO.alarmDesc},'%')
+        </if>
+        <if test="AlarmItemGroupVO.startTime != null and AlarmItemGroupVO.startTime != ''">
+            AND alarm_time &gt;= #{AlarmItemGroupVO.startTime}
+        </if>
+        <if test="AlarmItemGroupVO.endTime != null and AlarmItemGroupVO.endTime != ''">
+            AND alarm_time &lt;= #{AlarmItemGroupVO.endTime}
+        </if>
+        <if test="AlarmItemGroupVO.groupId != null and AlarmItemGroupVO.groupId != ''">
+            AND group_id = #{AlarmItemGroupVO.groupId}
+        </if>
+    </update>
+
+    <select id="getAlarmTrend" resultType="map">
+        SELECT
+        <if test="alarmItemVO.formatType==1">
+            DATE_FORMAT(alarm_time,'%Y-%m-%d %H:00')
+        </if>
+        <if test="alarmItemVO.formatType==2">
+            DATE_FORMAT(alarm_time,'%Y-%m-%d')
+        </if>
+         as date,count(*) as count
+        FROM alarm_item_collection
+        WHERE 1=1
+        <if test="alarmItemVO.startTime!=null and alarmItemVO.startTime != ''">
+            and alarm_time &gt;= #{alarmItemVO.startTime}
+        </if>
+        <if test="alarmItemVO.endTime!=null and alarmItemVO.endTime != ''">
+            and alarm_time &lt;= #{alarmItemVO.endTime}
+        </if>
+        GROUP BY
+        <if test="alarmItemVO.formatType==1">
+            DATE_FORMAT(alarm_time,'%Y-%m-%d %H:00')
+        </if>
+        <if test="alarmItemVO.formatType==2">
+            DATE_FORMAT(alarm_time,'%Y-%m-%d')
+        </if>
+        ORDER BY date asc;
+    </select>
+</mapper>

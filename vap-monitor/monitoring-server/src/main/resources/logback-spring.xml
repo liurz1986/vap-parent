@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+  <springProperty scope="context" name="springAppName" source="spring.application.name" />
+
+  <!-- 日志文件 -->
+  <property name="LOG_FILE" value="${LOG_PATH}/${springAppName}.log"/>
+
+  <!-- 文件输出 -->
+  <appender name="FILE"
+            class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <file>${LOG_FILE}</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i
+      </fileNamePattern>
+      <!-- 日志文件最多保存30天数 -->
+      <maxHistory>30</maxHistory>
+      <timeBasedFileNamingAndTriggeringPolicy
+              class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- 单个日志文集超过100MB时将被分割 -->
+        <maxFileSize>100MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+    </rollingPolicy>
+  </appender>
+
+  <!-- 异步输出（文件输出采用异步处理，以提升应用程序的处理效率） -->
+  <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+    <discardingThreshold>0</discardingThreshold>
+    <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+    <queueSize>8192</queueSize>
+    <!-- 添加附加的appender,最多只能添加一个 -->
+    <appender-ref ref="FILE"/>
+  </appender>
+
+  <logger name="org.apache.kafka" level="off" />
+
+  <!-- <root level="INFO">
+       <appender-ref ref="CONSOLE"/>
+       <appender-ref ref="ASYNC"/>
+       <appender-ref ref="KAFKA"/>
+   </root>-->
+
+  <root level="ERROR">
+    <appender-ref ref="ASYNC"/>
+    <appender-ref ref="CONSOLE"/>
+    <!-- <appender-ref ref="KAFKA"/> -->
+
+  </root>
+</configuration>

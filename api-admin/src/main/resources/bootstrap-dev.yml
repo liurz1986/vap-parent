@@ -1,0 +1,33 @@
+# 环境变量配置，打包时排除,方便网关调试直接修改参数
+# 写自己机器IP，或者不修改，绑定了host
+LOCAL_SERVER_IP: 192.168.118.88
+#LOCAL_IP: 192.168.118.124
+# 调试的远程服务器IP
+REMOTE_IP: 192.168.120.201
+NACOS_HOST: 192.168.120.201
+NACOS_NAMESPACE: a338c762-d2a7-4a2f-86f0-022c171c0928
+NACOS_PORT: 8848
+NACOS_USERNAME: nacos
+#NACOS_PWD: ENC(ELNF8TH9nhxw+XcDq/0O+HBkxNLqW3UDX0eMi4forba0kr5rWl1Ln7Gu14w4KGcS)
+NACOS_PWD: Qwe123!@#
+
+#是否使用远程NACOS配置 ,自身调试防止远程nacos配置污染，可以关闭
+NACOS_CONFIG: true
+#前端静态页面代理地址，可以使用本机页面调试，比如file:/usr/local/vap/app-web/dist
+WEBAPP: http://${REMOTE_IP}:9999/
+REDIS_HOST: ${REMOTE_IP}
+REDIS_PORT: 6379
+#REDIS_PWD: ENC(dCVHaPGCbhB1w06H6Nkvkw3ijTZQ0XfOvo4lRnaxrfpNZzsICnwPuTGFtJqT/qq2)
+REDIS_PWD: vrv@1234
+
+#MYSQL_HOST: ${LOCAL_SERVER_IP}
+#MYSQL_USER: root
+#MYSQL_PORT: 3306
+#MYSQL_PASSWORD: ENC(0CgsCeqV6pCYTFY6k+tuEhSOLhqTDhJ/H/p4li5e7uvrEVyiqfuTWA7denVghHYD)
+
+# jasypt,  PBEWITHHMACSHA512ANDAES_256
+ENC_SALT: salt
+ENC_ALGORITHM: PBEWithMD5AndDES
+ENC_IV_CLASS: org.jasypt.iv.RandomIvGenerator
+ENC_SALT_CLASS: org.jasypt.salt.RandomSaltGenerator
+ENC_ITERATIONS: 1000

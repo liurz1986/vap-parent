@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>data_source</field>
+		<field>username</field>
+		<field>dev_ip</field>
+		<field>dev_name</field>
+		<field>op_type</field>
+		<field>op_result</field>
+		<field>file_name</field>
+		<field>file_level</field>
+		<field>business_list</field>
+		<field>md5</field>
+		<field>file_size</field>
+		<field>file_page</field>
+		<field>dev_id</field>
+		<field>file_num</field>
+		<field>file_type</field>
+		<field>event_time</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>主审</value>
+		<value>wz</value>
+		<value>139.211.222.235</value>
+		<value>HP-xxxx</value>
+		<value>0</value>
+		<value>0</value>
+		<value>266.pdf</value>
+		<value>2</value>
+		<value></value>
+		<value>31311231</value>
+		<value>15</value>
+		<value>15</value>
+		<value>32122</value>
+		<value>12</value>
+		<value>pdf</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>DT005</value>
+	</log>
+</data>

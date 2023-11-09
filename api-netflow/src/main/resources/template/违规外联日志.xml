@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>data_source</field>
+		<field>dev_id</field>
+		<field>out_ip</field>
+		<field>username</field>
+		<field>dev_ip</field>
+		<field>dev_mac</field>
+		<field>op_description</field>
+		<field>event_time</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>主审</value>
+		<value>32131</value>
+		<value>192.168.100.1</value>
+		<value>wz</value>
+		<value>139.211.222.235</value>
+		<value>00:23:9e:20:c0:9d</value>
+		<value>有线上网，联网接口：enp5s0，网关地址：192.168.6.1， 安全卡号：0100022004000997；内网探测地址触发违规外联。</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>DT032</value>
+	</log>
+</data>

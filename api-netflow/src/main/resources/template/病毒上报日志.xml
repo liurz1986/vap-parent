@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>dev_ip</field>
+		<field>event_time</field>
+		<field>virus_type</field>
+		<field>virus_name</field>
+		<field>virus_file</field>
+		<field>virus_result</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>1.1.1.1</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>MSWord.Virus.Nid.b.zav</value>
+		<value>主机病毒</value>
+		<value>home/secadm/桌面/1.doc</value>
+		<value>已清除</value>
+		<value>DT009</value>
+	</log>
+</data>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.xc.mapper.core.UserVisitAppTotalMapper">
+
+    <insert id="replaceInto" parameterType="java.util.List">
+        REPLACE INTO rpt_user_visit_app_total
+        (user_no,user_name,device_ip,depart_no,depart_name,app_no,app_name,`count`,`time`,version)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.userNo},
+            #{item.userName},
+            #{item.deviceIp},
+            #{item.departNo},
+            #{item.departName},
+            #{item.appNo},
+            #{item.appName},
+            #{item.count},
+            #{item.time},
+            #{item.version}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

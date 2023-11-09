@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.monitor.mapper.Monitor2AssetInfoMapper">
+
+    <select id="selectAssetConnectStatus" resultType="map">
+        SELECT dev_id devId, ifnull(connect_state,0) connectState FROM  monitor2_asset_info where startup_state = 1
+    </select>
+
+    <!--连接总数-->
+    <select id="selectAssetConnectCount" resultType="int">
+        select count(a.Guid) from asset a JOIN monitor2_asset_info t on a.Guid = t.dev_id
+        where t.connect_state=1 and t.startup_state=1
+    </select>
+
+    <!--未连接总数-->
+    <select id="selectAssetUnConnectCount" resultType="int">
+        select count(a.Guid) from asset a JOIN monitor2_asset_info t on a.Guid = t.dev_id
+        where t.connect_state=0 and t.startup_state=1
+    </select>
+
+    <!--未监控总数-->
+    <select id="selectAssetUnMonitorCount" resultType="int">
+        select count(a.Guid) from asset a where NOT EXISTS (select t.dev_id from monitor2_asset_info t where a.Guid=t.dev_id)
+    </select>
+
+    <!--在线资产排行-->
+    <select id="selectAssetOnlineTop" resultType="map">
+        select t.securityGuid securityCode, (select d.domain_name from base_security_domain d where d.code=t.securityGuid limit 1) domainName, t.onCount,t.totalCount, onCount/totalCount proportion from
+    (select a.securityGuid,  count(t.dev_id) onCount, count(a.Guid) totalCount from asset a
+    left join  monitor2_asset_info t on a.Guid = t.dev_id and t.connect_state=1 and t.startup_state=1 GROUP BY a.securityGuid) t ORDER BY proportion
+    </select>
+
+</mapper>

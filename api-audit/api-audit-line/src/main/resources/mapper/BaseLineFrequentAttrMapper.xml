@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.line.mapper.BaseLineFrequentAttrMapper">
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO base_line_frequent_attr
+        (
+        `hour`,
+        `pck`,
+        `item`,
+         start_time,
+         end_time,
+         ukey,
+         sys_id
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.hour},
+            #{item.pck},
+            #{item.item},
+            #{item.startTime},
+            #{item.endTime},
+            #{item.ukey},
+            #{item.sysId}
+            )
+        </foreach>
+    </insert>
+</mapper>

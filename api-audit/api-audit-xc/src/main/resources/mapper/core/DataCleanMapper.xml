@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vrv.vap.xc.mapper.core.custom.DataCleanMapper">
+    <select id="getConfById" parameterType="string" resultType="string">
+        select conf_value from tb_conf where conf_id = #{id}
+    </select>
+
+    <select id="getConfMapById" parameterType="string" resultType="map">
+        select conf_id id,conf_value val from tb_conf where conf_id like concat(#{id},'%')
+    </select>
+
+</mapper>

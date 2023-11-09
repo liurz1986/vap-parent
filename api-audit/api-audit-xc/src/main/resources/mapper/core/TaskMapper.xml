@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vrv.vap.xc.mapper.core.custom.TaskMapper">
+	<select id="queryTasks" resultType="com.vrv.vap.xc.model.TaskModel">
+		SELECT id, task_name as taskName, cron_time as cronTime, classpath, should_run as shouldRun, description 
+		FROM schedule_tasks_config
+	</select>
+
+	<select id="queryBaseArea" resultType="map">
+		select * from base_area
+	</select>
+</mapper>

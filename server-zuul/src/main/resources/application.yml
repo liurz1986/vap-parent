@@ -1,0 +1,600 @@
+promission:
+  static: /js/, /css/, /fonts/, /images/, /static/, /cboard/, /files/, /staticPages/,/navigation/
+  anon: /login/, /health/,/modify_password/,/modify_password2/, /forbid/,/api-common/user/login,/api-common/auth/app/token,/api-common/system/config/safety,/api-common/user/updatepwd, /api-common/user/salt/**,/api-common/user/sso, /api-common/user/logout,/favicon.ico, /search/dashboardShare,/search/linkShare,/search/dashboard/linkShareLogin,/api-common/user/pwFreeLogin,/api-serversys/hardware/getOEMConfig,/api-serversys/hardware/getImg/logo,/api-serversys/service/mapregion/**,/api-flow/expatriateTicket/createCollaborationTask,/api-flow/businessIntance/changeInitatesTicketStatus,/api-common/cascade/toLoginNew,/api-common/user/codeToToken/callback,/api-common/user/tokenToUser/callback,/api-common/syncData,/search/board/**,/api-common/user/xcTokenLogin,/api-common/system/config/sysInfo,/api-common/user/updpw/new,/cascade/policy/delete,/cascade/policy/report,/cascade/summary,/cascade/status,/cascade/logout,/cascade/register,/api-dncweb/access/license/details,/api-common/syncPm,/V1/log,/hystrix.stream,/api-common/captcha,/V1/register/reg_request,/api-evaluation/eventThreaten/acceptEvent,/api-evaluation/eventThreaten/vulnNotice,/bigScreen/*.js,/bigScreen/*.css,/V1/status,/V1/alarm/**,/V2/target_ident/**,/coor/**
+  auth: /api-,/V1/,/V2/
+  login: /login*/,/login*
+  forbidden: /forbid/
+  home: /
+  url-retain: false
+licence:
+  validateUrl: /hardware/?__hide=true#/authorizationfInfo
+server:
+  connection-timeout: 10000
+  session:
+    cookie:
+      max-age: 18000
+      http-only: false
+      secure: true
+  port: 10443
+  ssl:
+    enabled: true
+    enabled-protocols:
+      - TLSv1.2
+      - TLSv1.3
+    ciphers:
+      - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_DHE_DSS_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_DHE_DSS_WITH_AES_128_GCM_SHA256
+      - TLS_EMPTY_RENEGOTIATION_INFO_SCSVF
+    key-store: classpath:keystore.p12
+    key-store-password: 123456
+    keyStoreType: PKCS12
+    keyAlias: tomcat
+
+  tomcat:
+    max-threads: 1000
+    max-connections: 2000
+    accept-count: 1000
+    min-spare-threads: 300
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    port-header: X-Forwarded-Port
+    use-forward-headers: true
+  host: ${LOCAL_SERVER_IP:127.0.0.1}
+  #开启防刷，防重，防CSRF攻击开关
+  verify:
+    param: true
+    token: true
+    referer: true
+  #白名单列表，可使用,号分隔配置多个
+  white:
+    referer: https://${LOCAL_SERVER_IP:127.0.0.1}
+    param:
+    token:
+spring:
+  session:
+    store-type: redis
+  redis:
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:vrv@1234}
+    # ${REDIS_PWD:ENC(0J1mfnOW8o7bmIq7r1xf6eTiC1LpLH2O)}
+    pool:
+      max-active: -1 # 连接池最大连接数（使用负值表示没有限制）
+      max-wait: 10000 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      max-idle:  16 # 连接池中的最大空闲连接
+      min-idle: 0 # 连接池中的最小空闲连接
+    timeout: 10000  # 连接超时时间（毫秒）
+
+# 在默认情况下 spring cloud feign在进行各个子服务之间的调用时，http组件使用的是jdk的HttpURLConnection，没有使用线程池。
+# 有2种可选的线程池：HttpClient和OKHttp
+# 比较推荐OKHttp，请求封装的非常简单易用，性能也很ok。
+feign:
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+    max-connections: 1000
+    max-connections-per-route: 100
+  compression:
+    request:
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+      enabled: true
+    response:
+      enabled: true
+  hystrix:
+    enabled: true
+
+#  熔断器并发调优,修改熔断器的线程数量，注意线程数不是越多越好
+hystrix:
+  threadpool:
+    default:
+      coreSize: 200 #并发执行的最大线程数，默认10
+      maxQueueSize: 2000 #BlockingQueue的最大队列数，默认值-1
+      queueSizeRejectionThreshold: 2000 #即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝，默认值5
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 180000
+    server-sys:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 100000
+    api-security:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 100000
+    api-aduit-es:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 100000
+    api-aduit:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 100000
+    api-terminal:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 120000
+
+auth:
+  #0 本系统权限认证  1 国网
+  type: 0
+  loginUrl: ${auth.uiasLoginAddress:http://127.0.0.1:8080}/uias/uias/isAgainAuth4Client.do
+  iscAddress: https://192.168.120.188:8443
+  cemsAddress: https://192.168.118.211
+  uiasLoginAddress: http://127.0.0.1:8080
+  params:
+    responseType: code
+    scope: read,write
+    clientId: oauth1123
+    clientSecret:
+    redirectUri: /api-common/user/codeToToken/callback
+
+returnUrl:
+  enabled: true
+iscconfig:
+  home: https://${LOCAL_SERVER_IP:192.168.119.217}/
+  login: ${auth.cemsAddress:https://192.168.118.211}/CEMS/welcomeAction_welcomeForIscCems.do?request_locale=zh_CN
+  cems: ${auth.cemsAddress:https://192.168.118.211}/CEMS/cascade/cascadeTerminalAwarenessAction_authenticationTicket.do?token=
+  url: ${auth.iscAddress:https://192.168.120.188:8443}/isc_frontmv_serv/
+  appid: ff8080816cd7d5ed016cd7e2638a0004
+  authorization: isc_manage
+  resourceId: ff8080816cd7d5ed016cdb4d2af301d8
+
+
+# 主要调整请求的超时时间，是否重试
+ribbon:
+  ConnectTimeout: 60000
+  ServerListRefreshInterval: 15000
+  MaxAutoRetriesNextServer: 0
+  MaxConnectionsPerHost: 3000
+  MaxTotalConnections: 3000
+  ReadTimeout: 60000
+
+# zuul默认是使用semaphore隔离，并且最大的并发默认是10
+# 1. 修改隔离策略,默认情况下推荐使用 thread 隔离策略
+zuul:
+  semaphore:
+    max-semaphores: 5000
+  add-host-header: true
+  ribbon-isolation-strategy: thread
+  ribbon:
+    threadPool:
+      useSeparateThreadPools: true
+      threadPoolKeyPrefix: api-gateway
+  servlet-path: /
+  sensitive-headers: null
+  host:
+    max-per-route-connections: 3000
+    max-total-connections: 3000
+    connect-timeout-millis: 30000
+    socket-timeout-millis: 30000
+  routes:
+    assetIco:
+      path: /favicon.ico
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    asset-js:
+      path: /js/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    asset-css:
+      path: /css/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    asset-fonts:
+      path: /fonts/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    asset-images:
+      path: /images/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    portal-static:
+      path: /static/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    portal-home:
+      path: /
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    portal-portal-admin:
+      path: /admin/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    cboard:
+      path: /cboard/**
+      url: http://localhost:7090/
+      stripPrefix: false
+    files:
+      path: /files/**
+      url: http://localhost:7090/
+      stripPrefix: false
+    portal-login:
+      path: /login/
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    portal-login-new:
+      path: /login*/
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    portal-forbid:
+      path: /forbid/
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    portal-modifypwd:
+      path: /modify_password/
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    portal-modifypwd2:
+      path: /modify_password2/
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    portal-navigation:
+      path: /navigation/
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-search:
+      path: /search/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-ticket:
+      path: /ticket/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-safetycheck:
+      path: /safetycheck/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-asset:
+      path: /asset/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-alarmdeal:
+      path: /alarmdeal/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-knowledge:
+      path: /knowledge/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-weak:
+      path: /weak/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-ip:
+      path: /ip/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-report:
+      path: /report/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-forensics:
+      path: /forensics/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-audit:
+      path: /audit/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-oa:
+      path: /oa/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-persontrait:
+      path: /persontrait/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-flow:
+      path: /flow/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-sap:
+      path: /sap/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-bigScreen:
+      path: /bigScreen/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-audit-gw:
+      path: /terminaldata/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-terminal:
+      path: /terminal/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-risk:
+      path: /risk/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-hardware:
+      path: /hardware/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-assetmonitor:
+      path: /assetmonitor/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-situation:
+      path: /situation/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-security:
+      path: /security/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-analysisPlatform:
+      path: /analysisPlatform/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-seaoil:
+      path: /seaoil/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-remotectl:
+      path: /remotectl/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-dncweb:
+      path: /dnc-web/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-xgs:
+      path: /xgs/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-data:
+      path: /data/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-selfRegulation:
+      path: /selfRegulation/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-evaluation:
+      path: /evaluation/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    app-casom:
+      path: /casom/**
+      url: ${WEBAPP:http://127.0.0.1:9999/}
+      stripPrefix: false
+    cascade-api:
+      path: /cascade/register
+      serviceId: api-admin
+      sensitiveHeaders: null
+      stripPrefix: false
+    cascade-logout:
+      path: /cascade/logout
+      serviceId: api-admin
+      sensitiveHeaders: null
+      stripPrefix: false
+    cascade-status:
+      path: /cascade/status
+      serviceId: api-admin
+      sensitiveHeaders: null
+      stripPrefix: false
+    cascade-summary:
+      path: /cascade/summary
+      serviceId: api-audit-es
+      sensitiveHeaders: null
+      stripPrefix: false
+    cascade-report:
+      path: /cascade/policy/report
+      serviceId: api-admin
+      sensitiveHeaders: null
+      stripPrefix: false
+    cascade-delete:
+      path: /cascade/policy/delete
+      serviceId: api-admin
+      sensitiveHeaders: null
+      stripPrefix: false
+    api-common:
+      path: /api-common/**
+      serviceId: api-admin
+      sensitiveHeaders: null
+    api-admin:
+      path: /api-admin/**
+      serviceId: api-admin
+      sensitiveHeaders: null
+    api-log:
+      path: /V1/**
+      serviceId: api-netflow
+      stripPrefix: false
+    api-log-netflow:
+      path: /V2/**
+      serviceId: api-netflow
+      stripPrefix: false
+    api-netflow:
+      path: /api-netflow/**
+      serviceId: api-netflow
+      sensitiveHeaders: null
+    api-search:
+      path: /api-search/**
+      serviceId: api-admin
+      sensitiveHeaders: null
+    api-ticket:
+      path: /api-ticket/**
+      serviceId: api-ticket
+      sensitiveHeaders: null
+    api-report:
+      path: /api-report/**
+      serviceId: api-report
+      sensitiveHeaders: null
+    api-asset:
+      path: /api-asset/**
+      serviceId: api-alarmdeal
+      sensitiveHeaders: null
+    api-alarmDeal1:
+      path: /api-alarmDeal/**
+      serviceId: api-alarmdeal
+    api-alarmdeal:
+      path: /api-alarmdeal/**
+      serviceId: api-alarmdeal
+    api-knowledge:
+      path: /api-knowledge/**
+      serviceId: api-knowledge
+    api-ip:
+      path: /api-ip/**
+      serviceId: api-ip
+    api-audit-business:
+      path: /api-audit/**
+      serviceId: api-audit-xc
+    api-audit-xc:
+      path: /api-audit-xc/**
+      serviceId: api-audit-xc
+    api-audit-ads:
+      path: /api-audit-ads/**
+      serviceId: api-audit-xc
+    api-audit-es:
+      path: /api-audit-es/**
+      serviceId: api-audit-xc
+    api-audit-bigdata:
+      path: /api-audit-bigdata/**
+      serviceId: api-audit-xc
+    api-monitor:
+      path: /api-monitor/**
+      serviceId: server-monitor
+#    api-servermonitor:
+#      path: /api-servermonitor/**
+#      serviceId: server-monitor
+    api-flow:
+      path: /api-flow/**
+      serviceId: api-alarmdeal
+    server-fileupload:
+      path: /api-fileup/**
+      serviceId: server-fileupload
+    server-push:
+      path: /api-push/**
+      serviceId: server-push
+    server-monitor:
+      path: /api-servermonitor/**
+      serviceId: monitoring-server
+    api-oa:
+      path: /api-oa/**
+      serviceId: api-oa
+    api-persontrait:
+      path: /api-persontrait/**
+      serviceId: api-persontrait
+    api-audit-gw:
+      path: /api-audit-gw/**
+      serviceId: api-audit-gw
+    api-risk:
+      path: /api-risk/**
+      serviceId: api-risk
+    api-serversys:
+      path: /api-serversys/**
+      serviceId: api-admin
+    api-assetmonitor:
+      path: /api-assetmonitor/**
+      serviceId: api-assetmonitor
+      sensitiveHeaders:
+    api-situation:
+      path: /api-situation/**
+      serviceId: api-situation
+      sensitiveHeaders:
+    api-security:
+      path: /api-security/**
+      serviceId: api-security
+    api-seaoil:
+      path: /api-seaoil/**
+      serviceId: api-seaoil
+    api-remotectl:
+      path: /api-remotectl/**
+      serviceId: api-remotectl
+      sensitiveHeaders:
+    api-dncweb:
+      path: /api-dncweb/**
+      serviceId: dnc-application
+      sensitiveHeaders: null
+    api-dncweb1:
+      path: /api-dncweb1/**
+      serviceId: dnc-application1
+      sensitiveHeaders: null
+    api-dncweb3:
+      path: /api-dncweb3/**
+      serviceId: dnc-application3
+      sensitiveHeaders: null
+    api-dncweb4:
+      path: /api-dncweb4/**
+      serviceId: dnc-application4
+      sensitiveHeaders: null
+    api-dncweb8:
+      path: /api-dncweb8/**
+      serviceId: dnc-application8
+      sensitiveHeaders: null
+    api-dncweb5:
+      path: /api-dncweb5/**
+      serviceId: dnc-application5
+      sensitiveHeaders: null
+    api-dncweb9:
+      path: /api-dncweb9/**
+      serviceId: dnc-application9
+      sensitiveHeaders: null
+    api-dncweb10:
+      path: /api-dncweb10/**
+      serviceId: dnc-application10
+      sensitiveHeaders: null
+    api-data:
+      path: /api-data/**
+      serviceId: api-data
+    api-evaluation:
+      path: /api-evaluation/**
+      serviceId: api-evaluation
+    api-casom:
+      path: /api-casom/**
+      serviceId: api-casom
+    supervise:
+      path: /coor/**
+      serviceId: api-admin
+      sensitiveHeaders: null
+      stripPrefix: false
+info:
+  app:
+    name: "server-zuul"
+    description: "服务网关模块"
+    version: "2.2-SNAPSHOT"
+    spring-boot-version: "1.5.19"
+
+xss:
+  excludes: /favicon.ico,/img/*,/js/*,/css/*,/api-data/content/es,/V1/*,/V2/*
+  urlPatterns: /*
+
+sqlinjection:
+  excludes: /favicon.ico,/img/*,/js/*,/css/*,/api-data/content/es,/V1/*,/V2/*
+  urlPatterns: /*
+
+vap:
+  common:
+    session-base64: false
+
+logging:
+  level:
+    com.vrv.vap: info
+    root: ERROR
+    com.alibaba.nacos: ERROR

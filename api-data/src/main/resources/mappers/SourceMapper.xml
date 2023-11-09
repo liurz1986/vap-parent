@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.data.mapper.SourceMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.data.model.Source">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="time_field" jdbcType="VARCHAR" property="timeField"/>
+
+    </resultMap>
+
+
+    <select id="findAllbyRoleIds" resultType="com.vrv.vap.data.model.Source">
+        SELECT ds.* FROM data_source AS ds
+        INNER JOIN data_source_role AS dsr
+        ON ds.id = dsr.source_id
+        AND dsr.role_id IN
+        <foreach collection="roleIds" separator="," open="(" close=")" item="roleId">${roleId}</foreach>
+    </select>
+
+
+    <!--    <select id="querySource"></select>-->
+    <!--    <select id="querySourceCount"></select>-->
+    <!--    <insert id="insertSource"></insert>-->
+    <!--    <update id="updateSource"></update>-->
+    <!--    <delete id="deleteSource"></delete>-->
+    <!--    <insert id="batchInsert / import"></insert>-->
+
+</mapper>

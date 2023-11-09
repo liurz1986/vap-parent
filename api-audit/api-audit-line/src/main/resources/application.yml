@@ -1,0 +1,346 @@
+dir:
+  base: vap_server_dir
+  upload: /upload
+  tmp: /tmp
+  dataBackup: /dataBackup
+  backup: /data/elasticsearch/backup
+
+session:
+  base64:
+    enabled: false
+
+param:
+  #应用流量分析 接口时间转换
+  netflow-time: 1
+  #mysql数据导入
+  insert-mysql-size: 500
+  #预置情报数据导入zip包解压密码
+  zip-password: vrv@123
+  #flume domain文件存放路径
+  flume-domain-path: /usr/local/vap/flume/file/default/domain.yml
+
+liquibase:
+  enabled: false
+  change-log: classpath:sql/changelog-master.xml
+  url: jdbc:mysql://${MYSQL_HOST:192.168.119.213}:${MYSQL_PORT:3306}/ajb_vap?user=${MYSQL_USER:root}&password=${MYSQL_PASSWORD:mysql}&useUnicode=true&useSSL=false&characterEncoding=UTF-8
+
+database:
+  type: mysql
+
+spring:
+  jmx:
+    default-domain: api-audit-xc
+  datasource:
+    druid:
+      initial-size: 10
+      max-active: 100
+      min-idle: 3
+      max-wait: 5000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 100
+    dynamic:
+      primary: core #设置默认的数据源或者数据源组,默认值即为master
+      strict: false #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
+      datasource:
+        core:
+          username: ${MYSQL_USER:root}
+          password: ${MYSQL_PASSWORD:mysql}
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${MYSQL_HOST:192.168.120.201}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+        drds:
+          username: ${MYSQL_USER:root}
+          password: ${MYSQL_PASSWORD:mysql}
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${MYSQL_HOST:192.168.120.201}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+        ads:
+          username: ${MYSQL_USER:root}
+          password: ${MYSQL_PASSWORD:mysql}
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${MYSQL_HOST:192.168.120.201}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+        rds2:
+          username: ${MYSQL_USER:root}
+          password: ${MYSQL_PASSWORD:mysql}
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${MYSQL_HOST:192.168.120.201}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+  session:
+    store-type: redis
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 0
+    # Redis服务器地址
+    host: ${REDIS_HOST:192.168.120.201}
+    port:  ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:vrv@1234}
+    # 连接池最大连接数（使用负值表示没有限制）
+    pool.max-active: -1
+    # 连接池最大阻塞等待时间（使用负值表示没有限制）
+    pool.max-wait: 10000
+    # 连接池中的最大空闲连接
+    pool.max-idle: 10
+    # 连接池中的最小空闲连接
+    pool.min-idle: 2
+    # 连接超时时间（毫秒）
+    timeout: 60000ms
+  rabbitmq:
+    host:  ${RABBITMQ_HOST:192.168.120.201}
+    port:  ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+    queueName:  sys_user_log
+    topicExchange: vap-exchange
+  http:
+    #新疆文件上传接口限制文件在1G以内
+    multipart:
+      maxFileSize: 1024Mb
+      maxRequestSize: 1280Mb
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: AUTO
+
+fdfs:
+  #是否启用fdfs
+  isUse: true
+  connectTimeout: 60
+  networkTimeout: 60
+  charset: UTF-8
+  httpPort: 80
+  stealToken: no
+  secretKey: FastDFS1234567890
+  trackerServers: ${FDFS_SERVER:192.168.119.208:22122,192.168.119.209:22122}
+
+permission:
+  version:
+  mapping:
+    mysql:
+    #      - base_sysinfo:security_domain_code
+    mysql-ip:
+    es:
+
+#新疆文件上传根目录
+upload:
+  basePath: /root
+
+#屏幕抓取导出相关配置
+screen-capturer:
+  url: http://${LOCAL_SERVER_IP:192.168.119.213}:8080
+  file-path: /usr/local/vap/screencapturer/pdf
+
+vap:
+  flume:
+    enable: true
+    channel-type: memory
+    capacity: 200000
+    sink-type: database
+    databases:
+      - url: jdbc:mysql://${MYSQL_HOST:192.168.120.201}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:mysql}
+      - url: jdbc:mysql://${MYSQL_HOST:192.168.120.201}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:mysql}
+    driver: com.mysql.jdbc.Driver
+    insert-sql: insert into sys_log (id, request_ip,type, user_id, user_name, organization_name, description, request_url, request_time, request_method, method_name, bean_name, params_value, response_result, login_type, role_name) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+
+datasource:
+  #数据源本地json文件路径
+  local-path: /opt/SecAudit/cas/devids.json
+
+flume:
+  client-id: collect
+  client-secret: collect
+  base-url: https://localhost:28081/
+  list-url: https://localhost:28081/collect/info
+  start-url: https://localhost:28081/collect/start
+  stop-url: https://localhost:28081/collect/stop
+
+
+#kafka cluster config
+kafka-sasl:
+  #上级kafka安装目录
+  baseHome: /usr/local/vap/kafka/
+  #上级平台 kafka 集群所有机器都要配
+  hostInfo:
+    - host: 192.168.119.213
+      port: 22
+      user: root
+      password: root
+  #    - host: 192.168.119.213
+  #      port: 22
+  #      user: root
+  #      password: root
+  kafkaPort: 9092
+  #存储jaas.conf路径
+  jaasPath: /home/kafka-jaas/
+  #上级平台 zookeeper  集群集群所有机器都要配
+  zookeeperInfo:
+    - host: 192.168.119.213
+      port: 22
+      user: root
+      password: root
+  zooPort: 2181
+  #zookeeper 独立安装 true，基于kafka false
+  zookeeperMode: true
+  # zookeeperMode = true 时需要填安装路径
+  zookeeperHome: /usr/local/vap/zookeeper/
+  #各平台配各自 连接hive2 jdbc ip地址
+  hiveJdbcIp: 192.168.119.206
+  #各平台配各自 hdfs nameNode 所在ip地址
+  nameNode: 192.168.119.203
+
+elk:
+  cluster:
+    name: ${ES_CLUSTER_NAME:es-cluster-5.5.3}
+  ip: ${ES_CLUSTER_HOST:192.168.18.170}
+  xpack:
+    security:
+      user: ${ES_CLUSTER_UNAME:elastic}
+      password: ${ES_CLUSTER_PWD:admin@12345}
+  port: ${ES_CLUSTER_PORT_REST:9200}
+index:
+  index-format: "${index}-${time}"
+  cache: [yysj-julongv2.1,netflow,copy,net,pki,moveablestorage,screenshots,startshutdown,pic,third]
+  refresh: true
+  startTime: 2010.01.01
+  time-foramt: "yyyy.MM.dd"
+  time-format-month: "yyyy.MM"
+  result-total: 10000
+  result-max: 500000
+  day-index:
+    - copy:复制粘贴
+    - moveablestorage:移动存储
+    - net:上网
+    - netflow:网络会话
+    - pki:PKI
+    - pro:进程
+    - screenshots:截屏
+    - startshutdown:开关机
+    - wangkang:网康
+    - pic:终端截屏
+    - ruixing:瑞星
+    - dongxu-trojan:东巽病毒
+    - dongxu-file:东巽文件
+    - dongxu-web:东巽web
+  month-index:
+    - yysj-julongv2.1:巨龙
+    - third:第三方应用
+  time-field:
+    default: event_time
+
+# 多集群相关配置
+multi-cluster:
+  # 是否开启多集群模式
+  open: false
+  configs:
+    - cluster-name: test1
+      index-mapping:
+        - index11
+        - index12
+        - index13
+    - cluster-name: test2
+      index-mapping:
+        - index21
+        - index22
+        - index23
+    - cluster-name: test3
+      index-mapping:
+        - index31
+        - index32
+        - index33
+
+auto-alias:
+  default-time-field: event_time
+  default-time-format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+  #只创建当月
+  current-month: false
+  indices:
+    - waf-event
+    - dm-netflow,event_time,yyyy-MM-dd
+    - probe-net
+    - probe-attack
+    - probe-db
+    - probe-dns
+    - probe-email
+    - probe-fileinfo
+    - probe-ssh
+    - probe-tls
+    - probe-transfer
+    - app-audit
+    - fireware-audit
+    - fireware-event
+    - fireware-netflow
+    - fort-audit
+    - host-virus
+    - ids-audit
+    - ids-event
+    - ips-audit
+    - ips-event
+    - skyeye-alarm
+    - skyeye-webattack
+    - vrv-one4two
+
+xgs:
+  channel:
+    #kafka批量发送数量
+    kafka-batch-size: 20
+    #发送失败重试次数
+    retries: 3
+    #data 数量
+    data-batch-size: 20
+    #开始时间为空时，默认开始时间
+    start-time: 2020-01-01 00:00:00
+
+outThread:
+  outVisitType:
+    - 01:数据库/mysql
+    - 02:数据库/oracle
+    - 03:数据库/sqlserver
+    - 04:远程登录/ftp
+    - 05:远程登录/ssh
+    - 06:远程登录/telnet
+    - 07:远程登录/windows远程
+    - 08:远程登录/teaviewer
+    - 09:远程登录/向日葵
+
+kafka.producer.servers: ${KAFKA_URL:192.168.120.201}:9092
+kafka.producer.enable.auto.commit: false
+kafka.producer.session.timeout: 15000
+kafka.producer.auto.commit.interval: 100
+kafka.producer.auto.offset.reset: latest
+kafka.producer.group.id: xc-producer-group-1
+kafka.producer.concurrency: 10
+kafka.producer.maxPollRecordsConfig: 100
+
+kafka:
+  host: ${KAFKA_URL:192.168.119.213}
+  port: ${KAFKA_PORT:9092}
+  user: ${KAFKA_USERNAME:admin}
+  password: ${KAFKA_PWD:admin-2019}
+  withoutLogin: false
+  baseHome: /home/download/kafka_2.12-2.5.0/
+  addTopicCmd: bin/kafka-topics.sh --create --topic %topic% --partitions 1 --zookeeper localhost:2181 --replication-factor 1 --force
+  delTopicCmd: bin/kafka-topics.sh --delete --topic %topic% --zookeeper localhost:2181 --force
+  addAclCmd: bin/kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:%user% --allow-host %ip% --consumer --group %group% --topic %topic% --force
+  delAclCmd: bin/kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --remove --allow-principal User:%user% --allow-host %ip% --consumer --group %group% --topic %topic% --force
+  describeGroupCmd: bin/kafka-consumer-groups.sh --bootstrap-server 192.168.119.186:9092 --describe --group %group%  --command-config config/sasl.properties
+  defaultUser: consumer
+  bootstrap:
+    servers: ${KAFKA_URL:192.168.119.213}:${KAFKA_PORT:9092}
+
+
+flink:
+  sshClientHost: ${LOCAL_SERVER_IP:localhost}
+  port: 8081
+
+message:
+  vapSourceKey: vap_source_message
+  vapBaseLineKey: vap_baseline_message
+  baseLineTopic: vap_event_change_message
+  sourceIdMap:
+    1: 184
+    2: 183
+    3: 184
+
+password:
+  url: http://${LOCAL_SERVER_IP:localhost}:9877/api-ml/sp/pwdPlaintextDetection

@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:mysql}
+    url: jdbc:mysql://${MYSQL_HOST:192.168.119.213}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+    loginUsername: vap
+    loginPassword: vap
+  session:
+    store-type: redis
+  redis:
+    host: ${REDIS_HOST:192.168.119.213}
+    port: ${REDIS_PORT:6379}
+    password: vrv@1234
+    maxidle: 2
+    maxTotal: 10
+    maxWaitMillis: 60000
+springfox:
+  name: 北信源武汉分公司
+  title: 推送服务
+  description: 推送服务
+info:
+  app:
+    name: server-push
+    description: 消息推送服务
+    version: 2.1-SNAPSHOT
+    spring-boot-version: 1.5.19
+logging:
+  level:
+    com.vrv.vap: debug
+    root: INFO
+    org.springframework.cloud.sleuth: DEBUG

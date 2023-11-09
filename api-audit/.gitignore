@@ -1,0 +1,33 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.project
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+
+.settings
+<<<<<<< HEAD
+*.iml
+*/target
+vap_server_dir/*
+=======
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+/bin/
+LOG_PATH_IS_UNDEFINED/
+api-audit-xc/web/WEB-INF/web.xml
+>>>>>>> zjg-master

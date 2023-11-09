@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.MessageMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.Message">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="source" jdbcType="TINYINT" property="source" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="content" jdbcType="VARCHAR" property="content" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="status" jdbcType="TINYINT" property="status" />
+        <result column="from_id" jdbcType="INTEGER" property="fromId" />
+        <result column="send_time" jdbcType="TIMESTAMP" property="sendtime" />
+        <result column="read_time" jdbcType="TIMESTAMP" property="read_time" />
+    </resultMap>
+
+    <update id="markReads">
+        UPDATE message SET status=1, read_time=NOW() WHERE id IN
+        <foreach item="id"  collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>

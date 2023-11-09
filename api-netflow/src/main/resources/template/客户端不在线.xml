@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>dev_ip</field>
+		<field>event_time</field>
+		<field>software_name</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>139.211.222.235</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>安全登录</value>
+		<value>DT030</value>
+	</log>
+</data>

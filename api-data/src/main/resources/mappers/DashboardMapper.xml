@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.data.mapper.DashboardMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.data.model.Dashboard">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="time_restore" jdbcType="VARCHAR" property="timeRestore" />
+    <result column="thumbnail" jdbcType="VARCHAR" property="thumbnail" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="top" jdbcType="INTEGER" property="top" />
+    <result column="ui" jdbcType="LONGVARCHAR" property="ui" />
+  </resultMap>
+
+
+  <select id="selectAll" resultType="com.vrv.vap.data.model.Dashboard">
+    SELECT id,title,time_restore as timeRestore,thumbnail,top,sort  FROM data_dashboard ORDER BY top DESC, sort asc
+  </select>
+
+
+</mapper>

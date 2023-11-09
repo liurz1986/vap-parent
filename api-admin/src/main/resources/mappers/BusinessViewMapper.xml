@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BusinessViewMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.BusinessView">
+    <!--
+      WARNING - @mbg.generated
+    -->
+     <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="userGuid" jdbcType="VARCHAR" property="user_guid" />
+    <result column="imgUrl" jdbcType="VARCHAR" property="img_url" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="intro" jdbcType="VARCHAR" property="intro" />
+    <result column="bsGuid" jdbcType="VARCHAR" property="bs_guid" />
+     <result column="addTime" jdbcType="TIMESTAMP" property="add_time" />
+  </resultMap>
+</mapper>

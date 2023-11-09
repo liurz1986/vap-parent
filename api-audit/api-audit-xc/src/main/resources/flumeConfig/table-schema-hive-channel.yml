@@ -1,0 +1,30 @@
+conf.schemas:
+  - schema:
+    index: probe-netflow
+    table: probe_netflow
+    partitions: [dt]
+
+  - schema:
+    index: probe-net
+    table: probe_net
+    partitions: [dt]
+
+  - schema:
+    index: netflow
+    table: netflow
+    partitions: [dt]
+
+  - schema:
+    index: ids-event
+    table: ids_event
+    partitions: [dt]
+
+  - schema:
+    index: app-audit
+    table: app_audit
+    partitions: [dt]
+
+  - schema:
+    index: fireware-event
+    table: fireware_event
+    partitions: [dt]

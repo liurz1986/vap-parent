@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.MapregionMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.Mapregion">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="up_id" jdbcType="VARCHAR" property="upId"/>
+        <result column="up_ip" jdbcType="VARCHAR" property="upIp"/>
+        <result column="is_main_server" jdbcType="TINYINT" property="isMainServer"/>
+        <result column="charge_man" jdbcType="VARCHAR" property="chargeMan"/>
+        <result column="run_status" jdbcType="INTEGER" property="runStatus"/>
+    </resultMap>
+
+    <select id="getMapregions"  resultType="com.vrv.vap.admin.model.Mapregion">
+       select * from mapregion where is_main_server = 1;
+    </select>
+
+
+</mapper>

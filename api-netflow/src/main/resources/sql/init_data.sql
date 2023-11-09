@@ -1,0 +1,45 @@
+--liquibase formatted sql
+--changeset lilang:20220401-apiNetflow-0401 labels:inittables
+
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('31', 'web登录.xls', '1', NULL, '2022-04-07 17:53:48', '2022-04-07 17:53:51', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('32', 'web登录.xml', '2', NULL, '2022-04-07 17:54:35', '2022-04-07 17:54:37', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('33', '病毒上报日志.xls', '1', NULL, '2022-04-07 17:54:57', '2022-04-07 17:54:59', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('34', '病毒上报日志.xml', '2', NULL, '2022-04-07 17:55:37', '2022-04-07 17:55:39', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('35', '策略变更日志.xls', '1', NULL, '2022-04-07 17:55:59', '2022-04-07 17:56:01', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('36', '策略变更日志.xml', '2', NULL, '2022-04-07 17:56:19', '2022-04-07 17:56:21', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('37', '打印刻录日志.xls', '1', NULL, '2022-04-07 17:56:38', '2022-04-07 17:56:40', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('38', '打印刻录日志.xml', '2', NULL, '2022-04-07 17:56:57', '2022-04-07 17:56:59', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('39', '服务器不在线日志.xls', '1', NULL, '2022-04-07 17:57:47', '2022-04-07 17:57:49', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('40', '服务器不在线日志.xml', '2', NULL, '2022-04-07 17:58:05', '2022-04-07 17:58:07', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('41', '服务审计日志.xls', '1', NULL, '2022-04-07 17:59:33', '2022-04-07 17:59:35', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('42', '服务审计日志.xml', '2', NULL, '2022-04-07 17:59:51', '2022-04-07 17:59:53', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('43', '告警日志.xls', '1', NULL, '2022-04-07 18:00:14', '2022-04-07 18:00:16', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('44', '告警日志.xml', '2', NULL, '2022-04-07 18:00:30', '2022-04-07 18:00:32', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('45', '共享审计.xls', '1', NULL, '2022-04-07 18:00:55', '2022-04-07 18:00:57', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('46', '共享审计.xml', '2', NULL, '2022-04-07 18:01:12', '2022-04-07 18:01:15', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('47', '进程日志.xls', '1', NULL, '2022-04-07 18:01:47', '2022-04-07 18:01:50', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('48', '进程日志.xml', '2', NULL, '2022-04-07 18:02:06', '2022-04-07 18:02:09', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('49', '开关机日志.xls', '1', NULL, '2022-04-07 18:02:29', '2022-04-07 18:02:32', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('50', '开关机日志.xml', '2', NULL, '2022-04-07 18:02:49', '2022-04-07 18:02:51', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('51', '客户端不在线.xls', '1', NULL, '2022-04-07 18:03:41', '2022-04-07 18:03:44', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('52', '客户端不在线.xml', '2', NULL, '2022-04-07 18:03:59', '2022-04-07 18:04:02', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('53', '客户端登录日志.xls', '1', NULL, '2022-04-07 18:04:17', '2022-04-07 18:04:20', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('54', '客户端登录日志.xml', '2', NULL, '2022-04-07 18:05:01', '2022-04-07 18:05:04', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('55', '软件日志.xls', '1', NULL, '2022-04-07 18:05:57', '2022-04-07 18:06:00', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('56', '软件日志.xml', '2', NULL, '2022-04-08 09:17:06', '2022-04-08 09:17:08', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('57', '违规介质操作日志.xls', '1', NULL, '2022-04-08 09:17:33', '2022-04-08 09:17:35', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('58', '违规介质操作日志.xml', '2', NULL, '2022-04-08 09:17:57', '2022-04-08 09:17:59', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('59', '违规外联日志.xls', '1', NULL, '2022-04-08 09:18:18', '2022-04-08 09:18:20', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('60', '违规外联日志.xml', '2', NULL, '2022-04-08 09:18:39', '2022-04-08 09:18:40', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('61', '文件监控.xls', '1', NULL, '2022-04-08 09:19:05', '2022-04-08 09:19:07', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('62', '文件监控.xml', '2', NULL, '2022-04-08 09:19:21', '2022-04-08 09:19:23', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('63', '文件密级操作日志.xls', '1', NULL, '2022-04-08 09:19:41', '2022-04-08 09:19:43', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('64', '文件密级操作日志.xml', '2', NULL, '2022-04-08 09:19:57', '2022-04-08 09:19:59', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('65', '硬件变更审计.xls', '1', NULL, '2022-04-08 09:20:14', '2022-04-08 09:20:16', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('66', '硬件变更审计.xml', '2', NULL, '2022-04-08 09:20:32', '2022-04-08 09:20:35', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('67', '用户操作日志.xls', '1', NULL, '2022-04-08 09:20:49', '2022-04-08 09:20:51', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('68', '用户操作日志.xml', '2', NULL, '2022-04-08 09:21:04', '2022-04-08 09:21:06', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('69', '优盘使用日志.xls', '1', NULL, '2022-04-08 09:21:20', '2022-04-08 09:21:22', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('70', '优盘使用日志.xml', '2', NULL, '2022-04-08 09:21:35', '2022-04-08 09:21:37', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('71', '终端登录日志.xls', '1', NULL, '2022-04-08 09:21:58', '2022-04-08 09:22:00', '1');
+INSERT INTO `collector_offline_template` (`id`, `name`, `type`, `path`, `create_time`, `last_update_time`, `oper_type`) VALUES ('72', '终端登录日志.xml', '2', NULL, '2022-04-08 09:22:14', '2022-04-08 09:22:16', '1');

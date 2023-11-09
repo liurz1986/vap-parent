@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.netflow.mapper.BaseKoalOrgMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.netflow.model.BaseKoalOrg">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="uuId" jdbcType="INTEGER" property="uu_id" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="parentCode" jdbcType="VARCHAR" property="parent_code" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="shortName" jdbcType="VARCHAR" property="short_name" />
+    <result column="otherName" jdbcType="VARCHAR" property="other_name" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="oldCode" jdbcType="VARCHAR" property="old_code" />
+    <result column="startDate" jdbcType="VARCHAR" property="start_date" />
+    <result column="endDate" jdbcType="VARCHAR" property="end_date" />
+    <result column="oldCodeEnd" jdbcType="VARCHAR" property="old_code_end" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="update_time" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="orghierarchy" jdbcType="TINYINT" property="org_hierarchy" />
+    <result column="businessline" jdbcType="VARCHAR" property="business_line" />
+  </resultMap>
+
+    <select id="findAll"  resultType="com.vrv.vap.netflow.vo.BaseKoalOrgVO">
+        SELECT o.uu_id as uuId,o.code,o.parent_code as parentCode,o.type,o.name,o.short_name as shortName,
+        o.other_name as otherName,o.status,o.old_code as oldCode,o.start_date as startDate,
+        o.end_date as endDate,o.old_code_end as oldCodeEnd,o.update_time as updatetime,
+        o.sort,o.org_hierarchy as orghierarchy,o.business_line as businessline,o.secret_level as secretLevel,o.secret_qualifications as secretQualifications,o.org_type as orgType,o.protection_level as protectionLevel,
+        oi.start_ip_num as startIpNum,oi.end_ip_num as endIpNum FROM base_koal_org AS o
+        left join  base_org_ip_segment AS oi ON oi.area_code = o.`code`
+        ORDER BY oi.start_ip_num DESC,oi.end_ip_num ASC
+    </select>
+
+</mapper>

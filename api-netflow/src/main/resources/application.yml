@@ -1,0 +1,179 @@
+server:
+  port: 9412
+  servlet:
+    context-path: /
+    uri-encoding: UTF-8
+    basedir: /data/vap/temp
+    threads:
+      max: 800
+      minSpare: 30
+  tomcat:
+    remoteip:
+      remote-ip-header: x-forwarded-for
+      port-header: X-Forwarded-Port
+      use-forward-headers: true
+      protocol-header: x-forwarded-proto
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:mysql}
+    driver-class-name: ${DATABASE_DRIVER:com.mysql.cj.jdbc.Driver}
+    url: jdbc:mysql://${MYSQL_HOST:192.168.120.86}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+    hikari:
+      minimum-idle: 5
+      idle-timeout: 600000
+      maximum-pool-size: 15
+      auto-commit: true
+      pool-name: MyHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  session:
+    store-type: redis
+  redis:
+    host: ${REDIS_HOST:192.168.120.86}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:vrv@1234}
+    pool:
+      max-active: -1 # 连接池最大连接数（使用负值表示没有限制）
+      max-wait: 10000 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      max-idle:  16 # 连接池中的最大空闲连接
+      min-idle: 2
+    timeout: 10000  # 连接超时时间（毫秒）
+    database: 0
+  servlet:
+    multipart:
+      max-file-size: 300MB      # Max file size，默认1M
+      max-request-size: 300MB   # Max request size，默认10M
+
+
+logging:
+  level:
+    com.vrv.vap: ERROR
+    root: info
+    com.alibaba.nacos: ERROR
+
+vap:
+  common:
+    session-base64: false
+  flume:
+    enable: true
+    channel-type: memory
+    capacity: 200000
+    byte-capacity: 314572800
+    sink-type: avro
+    batch: 5000
+    avro-addresses:
+      - vap:515
+      - vap:515
+  zjg:
+    data-batch:
+      max-queue-size: 40000
+      batch-time: 60000 #最长处理时间(毫秒)
+      batch-capability: 1000
+      file-folder: ${VAP_WORK_DIR:/vrv}/netflow #数据落地目录
+      sub-folder-size: 100
+      file-suffix: txt #写入完成文件后缀
+      tmp-file-suffix: temp #写入是临时文件后缀
+      log-type-dic: 1,DT012;2,DT013;3,DT014;4,DT015;5,DT016;6,DT017;7,DT018;9,DT019;10,DT020;11,DT021;
+      dev-type-dic: 用户终端,0;服务器,1;安全保密产品,2;应用,3;网络设备,4;通用办公设备,5;运维终端,6
+      level-type-dic: 绝密,0;机密,1;秘密,2;内部,3;公开,4
+      ignoreFilterIps: "114.114.114.114,8.8.8.8"
+    monitor:
+      reportInterval: 5 #监测器上报时间间隔（分钟）
+    backup:
+      filePath: /opt/file/backup
+  alarm-log:
+    address: ${LOCAL_SERVER_IP:192.168.120.201}:40518
+  swagger:
+    enabled: true
+    title: api-netflow接口文档
+    description: api-netflow接口文档
+    base-package: com.vrv.vap.netflow
+    version: 1.0.4
+
+elk:
+  permission: none
+  cluster:
+    name: ${ES_CLUSTER_NAME:es-cluster-5.5.3}
+  ip: ${ES_CLUSTER_HOST:192.168.119.213}
+  port: ${ES_CLUSTER_PORT_REST:9200}
+  xpack:
+    security:
+      user: ${ES_CLUSTER_UNAME:admin}
+      password: ${ES_CLUSTER_PWD:vrv@12345}
+
+kafka:
+  topic: ${KAFKA_TOPIC:logstash-elk}
+  bootstrap:
+    servers : ${KAFKA_URL:192.168.119.213}:${KAFKA_PORT:9092}
+  consumer:
+    servers: ${KAFKA_URL:192.168.119.213}:${KAFKA_PORT:9092}
+    concurrency: 10
+    maxPollRecordsConfig: 100
+    group:
+      id: test-consumer-group
+    session:
+      timeout: 15000
+    enable:
+      auto:
+        commit: false
+    auto:
+      offset:
+        reset: latest
+      commit:
+        interval: 100
+  userName: admin
+  password: admin-2019
+
+collector:
+  configPath: ${VAP_WORK_DIR:/usr/local/vap}/flume/file/default
+
+database:
+  dbType: ${DB_TYPE:mysql}
+
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 5000
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+    max-connections: 1000
+    max-connections-per-route: 100
+  compression:
+    request:
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+      enabled: true
+    response:
+      enabled: true
+  hystrix:
+    enabled: false
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 100
+      maximumSize: 2000
+      allowMaximumSizeToDivergeFromCoreSize: true
+      maxQueueSize: -1
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 10000
+
+#mybatis
+mybatis:
+  mapper-locations: classpath*:mappers/*.xml
+#mappers 多个接口时逗号隔开
+mapper:
+  mappers: com.vrv.vap.base.BaseMapper

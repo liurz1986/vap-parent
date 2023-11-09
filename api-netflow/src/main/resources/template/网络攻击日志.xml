@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>dev_ip</field>
+		<field>dev_id</field>
+		<field>event_time</field>
+		<field>attack_ip</field>
+		<field>attack_type</field>
+		<field>attack_name</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>139.211.222.235</value>
+		<value>8a:51:3a:aa:a7:bc</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>wz</value>
+		<value>139.211.222.236</value>
+		<value>网关欺骗</value>
+		<value>ARP攻击</value>
+		<value>DT034</value>
+	</log>
+</data>

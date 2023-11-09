@@ -1,0 +1,579 @@
+package com.vrv.rule.source.datasourceconnector.es.util;
+
+
+import com.vrv.rule.source.datasourceconnector.es.vo.ResultCodeEnum;
+import com.vrv.rule.source.datasourceconnector.es.vo.SearchField;
+import com.vrv.rule.util.DateUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.elasticsearch.search.aggregations.metrics.NumericMetricsAggregation;
+import org.elasticsearch.search.aggregations.metrics.Stats;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
+
+
+/**
+ * @author wudi
+ * @version 创建时间：2018年7月28日 下午4:48:34
+ * @ClassName ElasticSearchUtil
+ * @Description Es工具类
+ */
+public class ElasticSearchUtil {
+
+	private static Logger logger = LoggerFactory.getLogger(ElasticSearchUtil.class);
+
+	/**
+	 * 获得properties对应的属性
+	 * 
+	 * @param declaredFields
+	 * @return
+	 */
+	public static XContentBuilder getXContentBuilder(Map<String, Class<?>> declaredFields, Object obj) {
+		try {
+			XContentBuilder builder = XContentFactory.jsonBuilder().startObject().startObject("properties");
+			builder = getXContentBuilder(declaredFields, "", builder,obj);
+			builder = builder.endObject().endObject();
+			return builder;
+		} catch (IOException e) {
+			logger.error("构造错误", e);
+			throw new ElasticSearchException(ResultCodeEnum.ERROR.getCode(), "构造错误");
+		}
+	}
+
+	private static XContentBuilder getXContentBuilder(Map<String, Class<?>> declaredFields, String rootName,
+			XContentBuilder rootBuilder,Object obj) {
+		try {
+
+			for (Map.Entry<String, Class<?>> field : declaredFields.entrySet()) {
+				Class<?> type = field.getValue(); // field.getType();
+				String typename = type.getName();
+				String name = field.getKey(); // field.getName();
+				if (!StringUtils.isEmpty(rootName)) {
+					name = rootName + "." + name;
+				}
+				logger.info("名称:"+name+","+"类型:"+typename);
+				switch (typename) {
+				case "java.lang.String":
+					rootBuilder = rootBuilder.startObject(name).field("type", "keyword").endObject();
+					break;
+				case "[Ljava.lang.String;":  //字符串数组
+					rootBuilder = rootBuilder.startArray(name).endArray();
+					//rootBuilder = rootBuilder.startObject(name).field("type", "text").startObject("fields").startObject("keyword").field("type", "keyword").endObject().endObject().endObject();
+					break;
+				case "java.lang.Integer":
+				case "int":
+					rootBuilder = rootBuilder.startObject(name).field("type", "integer").endObject();
+					break;
+				case "java.util.Date":
+					logger.info("java.util.Date 日期:"+name);
+					rootBuilder = rootBuilder.startObject(name).field("type", "date")
+							.field("format", "yyyy-MM-dd HH:mm:ss").endObject();
+					break;
+				case "boolean":
+				case "java.lang.Boolean":
+					rootBuilder = rootBuilder.startObject(name).field("type", "boolean").endObject();
+					break;
+				case "long":
+				case "java.lang.Long":
+					rootBuilder = rootBuilder.startObject(name).field("type", "long").endObject();
+					break;
+				case "byte":
+				case "java.lang.Byte":
+					rootBuilder = rootBuilder.startObject(name).field("type", "long").endObject();
+					break;
+				case "short":
+				case "java.lang.Short":
+					rootBuilder = rootBuilder.startObject(name).field("type", "short").endObject();
+					break;
+				case "double":
+				case "java.lang.Double":
+					rootBuilder = rootBuilder.startObject(name).field("type", "double").endObject();
+					break;
+				case "float":
+				case "java.lang.Float":
+					rootBuilder = rootBuilder.startObject(name).field("type", "float").endObject();
+					break;
+				case "java.util.List":
+					rootBuilder = getListXContentBuilder(rootBuilder, obj, name);
+					break;
+				default:
+					Field[] fields = type.newInstance().getClass().getDeclaredFields();
+					Map<String, Class<?>> map = fieldsConvertMap(fields);
+					rootBuilder = getXContentBuilder(map, name, rootBuilder,obj);
+					break;
+				}
+			}
+			return rootBuilder;
+		} catch (Exception e) {
+			logger.error("解析匹配错误", e);
+			throw new ElasticSearchException(ResultCodeEnum.ERROR.getCode(), "构造错误");
+		}
+	}
+
+	/**
+	 *获得List对应的数据
+	 * @param rootBuilder
+	 * @param obj
+	 * @param name
+	 * @return
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 */
+	private static XContentBuilder getListXContentBuilder(XContentBuilder rootBuilder, Object obj, String name)
+			throws NoSuchFieldException, IllegalAccessException, ClassNotFoundException {
+		Field declaredField =obj.getClass().getDeclaredField(name);
+		String paramterType = ElasticSearchUtil.getParamterTypeByList(declaredField);
+		if(paramterType.contains("java.util.Map")){
+			Map<String, Class<?>> maps = new HashMap<>();
+			declaredField.setAccessible(true);
+			List<Map<String,Object>> listMap = (List<Map<String,Object>>)declaredField.get(obj);
+			for (Map<String, Object> map : listMap) {
+				Map<String, Class<?>> fieldMap =ElasticSearchUtil.getFieldMap(map,name);
+				maps.putAll(fieldMap);
+			}
+			rootBuilder = getXContentBuilder(maps, null, rootBuilder,obj);
+		}else{
+			Class<?> forName = Class.forName(paramterType);
+			Map<String, Class<?>> mapList = new HashMap<>();
+			mapList.put(name, forName);
+			rootBuilder = getXContentBuilder(mapList, null, rootBuilder,obj);
+		}
+		return rootBuilder;
+	}
+
+	/**
+	 * 将map对应的数据转换成<key,clazz>
+	 * @param obj
+	 * @return
+	 */
+	private static Map<String, Class<?>> getMapFieldConvertMap(Object obj) {
+		Map<String, Class<?>> fieldsConvertMap=new HashMap<>();
+		Field[] fields = obj.getClass().getDeclaredFields();
+		for (Field field : fields) {
+	        field.setAccessible(true);
+	        String name = field.getName(); //获得属性
+			String typeName = field.getType().getName(); //获得typeName
+			try{
+			switch (typeName) {
+			case "java.util.Map":
+		        //获取属性值
+		        Map<String,Object> value = (Map<String,Object>)field.get(obj);
+		        if(value!=null){
+		        	Map<String, Class<?>> fieldMap =ElasticSearchUtil.getFieldMap(value,name);
+		        	fieldsConvertMap.putAll(fieldMap);
+		        }
+				break;
+			default:
+				fieldsConvertMap.put(name, field.getType());
+				break;
+			}
+			}catch(Exception e) {
+				 logger.error("拼接解析出现错误", e);
+				 throw new ElasticSearchException(ResultCodeEnum.ERROR.getCode(), e.getMessage());
+			}
+		}
+		return fieldsConvertMap;
+	}
+	
+	
+	public static Map<String, Class<?>> fieldsConvertMap(Field[] fields) {
+		Map<String, Class<?>> map = new HashMap<>();
+		for (Field field : fields) {
+			map.put(field.getName(), field.getType());
+		}
+		return map;
+	}
+
+	/**
+	 * 完成对应的查询（must查询语句）
+	 * 
+	 * @param conditions
+	 * @return
+	 */
+	public static QueryBuilder toQueryBuilder(List<QueryCondition_ES> conditions) {
+		BoolQueryBuilder query = QueryBuilders.boolQuery();//
+		for (QueryCondition_ES con : conditions) {
+			query = query.must(toQueryBuild(con));
+		}
+		return query;
+	}
+
+	/**
+	 * 获得Map<String,Class<?>>
+	 * 
+	 * @param map
+	 * @return
+	 */
+	public static Map<String, Class<?>> getFieldMap(Map<String, Object> map, String rootName) {
+		Map<String, Class<?>> field = new HashMap<>();
+		for (Map.Entry<String, Object> entry : map.entrySet()) {
+			String key = entry.getKey();
+			if (!StringUtils.isEmpty(rootName)) {
+				key = rootName + "." + key;
+			}
+			Object value = entry.getValue();
+			if(value!=null){
+				String name = value.getClass().getName();
+				switch (name) {
+				case "java.util.Map":
+				case "java.util.HashMap":
+					Map<String, Object> maps = (Map<String, Object>) value;
+					field.putAll(getFieldMap(maps, key));
+					break;
+				default:
+					Class<? extends Object> fieldClass = entry.getValue().getClass();
+					field.put(key, fieldClass);
+					break;
+				}
+			}
+		}
+		return field;
+	}
+
+	/**
+	 * 查询语句
+	 * 
+	 * @param con
+	 * @return
+	 */
+	public static QueryBuilder toQueryBuild(QueryCondition_ES con) {
+		QueryBuilder query = null;
+		switch (con.getCompareExpression()) {
+		/// <summary>
+		/// 等于
+		/// </summary>
+		case Eq:
+			query = QueryBuilders.termQuery(con.getField(), con.getValue1());
+			break;
+		/// <summary>
+		/// where a!=1
+		/// </summary>
+		case NotEq:
+			query = QueryBuilders.boolQuery().mustNot(QueryBuilders.termQuery(con.getField(), con.getValue1()));
+			break;
+
+		/// <summary>
+		/// in (1,2,3)
+		/// </summary>
+		case In:
+			// FilterBuilder inFilter = FilterBuilders.inFilter("typeId", ids)
+			if(con.getValue1() instanceof List<?>) {
+				query = QueryBuilders.termsQuery(con.getField(),((List<Object>)con.getValue1()).toArray());
+			}else {
+				query = QueryBuilders.termsQuery(con.getField(),(Object[])con.getValue1());
+			}
+			break;
+
+		/// <summary>
+		/// 之间
+		/// </summary>
+		case Between:
+			query = QueryBuilders.rangeQuery(con.getField()).gte(con.getValue1()).lt(con.getValue2());
+			break;
+		/// <summary>
+		/// is not null
+		/// </summary>
+		case NotNull:
+			// 参考https://blog.csdn.net/wangsht/article/details/52776139
+			// query=QueryBuilders.notQuery(QueryBuilders.missingQuery(con.getField()));
+			query = QueryBuilders.existsQuery(con.getField());
+			break;
+
+		/// <summary>
+		/// is null
+		/// </summary>
+		case IsNull:
+			// query=QueryBuilders.missingQuery(con.getField());
+			query = QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(con.getField()));
+			break;
+
+		/// <summary>
+		/// 类似
+		/// 不需要加配符号
+		/// </summary>
+		case Like:
+			query = QueryBuilders.wildcardQuery(con.getField(), "*" + con.getValue1() + "*");
+			break;
+		/// <summary>
+		/// like '%xx'
+		/// 不需要加配符号
+		/// </summary>
+		case LikeEnd:
+			query = QueryBuilders.wildcardQuery(con.getField(), "*" + con.getValue1());
+			break;
+		/// <summary>
+		/// like 'xx%'
+		/// 不需要加配符号
+		/// </summary>
+		case LikeBegin:
+			query = QueryBuilders.wildcardQuery(con.getField(), con.getValue1() + "*");
+			break;
+		/// <summary>
+		/// 大于
+		/// </summary>
+		case Gt:
+			query = QueryBuilders.rangeQuery(con.getField()).gt(con.getValue1());
+			break;
+		/// <summary>
+		/// 大于等于
+		/// </summary>
+		case Ge:
+			query = QueryBuilders.rangeQuery(con.getField()).gte(con.getValue1());
+			break;
+		/// <summary>
+		/// 小于等于
+		/// </summary>
+		case Le:
+			query = QueryBuilders.rangeQuery(con.getField()).lte(con.getValue1());
+			break;
+		/// <summary>
+		/// 小于
+		/// </summary>
+		case Lt:
+			query = QueryBuilders.rangeQuery(con.getField()).lt(con.getValue1());
+			break;
+
+		/// <summary>
+		/// 逻辑且
+		/// </summary>
+		case And:
+			QueryBuilder must1 = toQueryBuild((QueryCondition_ES) con.getValue1());
+			QueryBuilder must2 = toQueryBuild((QueryCondition_ES) con.getValue2());
+			query = QueryBuilders.boolQuery().must(must1).must(must2);
+			break;
+		/// <summary>
+		/// 逻辑或者
+		/// </summary>
+		case Or:
+			QueryBuilder queryBuilder1 = toQueryBuild((QueryCondition_ES) con.getValue1());
+			QueryBuilder queryBuilder2 = toQueryBuild((QueryCondition_ES) con.getValue2());
+
+			query = QueryBuilders.boolQuery().should(queryBuilder1).should(queryBuilder2);
+			break;
+		/// <summary>
+		/// 逻辑非
+		/// </summary>
+		case Not:
+			query = QueryBuilders.boolQuery().mustNot(toQueryBuild((QueryCondition_ES) con.getValue1()));
+			break;
+
+		}
+		return query;
+	}
+   /**
+    * 获得泛型的类型
+    * @param field
+    * @return
+    */
+	public static String getParamterTypeByList(Field field) {
+		String typeName = null;
+		try {
+			Type genericType = field.getGenericType();
+			ParameterizedType pt = (ParameterizedType) genericType;
+			Type ts = pt.getActualTypeArguments()[0];
+			typeName = ts.getTypeName();
+		} catch (Exception e) {
+			logger.info("泛型实例化异常", e);
+			throw new ElasticSearchException(ResultCodeEnum.ERROR.getCode(), e.getMessage());
+		}
+		return typeName;
+	}
+
+
+	/**
+	 * 获得List对应的Map<String,Class<?>>
+	 * @param key
+	 * @param value
+	 * @param obj
+	 * @return
+	 */
+	private static Map<String, Object> getMapParamerInfoByList(String key, Object value,Object obj) {
+		Map<String, Object> map = new HashMap<>();
+		try {
+			Field field = obj.getClass().getDeclaredField(key);
+			String paramterType = getParamterTypeByList(field); // 获得List当中的包装类
+			switch (paramterType) {
+			case "java.lang.String":
+			case "java.lang.Integer":
+			case "java.lang.Boolean":
+			case "java.lang.FLoat":
+			case "java.lang.Long":
+			case "java.lang.Byte":
+			case "java.lang.Short":
+			case "java.lang.Double":
+				map.put(key, value);
+				break;
+			default: //业务实体
+				if(paramterType.contains("java.util.Map")){
+					List<Map<String, Object>> listMap = (List<Map<String, Object>>) value;
+					map.put(key, listMap);
+				}else{
+					List<Object> businessList = (List<Object>) value;
+					List<Map<String,Object>> mapList = new ArrayList<>();
+					for (Object busiObject : businessList) {
+						Map<String, Object> childrenMap = transBean2Map(busiObject);
+						mapList.add(childrenMap);
+					}
+					map.put(key, mapList);
+				}
+				break;
+			}
+		} catch (Exception e) {
+			logger.error("List数据解析出现错误", e);
+			throw new ElasticSearchException(ResultCodeEnum.ERROR.getCode(), e.getMessage());
+		}
+		return map;
+	}
+
+	
+	
+	/**
+	 * 将对应的实体转换成map数据结构
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	public static Map<String, Object> transBean2Map(Object obj) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			if(obj!=null){
+				BeanInfo beanInfo = Introspector.getBeanInfo(obj.getClass());
+				PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+				for (PropertyDescriptor property : propertyDescriptors) {
+					String key = property.getName();
+					Method getter = property.getReadMethod();
+					Object value = getter.invoke(obj);
+					String typeName = property.getPropertyType().getName();
+					switch (typeName) {
+					case "java.lang.String":
+					case "java.lang.Integer":
+					case "int":
+					case "java.lang.Boolean":
+					case "boolean":
+					case "java.lang.FLoat":
+					case "float":
+					case "java.lang.Long":
+					case "long":
+					case "java.lang.Byte":
+					case "byte":
+					case "java.lang.Short":
+					case "short":
+					case "java.lang.Double":
+					case "double":
+					case "java.util.Map":
+						map.put(key, value);
+						break;
+					case "java.util.List":
+						Map<String, Object> mapParamerInfoByList = getMapParamerInfoByList(key, value,obj);
+						map.putAll(mapParamerInfoByList);;
+						break;
+					case "java.util.Date":
+						if(value!=null){
+							map.put(key, DateUtil.format((Date) value));
+						}
+						break;
+					case "java.lang.Class":
+						break;
+					default:
+						map.put(key, transBean2Map(value));
+						break;
+					}
+				}
+			}
+			return map;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new ElasticSearchException(ResultCodeEnum.ERROR.getCode(), "object转map出现错误");
+		}
+
+	}
+
+	/**
+	 * 解析aggs对应的数据格式
+	 * 
+	 * @param field
+	 * @param aggregation
+	 * @return
+	 */
+	public static List<Map<String, Object>> getMultiBucketsMap(SearchField field, Aggregation aggregation) {
+		List<Map<String, Object>> result = new ArrayList<>();
+		switch (field.getFieldType()) {
+		case NumberSum:
+		case NumberAvg:
+		case NumberMax:
+		case NumberMin:
+		case ObjectDistinctCount:
+			String valueAsString = ((NumericMetricsAggregation.SingleValue) aggregation).getValueAsString();
+			Map<String, Object> mapss = new HashMap<>();
+			mapss.put(field.getFieldName(), field.getFieldType().toString());// 根节点元素提取
+			mapss.put("doc_count", valueAsString);// 根节点元素提取
+			result.add(mapss);
+			break;
+		case Numberstat:
+			Stats stats = (Stats) aggregation;
+			Map<String, Object> mapstats = new HashMap<>();
+			double avg = stats.getAvg();
+			long count = stats.getCount();
+			double max = stats.getMax();
+			double min = stats.getMin();
+			double sum = stats.getSum();
+			mapstats.put(field.getFieldName(), field.getFieldType().toString());
+			mapstats.put("avg", avg);
+			mapstats.put("count", count);
+			mapstats.put("max", max);
+			mapstats.put("min", min);
+			mapstats.put("sum", sum);
+			result.add(mapstats);
+			break;
+		default:
+			MultiBucketAggregation(field, aggregation, result);
+			break;
+		}
+		return result;
+	}
+
+	/**
+	 * 分组递归
+	 * 
+	 * @param field
+	 * @param aggregation
+	 * @param result
+	 */
+	private static void MultiBucketAggregation(SearchField field, Aggregation aggregation,
+											   List<Map<String, Object>> result) {
+		List<? extends MultiBucketsAggregation.Bucket> buckets = ((MultiBucketsAggregation) aggregation).getBuckets();
+		for (MultiBucketsAggregation.Bucket bucket : buckets) {
+			Map<String, Object> maps = new HashMap<>();
+			maps.put(field.getFieldName(), bucket.getKeyAsString());// 根节点元素提取
+			if (field.getChildrenField() != null && field.getChildrenField().size() > 0) {
+				for (SearchField child : field.getChildrenField()) {
+					Aggregation childterms = bucket.getAggregations().get("aggs" + child.getFieldName());
+					List<Map<String, Object>> childResult = getMultiBucketsMap(child, childterms);// 根节点的结果
+					maps.put(child.getFieldName(), childResult);
+					result.add(maps);
+				}
+			} else {
+				maps.put("doc_count", bucket.getDocCount());// 根节点元素提取
+				result.add(maps);
+			}
+		}
+	}
+
+}

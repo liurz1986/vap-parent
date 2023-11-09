@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<title>
+		<field>dev_ip</field>
+		<field>dev_id</field>
+		<field>event_time</field>
+		<field>username</field>
+		<field>alarm_name</field>
+		<field>alarm_type</field>
+		<field>current_situation</field>
+		<field>report_log_type</field>
+	</title>
+	<log>
+		<value>139.211.222.235</value>
+		<value>8a:51:3a:aa:a7:bc</value>
+		<value>2022-04-01 14:26:33</value>
+		<value>wz</value>
+		<value>硬盘告警</value>
+		<value>硬盘剩余空间不足</value>
+		<value>864M</value>
+		<value>DT035</value>
+	</log>
+</data>

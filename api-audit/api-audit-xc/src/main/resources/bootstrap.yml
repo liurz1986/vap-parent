@@ -1,0 +1,21 @@
+spring:
+ application:
+    name:  api-audit-xc
+ sleuth:
+    sampler:
+      percentage: 1.0
+ profiles:
+   active: dev
+
+jasypt:
+  encryptor:
+    password: salt
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+
+info:
+  app:
+    name: "api-audit-xc"
+    description: "态势感知核心业务服务"
+    version: "1.9-SNAPSHOT"
+    spring-boot-version: "1.9-SNAPSHOT"

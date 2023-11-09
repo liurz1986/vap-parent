@@ -1,0 +1,10 @@
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+spring:
+  datasource:
+       driver-class-name: com.mysql.jdbc.Driver
+       username: ${MYSQL_USER:ajdsjpt_rds}
+       password: ${MYSQL_PASSWORD:ajdsjpt_rds_123456}
+       url: jdbc:mysql://${MYSQL_HOST:vrvrds001.mysql.rds.aliyuncs.com}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+index:
+  label_mark: label_mark

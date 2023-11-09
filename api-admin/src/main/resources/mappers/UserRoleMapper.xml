@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.UserRoleMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.UserRole">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="user_id" jdbcType="INTEGER" property="userid" />
+        <result column="role_id" jdbcType="INTEGER" property="roleid" />
+    </resultMap>
+
+    <select id="queryCountByRole" parameterType="java.util.List" resultType="INTEGER">
+        select count(*) from user_role where role_id in
+        <foreach collection="roleIds" open="(" close=")" separator="," item="role">
+            #{role}
+        </foreach>
+    </select>
+
+</mapper>

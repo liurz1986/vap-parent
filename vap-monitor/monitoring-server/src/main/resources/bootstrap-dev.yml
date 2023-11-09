@@ -1,0 +1,20 @@
+# 环境变量配置，打包时排除,方便网关调试直接修改参数
+# 写自己机器IP，或者不修改，绑定了host
+LOCAL_SERVER_IP: 192.168.120.201
+#LOCAL_IP: 192.168.118.124
+# 调试的远程服务器IP
+REMOTE_IP: 192.168.120.201
+NACOS_HOST: ${REMOTE_IP}
+NACOS_NAMESPACE: a338c762-d2a7-4a2f-86f0-022c171c0928
+NACOS_PORT: 8848
+#是否使用远程NACOS配置 ,自身调试防止远程nacos配置污染，可以关闭
+NACOS_CONFIG: true
+#前端静态页面代理地址，可以使用本机页面调试，比如file:/usr/local/vap/app-web/dist
+WEBAPP: http://${REMOTE_IP}:9999/
+REDIS_HOST: ${REMOTE_IP}
+REDIS_PORT: 6379
+REDIS_PWD: vrv@1234
+MYSQL_HOST: ${REMOTE_IP}
+MYSQL_USER: root
+MYSQL_PORT: 3306
+MYSQL_PASSWORD: mysql

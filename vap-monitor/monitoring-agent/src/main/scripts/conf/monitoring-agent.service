@@ -1,0 +1,11 @@
+[Unit]
+Description=monitoring-agent
+After=mysqld.service
+[Service]
+Type=forking
+Environment="JAVA_HOME=/usr/java/jdk1.8.0_171"
+ExecStart=/opt/vrv/vap/vap-install/monitoring-agent/startup.sh start
+ExecStop=/opt/vrv/vap/vap-install/monitoring-agent/startup.sh stop
+PrivateTmp=true
+[Install]
+WantedBy=multi-user.target

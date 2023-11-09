@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.admin.mapper.BasePersonZjgMapper">
+  <resultMap id="BaseResultMap" type="com.vrv.vap.admin.model.BasePersonZjg">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_no" jdbcType="VARCHAR" property="userNo" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="user_idn_ex" jdbcType="VARCHAR" property="userIdnEx" />
+    <result column="person_type" jdbcType="VARCHAR" property="personType" />
+    <result column="person_rank" jdbcType="VARCHAR" property="personRank" />
+    <result column="secret_level" jdbcType="INTEGER" property="secretLevel" />
+    <result column="org_code" jdbcType="VARCHAR" property="orgCode" />
+    <result column="org_name" jdbcType="VARCHAR" property="orgName" />
+    <result column="create_time" jdbcType="DATE" property="createTime" />
+  </resultMap>
+
+  <select id="queryBasePersonTrend" resultType="map" parameterType="com.vrv.vap.admin.vo.BasePersonZjgQuery" >
+    SELECT
+      count(*) as count
+    FROM base_person_zjg
+    WHERE
+    1=1
+    <if test="month!=null">
+      and DATE_FORMAT(create_time,'%Y-%m') <![CDATA[ <= ]]> #{month}
+    </if>
+  </select>
+
+  <select id="getOrgPersonTop" resultType="map">
+    select count(*) personNum,org_code orgCode,org_name orgName from base_person_zjg
+    GROUP BY org_code ORDER BY personNum desc limit 10
+  </select>
+
+  <select id="getAllUsersAuth" resultType="map">
+    select user_name as name,user_no as flag from base_person_zjg
+  </select>
+</mapper>

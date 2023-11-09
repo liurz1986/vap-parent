@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.server.push.mapper.MessageMapper">
+    <resultMap id="BaseResultMap" type="com.vrv.vap.server.push.model.Message">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="source" jdbcType="TINYINT" property="source" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="content" jdbcType="VARCHAR" property="content" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="status" jdbcType="TINYINT" property="status" />
+        <result column="from_id" jdbcType="INTEGER" property="fromId" />
+        <result column="send_time" jdbcType="TIMESTAMP" property="sendtime" />
+        <result column="read_time" jdbcType="TIMESTAMP" property="readtime" />
+        <result column="send_batch" jdbcType="VARCHAR" property="sendbatch" />
+    </resultMap>
+
+    
+    <insert id="insertByRole">
+          INSERT INTO message (user_id,title,content,url,`status`,`source`,send_time,send_batch)
+          SELECT user_id,
+              #{group.title} AS title,
+              #{group.content} AS content,
+              #{group.url} AS url,
+              0 AS `status`,
+              0 AS `source`,
+              NOW() AS send_time,
+              #{group.sendbatch} AS send_batch
+          FROM user_role WHERE role_id = #{group.roleId}
+    </insert>
+
+
+</mapper>

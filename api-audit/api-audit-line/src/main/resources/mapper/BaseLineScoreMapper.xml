@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vrv.vap.line.mapper.BaseLineScoreMapper">
+
+    <insert id="saveBatch4List" parameterType="java.util.List">
+        INSERT INTO base_line_score
+        (
+        `user_key`,
+        `similarity_score`,
+        `similarity_score_org`,
+        `similarity_score_role`,
+        `hour_score`,
+        `packge_score`,
+        `compress`,
+        `frequent_id`,
+        `time`,
+        `type`,
+         start_time,
+         end_time,
+         sys_id
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.userKey},
+            #{item.similarityScore},
+            #{item.similarityScoreOrg},
+            #{item.similarityScoreRole},
+            #{item.hourScore},
+            #{item.packgeScore},
+            #{item.compress},
+            #{item.frequentId},
+            CURRENT_TIMESTAMP,
+            #{item.type},
+            #{item.startTime},
+            #{item.endTime},
+            #{item.sysId}
+            )
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,7 @@
+spring:
+  application:
+    name:  api-alarmdeal
+  profiles:
+    active: es
+  main:
+    allow-bean-definition-overriding: true

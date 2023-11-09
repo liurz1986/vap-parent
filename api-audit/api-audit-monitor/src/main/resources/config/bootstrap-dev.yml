@@ -1,49 +1,36 @@
-server:
-  port: 9051
-
+# 单机与集群的server_addr 不一样， 引用的环境不一致。 NACOS_CLUSTER  与  NACOS_HOST 区别
 spring:
-  http:
-      multipart:
-        enabled: true
-        max-file-size: 200Mb
-        max-request-size: 200Mb
   cloud:
     nacos:
       config:
+        #username: ${NACOS_USERNAME:nacos}
+        #password: ${NACOS_PWD:ENC(mMa4jvNf/ielT0hHUaYewyz89gHSjVySyWhkt4ySxzCUrjlpGUxF7JM+3VsE0TeF)}
+        enabled: ${NACOS_CONFIG:true}
         server-addr: ${SERVER_ADDR}
-        namespace: ${NAMESPACE}
+        namespace:   ${NAMESPACE}
         file-extension: yml
-        username: ${NACOS_USERNAME:}
-        password: ${NACOS_PWD:}
-#        username: ${NACOS_USERNAME:}
-#        password: ${NACOS_PWD:ENC(/ODT3bzE5wCk/WQpqhzTTh8i2Vmg1+FHX1nBhr0Oc294cpPErJcIqPob+lUbK9P6)}
+        shared-configs:
+          - data-id: base-dev.yaml
+            group: DEFAULT_GROUP
+            refresh: true
       discovery:
+        #username: ${NACOS_USERNAME:nacos}
+        #password: ${NACOS_PWD:ENC(mMa4jvNf/ielT0hHUaYewyz89gHSjVySyWhkt4ySxzCUrjlpGUxF7JM+3VsE0TeF)}
         server-addr: ${SERVER_ADDR}
         namespace: ${NAMESPACE}
-        ip: ${LOCAL_SERVER_IP}
         enabled: true
-        username: ${NACOS_USERNAME:}
-        password: ${NACOS_PWD:}
-#        username: ${NACOS_USERNAME:}
-#        password: ${NACOS_PWD:ENC(/ODT3bzE5wCk/WQpqhzTTh8i2Vmg1+FHX1nBhr0Oc294cpPErJcIqPob+lUbK9P6)}
-
-SERVER_ADDR: ${NACOS_HOST:192.168.121.110}:${NACOS_PORT:8848}
+        ip: ${LOCAL_SERVER_IP:}
+SERVER_ADDR: ${NACOS_HOST:192.168.120.201}:${NACOS_PORT:8848}
 NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
-#SERVER_ADDR: ${NACOS_HOST:192.168.119.213}:${NACOS_PORT:8848}
-#NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
-
-
-logging:
-  config: classpath:logback-spring.xml
-      
-debug: false
 
 # jasypt的参数配置
 jasypt:
   encryptor:
     algorithm: ${ENC_ALGORITHM:PBEWithMD5AndDES}
-    password: ${ENC_SALT:salt}
-    iv-generator-classname: ${ENC_IV_CLASS:org.jasypt.iv.NoIvGenerator}
+    password: ${ENC_SALT}
+    iv-generator-classname: ${ENC_IV_CLASS:org.jasypt.iv.RandomIvGenerator}
     salt-generator-classname: ${ENC_SLAT_CLASS:org.jasypt.salt.RandomSaltGenerator}
     poolSize: 3
     keyObtentionIterations: 1000
+
+

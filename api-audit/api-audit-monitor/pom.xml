@@ -10,11 +10,15 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+<!--    <parent>-->
+<!--        <groupId>org.springframework.boot</groupId>-->
+<!--        <artifactId>spring-boot-dependencies</artifactId>-->
+<!--        <version>2.7.13</version>-->
+<!--    </parent>-->
     <artifactId>api-audit-monitor</artifactId>
     <name>api-audit-monitor</name>
-
+    <description>api-audit-monitor ${project.version}</description>
     <properties>
-        <project.mv.version>1.0.0</project.mv.version>
         <release.dir>../release/package</release.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -24,10 +28,13 @@
         <search-guard-5.version>5.5.3-16</search-guard-5.version>
         <vap.toolkit.version>zjg-1.0-SNAPSHOT</vap.toolkit.version>
 
-        <spring-boot.version>2.7.13</spring-boot.version>
-        <spring-cloud.version>2021.0.4</spring-cloud.version>
-        <alibaba-cloud.version>2021.0.4.0</alibaba-cloud.version>
-        <alibaba-nacos.version>2021.0.4.0</alibaba-nacos.version>
+<!--        <spring-boot.version>2.3.8.RELEASE</spring-boot.version>-->
+<!--        <spring-cloud.version>Hoxton.SR9</spring-cloud.version>-->
+<!--        <alibaba-cloud.version>2.2.5.RELEASE</alibaba-cloud.version>-->
+
+<!--        <spring-boot.version>2.7.13</spring-boot.version>-->
+<!--        <spring-cloud.version>2021.0.5</spring-cloud.version>-->
+<!--        <alibaba-cloud.version>2021.0.5.0</alibaba-cloud.version>-->
 
         <swagger2.version>2.9.2</swagger2.version>
         <swagger-bootstrap-ui.version>1.9.1</swagger-bootstrap-ui.version>
@@ -36,8 +43,6 @@
         <commons-net.version>3.5</commons-net.version>
         <commons-fileupload.version>1.5</commons-fileupload.version>
         <poi.version>3.13</poi.version>
-        <nacos-client.version>1.4.6</nacos-client.version>
-
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <mybatis-plus.version>3.4.2</mybatis-plus.version>
         <dynamic-datasource.version>3.3.5</dynamic-datasource.version>
@@ -53,7 +58,6 @@
         <flume-avro.version>1.5.0</flume-avro.version>
         <joda-time.version>2.10.10</joda-time.version>
         <xtool.version>1.0.0</xtool.version>
-        <druid.version>1.2.16</druid.version>
         <minio.version>7.1.0</minio.version>
         <logstash-logback-encoder.version>5.0</logstash-logback-encoder.version>
         <log4j.version>2.18.0</log4j.version>
@@ -66,10 +70,27 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.alibaba.nacos</groupId>
             <artifactId>nacos-client</artifactId>
-            <version>${nacos-client.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.11</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-bootstrap</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
@@ -116,6 +137,12 @@
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>swagger-bootstrap-ui</artifactId>
         </dependency>
+
+      <!--  <dependency>
+            <groupId>com.vrv.vap</groupId>
+            <artifactId>vap-swagger2-spring-boot-starter</artifactId>
+        </dependency>-->
+
         <dependency>
             <groupId>com.vrv.vap.flumeavrostarter</groupId>
             <artifactId>flume-avro-starter</artifactId>
@@ -148,24 +175,6 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
-        </dependency>
-
-
-
-        <!--
-                <dependency>
-                    <groupId>org.springframework.cloud</groupId>
-                    <artifactId>spring-cloud-starter-openfeign</artifactId>
-                </dependency>-->
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-client -->
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
@@ -183,6 +192,27 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+        <!--连接池依赖-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -216,10 +246,6 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
@@ -323,7 +349,6 @@
     <build>
         <finalName>${artifactId}-${version}</finalName>
         <plugins>
-            <!-- template下保留所有的配置文件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>

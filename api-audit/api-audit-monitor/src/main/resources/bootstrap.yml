@@ -1,21 +1,6 @@
 spring:
  application:
     name:  api-audit-monitor
- sleuth:
-    sampler:
-      percentage: 1.0
  profiles:
    active: dev
 
-info:
-  app:
-    name: "api-security"
-    description: "安全服务管理"
-    version: "1.0-SNAPSHOT"
-    spring-boot-version: "1.0-SNAPSHOT"
-
-jasypt:
-  encryptor:
-    password: salt
-    algorithm: PBEWithMD5AndDES
-    iv-generator-classname: org.jasypt.iv.NoIvGenerator

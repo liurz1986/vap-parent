@@ -178,12 +178,7 @@
                 <artifactId>micrometer-registry-prometheus</artifactId>
                 <version>${registry-prometheus.version}</version>
             </dependency>
-            <!--  在Redis基础上的一个Java实用工具包  -->
-            <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson-spring-boot-starter</artifactId>
-                <version>${redisson-starter.version}</version>
-            </dependency>
+
             <!--  spring session  -->
             <dependency>
                 <groupId>org.springframework.session</groupId>
@@ -664,4 +659,24 @@
             <url>http://192.168.119.24:18081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>external.atlassian.jgitflow</groupId>
+                <artifactId>jgitflow-maven-plugin</artifactId>
+                <version>1.0-m3</version>
+                <configuration>
+                    <flowInitContext>
+                        <masterBranchName>master</masterBranchName>
+                        <developBranchName>develop</developBranchName>
+                        <featureBranchPrefix>feature/</featureBranchPrefix>
+                        <releaseBranchPrefix>release/</releaseBranchPrefix>
+                        <hotfixBranchPrefix>hotfix/</hotfixBranchPrefix>
+                        <versionTagPrefix>V</versionTagPrefix>
+                    </flowInitContext>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

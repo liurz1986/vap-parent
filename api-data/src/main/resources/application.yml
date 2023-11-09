@@ -239,8 +239,7 @@ kafka:
 logging:
   level:
     com.vrv.vap: DEBUG
-    root: error
-    org.springframework.cloud.sleuth: error
+    root: ERROR
 screen-capturer:
   url: http://${LOCAL_SERVER_IP:192.168.119.213}:8080
   file-path: /opt/SecAudit/vrv/vap/screencapturer/pdf

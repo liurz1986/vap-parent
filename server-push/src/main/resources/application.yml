@@ -3,27 +3,28 @@ spring:
     username: ${MYSQL_USER:root}
     password: ${MYSQL_PASSWORD:mysql}
     url: jdbc:mysql://${MYSQL_HOST:192.168.119.213}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
-    filters: stat
-    maxActive: 20
-    initialSize: 1
-    maxWait: 60000
-    minIdle: 1
-    timeBetweenEvictionRunsMillis: 60000
-    minEvictableIdleTimeMillis: 300000
-    validationQuery: select 'x'
-    testWhileIdle: true
-    testOnBorrow: false
-    testOnReturn: false
-    poolPreparedStatements: true
-    maxOpenPreparedStatements: 20
-    loginUsername: vap
-    loginPassword: vap
+    druid:
+      filters: stat
+      maxActive: 20
+      initialSize: 1
+      maxWait: 60000
+      minIdle: 1
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20
+      username: vap
+      password: vap
   session:
     store-type: redis
   redis:
     host: ${REDIS_HOST:192.168.119.213}
     port: ${REDIS_PORT:6379}
-    password: vrv@1234
+    password: ${REDIS_PASSWORD:vrv@1234}
     maxidle: 2
     maxTotal: 10
     maxWaitMillis: 60000

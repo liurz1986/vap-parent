@@ -179,11 +179,11 @@
                 <version>${registry-prometheus.version}</version>
             </dependency>
             <!--  在Redis基础上的一个Java实用工具包  -->
-            <!-- <dependency>
+            <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson-starter.version}</version>
-            </dependency>-->
+            </dependency>
             <!--  spring session  -->
             <dependency>
                 <groupId>org.springframework.session</groupId>

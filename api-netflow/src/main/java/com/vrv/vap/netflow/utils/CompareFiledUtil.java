@@ -1,7 +1,5 @@
 package com.vrv.vap.netflow.utils;
 
-import com.github.xtool.util.ObjectUtil;
-
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -60,7 +58,7 @@ public class CompareFiledUtil {
                         o2 = ((BigDecimal) o2).setScale(2, BigDecimal.ROUND_HALF_UP);
                     }
 
-                    if ((ObjectUtil.isEmpty(o1) || o1.equals("null")) && (ObjectUtil.isEmpty(o2) || o2.equals("null"))) {
+                    if ((o1 == null || "null".equals(o1)) && (o2 == null || "null".equals(o2))) {
                         continue;
                     }
                     if (o1 == null && o2 != null) {
@@ -81,7 +79,6 @@ public class CompareFiledUtil {
             }
             return map;
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }

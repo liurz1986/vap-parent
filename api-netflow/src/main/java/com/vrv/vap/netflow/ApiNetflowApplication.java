@@ -12,12 +12,16 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 
 
+/**
+ * @author wh1107066
+ */
 @EnableDiscoveryClient
 @EnableFeignClients
 @SpringBootApplication(scanBasePackages = {"com.vrv.vap"})
 @EnableEncryptableProperties
 @EnableScheduling
 public class ApiNetflowApplication {
+
     @Value("${vap.common.session-base64:false}")
     private Boolean sessionBase64;
 

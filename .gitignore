@@ -1,6 +1,17 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
 .project
+logs/
+.settings
+*.log
+work
+derby.log
+
+### vscode ###
+.vscode
+node_modules
+dist/
+
 ### STS ###
 .apt_generated
 .classpath
@@ -20,7 +31,6 @@ target/
 nbproject/private/
 build/
 nbbuild/
-dist/
 nbdist/
 .nb-gradle/
 /bin/

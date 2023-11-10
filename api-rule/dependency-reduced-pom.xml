@@ -3,14 +3,12 @@
   <parent>
     <artifactId>vap-parent</artifactId>
     <groupId>com.vrv.vap</groupId>
-    <version>${revision}</version>
+    <version>4.23.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.vrv.vap</groupId>
   <artifactId>api-rule</artifactId>
   <name>api-rule</name>
-  <version>2.8.6</version>
-  <description>告警中心2.0规则版本</description>
+  <description>告警中心规则</description>
   <build>
     <plugins>
       <plugin>

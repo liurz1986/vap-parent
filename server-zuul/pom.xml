@@ -178,7 +178,6 @@
 								</resource>
 							</resources>
 						</configuration>
-						<inherited />
 					</execution>
 				</executions>
 			</plugin>

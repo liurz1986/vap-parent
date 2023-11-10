@@ -6,17 +6,15 @@
     <parent>
         <groupId>com.vrv.vap</groupId>
         <artifactId>vap-parent</artifactId>
-        <version>${revision}</version>
+        <version>4.23.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>api-rule</artifactId>
-    <groupId>com.vrv.vap</groupId>
-    <version>2.8.6</version>
     <packaging>jar</packaging>
 
     <name>api-rule</name>
-    <description>告警中心2.0规则版本</description>
+    <description>告警中心规则</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

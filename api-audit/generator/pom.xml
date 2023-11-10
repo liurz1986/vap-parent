@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>com.vrv.vap</groupId>
 		<artifactId>api-audit</artifactId>
-		<version>3.0</version>
+		<version>4.23.0-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>

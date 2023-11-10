@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.vrv.vap</groupId>
         <artifactId>api-audit</artifactId>
-        <version>${revision}</version>
+        <version>4.23.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 <!--    <parent>-->

@@ -4,13 +4,14 @@
 	<parent>
 		<groupId>com.vrv.vap</groupId>
 		<artifactId>vap-parent</artifactId>
-		<version>${revision}</version>
+		<version>4.23.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>server-zuul</artifactId>
 	<packaging>jar</packaging>
 	<name>server-zuul</name>
+	<description>${project.artifactId} 模块 ${project.version}</description>
 
 	<scm>
 		<!-- #git项目浏览器里的地址 -->

@@ -4,13 +4,14 @@
 	<parent>
 		<groupId>com.vrv.vap</groupId>
 		<artifactId>vap-parent</artifactId>
-		<version>${revision}</version>
+		<version>4.23.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>api-admin</artifactId>
 	<packaging>jar</packaging>
 	<name>api-admin</name>
+	<description>api-admin 模块 ${project.version}</description>
 
 	<scm>
 		<url>${url}</url>

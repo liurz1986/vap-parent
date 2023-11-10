@@ -47,7 +47,7 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
     <fileSet>
         <directory>target</directory>
         <includes>
-            <include>${project.artifactId}.jar</include>
+            <include>${project.artifactId}-${project.version}.jar</include>
         </includes>
         <outputDirectory>/${project.artifactId}/package/monitoring-agent-0.1/target</outputDirectory>
     </fileSet>

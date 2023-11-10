@@ -162,7 +162,6 @@
 
 
     <build>
-        <finalName>monitoring-agent</finalName>
         <plugins>
             <!-- 打包复制application.yml到template目录下 -->
             <plugin>

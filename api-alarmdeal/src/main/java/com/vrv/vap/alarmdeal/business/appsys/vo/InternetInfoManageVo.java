@@ -19,8 +19,8 @@ import java.util.List;
 @ApiModel(value = "互联网信息管理VO")
 public class InternetInfoManageVo extends PageReqVap {
 
-    public static final List<String> HEADERS =  new ArrayList<String>(Arrays.asList("互联单位", "接入方式", "涉密等级", "防护等级"));
-    public static final String[] KEYS= new String[]{"internetName","internetType","secretLevel","protectLevel"};
+    public static final List<String> HEADERS =  new ArrayList<String>(Arrays.asList("互联单位", "接入方式", "涉密等级", "防护等级","互联网络名称","互联边界IP地址"));
+    public static final String[] KEYS= new String[]{"internetName","internetType","secretLevel","protectLevel","name","ip"};
     public static final String INTERNET_INFO_MANAGE="互联网信息";
 
     private Integer id;
@@ -47,6 +47,16 @@ public class InternetInfoManageVo extends PageReqVap {
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
+    /**
+     * 互联网络名称
+     */
+    @ApiModelProperty(value = "互联网络名称")
+    private String name;
 
+    /**
+     * 互联网络ip
+     */
+    @ApiModelProperty(value = "互联网络ip")
+    private String ip;
 
 }

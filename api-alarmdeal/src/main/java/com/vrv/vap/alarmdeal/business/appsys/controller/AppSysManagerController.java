@@ -580,4 +580,11 @@ public class AppSysManagerController  extends AbstractAppSysController<AppSysMan
         appNetFlowAuditJob.appNetFlowAuditTask();
         return ResultUtil.success(1L);
     }
+    @GetMapping("getAllAppSys")
+    @ApiOperation(value="获取所以应用系统",notes="")
+    @SysRequestLog(description="获取所以应用系统", actionType = ActionType.SELECT,manually=false)
+    public Result<List<AppSysManager>> getAllAppSys(){
+        List<AppSysManager> all = appSysManagerService.findAll();
+        return ResultUtil.successList(all);
+    }
 }

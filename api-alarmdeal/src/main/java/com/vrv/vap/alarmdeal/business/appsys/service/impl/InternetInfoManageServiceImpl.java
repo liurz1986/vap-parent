@@ -11,6 +11,7 @@ import com.vrv.vap.alarmdeal.business.appsys.vo.InternetInfoManageVo;
 import com.vrv.vap.alarmdeal.business.appsys.vo.NetInfoManageVo;
 import com.vrv.vap.alarmdeal.business.asset.datasync.service.MessageService;
 import com.vrv.vap.alarmdeal.business.asset.util.ImportExcelUtil;
+import com.vrv.vap.alarmdeal.business.baseauth.util.PValidUtil;
 import com.vrv.vap.alarmdeal.frameworks.exception.AlarmDealException;
 import com.vrv.vap.jpa.web.page.PageReq;
 import com.vrv.vap.jpa.web.page.PageRes;
@@ -70,6 +71,8 @@ public class InternetInfoManageServiceImpl extends AbstractBaseServiceImpl<Inter
         String internetType=internetInfoManageVo.getInternetType();
         String protectLevel=internetInfoManageVo.getProtectLevel();
         String secretLevel=internetInfoManageVo.getSecretLevel();
+        String name=internetInfoManageVo.getName();
+        String ip=internetInfoManageVo.getIp();
         if(StringUtils.isNotBlank(internetName)){
             queryConditions.add(QueryCondition.like("internetName",internetName));
         }
@@ -81,6 +84,12 @@ public class InternetInfoManageServiceImpl extends AbstractBaseServiceImpl<Inter
         }
         if(StringUtils.isNotBlank(secretLevel)){
             queryConditions.add(QueryCondition.eq("secretLevel",secretLevel));
+        }
+        if(StringUtils.isNotBlank(name)){
+            queryConditions.add(QueryCondition.like("name",name));
+        }
+        if(StringUtils.isNotBlank(ip)){
+            queryConditions.add(QueryCondition.like("ip",ip));
         }
         PageReq pager = mapperUtil.map(internetInfoManageVo, PageReq.class);
         pager.setOrder("createTime");
@@ -275,6 +284,16 @@ public class InternetInfoManageServiceImpl extends AbstractBaseServiceImpl<Inter
                     return returnEroorResult("安全域:"+value+"不能为空");
                 }
                 break;
+            case "ip":
+                if(StringUtils.isBlank(value)){
+                    return returnEroorResult("互联边界ip:"+value+"不能为空");
+                }
+                break;
+            case "name":
+                if(StringUtils.isBlank(value)){
+                    return returnEroorResult("互联网络名称:"+value+"不能为空");
+                }
+                break;
             default:
                 break;
         }
@@ -320,6 +339,14 @@ public class InternetInfoManageServiceImpl extends AbstractBaseServiceImpl<Inter
                     return returnEroorResult("防护等级:"+value+"不存在");
                 }else{
                     map.put(key,codePro); // 执行转换
+                }
+                break;
+            case "ip":
+                if(!PValidUtil.isIPValid(value)){
+                    return returnEroorResult("互联ip:"+value+"格式错误");
+                }
+                if(!PValidUtil.hasDuplicate(value)){
+                    return returnEroorResult("互联ip:"+value+"存在重复ip");
                 }
                 break;
             default:

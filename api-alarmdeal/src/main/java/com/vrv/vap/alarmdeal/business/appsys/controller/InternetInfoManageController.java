@@ -10,6 +10,7 @@ import com.vrv.vap.alarmdeal.business.appsys.service.InternetInfoManageService;
 import com.vrv.vap.alarmdeal.business.appsys.service.ProtectionLevelService;
 import com.vrv.vap.alarmdeal.business.appsys.vo.InternetInfoManageVo;
 import com.vrv.vap.alarmdeal.business.asset.datasync.service.MessageService;
+import com.vrv.vap.alarmdeal.business.baseauth.util.PValidUtil;
 import com.vrv.vap.alarmdeal.frameworks.contract.user.BaseSecurityDomain;
 import com.vrv.vap.jpa.web.Result;
 import com.vrv.vap.jpa.web.ResultCodeEnum;
@@ -20,6 +21,7 @@ import com.vrv.vap.syslog.common.enums.ActionType;
 import com.vrv.vap.utils.dozer.MapperUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,6 +139,14 @@ public class InternetInfoManageController extends AbstractAppSysController<Inter
     public Result<InternetInfoManage> addInternetInfoManage(@RequestBody InternetInfoManageVo internetInfoManageVo){
         InternetInfoManage internetInfoManage=mapperUtil.map(internetInfoManageVo,InternetInfoManage.class);
         internetInfoManage.setCreateTime(new Date());
+        if (StringUtils.isNotBlank(internetInfoManageVo.getIp())){
+            if (!PValidUtil.isIPValid(internetInfoManageVo.getIp())){
+                return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "互联边界ip格式异常");
+            }
+            if (PValidUtil.hasDuplicate(internetInfoManageVo.getIp())){
+                return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "互联边界ip存在重复ip");
+            }
+        }
         internetInfoManageService.save(internetInfoManage);
         // 数据变更消息推送 2022-06-01
         messageService.sendKafkaMsg("internet");
@@ -154,6 +164,14 @@ public class InternetInfoManageController extends AbstractAppSysController<Inter
     public Result<InternetInfoManage> editRoleManage(@RequestBody InternetInfoManageVo internetInfoManageVo){
         InternetInfoManage internetInfoManage=internetInfoManageService.getOne(internetInfoManageVo.getId());
         internetInfoManage=mapperUtil.map(internetInfoManageVo,internetInfoManage.getClass());
+        if (StringUtils.isNotBlank(internetInfoManageVo.getIp())){
+            if (!PValidUtil.isIPValid(internetInfoManageVo.getIp())){
+                return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "互联边界ip格式异常");
+            }
+            if (PValidUtil.hasDuplicate(internetInfoManageVo.getIp())){
+                return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "互联边界ip存在重复ip");
+            }
+        }
         internetInfoManageService.save(internetInfoManage);
         // 数据变更消息推送 2022-06-01
         messageService.sendKafkaMsg("internet");
@@ -231,7 +249,13 @@ public class InternetInfoManageController extends AbstractAppSysController<Inter
         return ResultUtil.success(appCount);
     }
 
-
+    @GetMapping("getInternetInfo")
+    @ApiOperation(value="获取互联网信息",notes="")
+    @SysRequestLog(description="获取互联网信息", actionType = ActionType.SELECT,manually=false)
+    public Result<List<InternetInfoManage>> getInternetInfo(){
+        List<InternetInfoManage> all = internetInfoManageService.findAll();
+        return ResultUtil.successList(all);
+    }
 
 
 }

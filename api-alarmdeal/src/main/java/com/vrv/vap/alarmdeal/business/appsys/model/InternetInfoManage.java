@@ -52,5 +52,18 @@ public class InternetInfoManage {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "create_time")
     private Date createTime;
+    /**
+     * 互联网络名称
+     */
+    @ApiModelProperty(value = "互联网络名称")
+    @Column(name = "name")
+    private String name;
+
+    /**
+     * 互联网络ip
+     */
+    @ApiModelProperty(value = "互联网络ip")
+    @Column(name = "ip")
+    private String ip;
 
 }

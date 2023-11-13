@@ -189,7 +189,11 @@ public abstract class AbstractBaseServiceImpl<T, ID extends Serializable> extend
             case "互联单位":
             case "网络名称":
             case "数据标识":
+            case "互联网络名称":
                 excelValidationData=new ExcelValidationData(index, 1, 50, null, null, "必填",colName+"不能重复" );
+                break;
+            case "互联边界IP地址":
+                excelValidationData=new ExcelValidationData(index, 1, 200, null, null, "必填",colName+"不能重复，多个用英文逗号隔开" );
                 break;
             case "文件名称":
             case "文件类型":

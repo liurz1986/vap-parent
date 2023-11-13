@@ -2,14 +2,10 @@ package com.vrv.vap.alarmdeal.business.baseauth.model;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
+
 import javax.persistence.*;
 import java.io.Serializable;
-/**
- * 审批类型配置表
- *
- * @author liurz
- * @date 202308
- */
+
 @Data
 @Table(name="base_auth_type_config")
 @Entity

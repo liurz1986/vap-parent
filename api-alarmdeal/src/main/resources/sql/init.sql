@@ -3954,3 +3954,46 @@ ALTER TABLE `supervise_task`
   ADD COLUMN  `disposal_describe` varchar(255)  NULL,
   ADD COLUMN  `warnning_id` varchar(64)  NULL,
   ADD column  `busi_args` text  NULL;
+
+
+-- changeset tyj:20231106 labels:新增字段
+ALTER TABLE `internet_info_manage`
+  ADD COLUMN  `ip` text  NULL,
+  ADD COLUMN  `name` varchar(225)  NULL;
+
+-- changeset tyj:20231109 labels:新增审批表
+
+CREATE TABLE IF NOT EXISTS `base_auth_app` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `app_id` int(11) DEFAULT NULL,
+  `ip` varchar(255) DEFAULT NULL COMMENT 'ip',
+  `type` int(1) DEFAULT 0 COMMENT '0ip为内部访问 1ip为外部访问',
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `base_auth_internet` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `internet_id` int(11) DEFAULT NULL,
+  `ip` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `base_auth_operation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip` varchar(255) DEFAULT NULL,
+  `dst_ip` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `type` int(1) DEFAULT 0 COMMENT '0资产类型 1应用系统',
+  PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `base_auth_print_burn` (
+  `id` int(22) NOT NULL AUTO_INCREMENT,
+  `ip` varchar(100) DEFAULT NULL,
+  `type` int(1) DEFAULT 1 COMMENT '1打印 2刻录',
+  `decide` int(1) DEFAULT 0 COMMENT '0允许 1不允许',
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+  )

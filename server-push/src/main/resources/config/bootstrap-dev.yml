@@ -1,40 +1,37 @@
-server:
-  port: 8780
-  ssl:
-    enabled: true
-    enabled-protocols:
-      - TLSv1.2
-      - TLSv1.3
-    ciphers:
-      - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-      - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
-      - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-      - TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384
-      - TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384
-      - TLS_DHE_DSS_WITH_AES_256_GCM_SHA384
-      - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-      - TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256
-      - TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256
-      - TLS_DHE_DSS_WITH_AES_128_GCM_SHA256
-      - TLS_EMPTY_RENEGOTIATION_INFO_SCSVF
-    key-store: classpath:keystore.p12
-    key-store-password: 123456
-    keyStoreType: PKCS12
-    keyAlias: tomcat
-jasypt:
-  encryptor:
-    password: salt
+# 单机和集群的namespace不一样
+# 单机与集群的server_addr 不一样， 引用的环境不一致。 NACOS_CLUSTER  与  NACOS_HOST 区别
 spring:
-  http: null
   cloud:
     nacos:
       config:
+        #username: ${NACOS_USERNAME:nacos}
+        #password: ${NACOS_PWD:ENC(mMa4jvNf/ielT0hHUaYewyz89gHSjVySyWhkt4ySxzCUrjlpGUxF7JM+3VsE0TeF)}
+        enabled: ${NACOS_CONFIG:true}
         server-addr: ${SERVER_ADDR}
-        namespace: ${NAMESPACE}
+        namespace:   ${NAMESPACE}
         file-extension: yml
+        shared-configs:
+          - data-id: base-dev.yaml
+            group: DEFAULT_GROUP
+            refresh: true
       discovery:
+        #username: ${NACOS_USERNAME:nacos}
+        #password: ${NACOS_PWD:ENC(mMa4jvNf/ielT0hHUaYewyz89gHSjVySyWhkt4ySxzCUrjlpGUxF7JM+3VsE0TeF)}
         server-addr: ${SERVER_ADDR}
         namespace: ${NAMESPACE}
         enabled: true
-SERVER_ADDR: ${NACOS_HOST:192.168.119.213}:${NACOS_PORT:8848}
+        ip: ${LOCAL_SERVER_IP:}
+SERVER_ADDR: ${NACOS_HOST:192.168.120.201}:${NACOS_PORT:8848}
 NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
+
+# jasypt的参数配置
+jasypt:
+  encryptor:
+    algorithm: ${ENC_ALGORITHM:PBEWithMD5AndDES}
+    password: ${ENC_SALT}
+    iv-generator-classname: ${ENC_IV_CLASS:org.jasypt.iv.RandomIvGenerator}
+    salt-generator-classname: ${ENC_SLAT_CLASS:org.jasypt.salt.RandomSaltGenerator}
+    poolSize: 3
+    keyObtentionIterations: 1000
+
+

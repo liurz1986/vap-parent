@@ -869,7 +869,7 @@ public class BaseLineUtil {
         List<Map<String, Object>> result = new ArrayList<>();
         String summaryTable = StringUtil.toUnderline(LineConstants.NAME_PRE.PRE_SM+line.getSaveIndex());
         StringBuffer colnum = new StringBuffer();
-        colnum.append("count(id)/").append(line.getSaveDays()).append(" AS process ");
+        colnum.append("count(id)/").append(line.getDays()).append(" AS process ");
         StringBuffer group = new StringBuffer(" GROUP BY ");
         JSONArray arrays = JSONArray.parseArray(line.getSaveColumns());
         //直接取值

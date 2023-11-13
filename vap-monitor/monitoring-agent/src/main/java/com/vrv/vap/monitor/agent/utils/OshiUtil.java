@@ -8,11 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
-import oshi.hardware.HardwareAbstractionLayer;
-import oshi.hardware.NetworkIF;
 import oshi.software.os.FileSystem;
 import oshi.software.os.OSFileStore;
-import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
 import oshi.util.Util;
 
@@ -149,40 +146,36 @@ public class OshiUtil {
         return timeStr;
     }
 
-    public static Long getUptimeSecond2(){
-        String str = CmdExecute.executeCmd("cat /proc/uptime");
-        String result="0";
-
-        if(StringUtils.isNotEmpty(str)) {
-            if (str.contains(" ")) {
-                String[] re = str.split(" ");
-
-                if (re.length > 0) {
-                    String first = re[0];
-                    if (first.contains(".")) {
-                        result = first.substring(0, first.indexOf("."));
-                    }
-                    else {
-                        result = first;
-                    }
-                }
-            }
-            else{
-                if (str.contains(".")) {
-                    result = str.substring(0, str.indexOf("."));
-                }
-                else {
-                    result = str;
-                }
-            }
-        }
-        Long l = 0L;
+    public static Long getUptimeSecond2() {
         try {
-            l = Long.valueOf(result);
-        }catch (Exception exception){
-            exception.printStackTrace();
+            String str = CmdExecute.executeCmd("cat /proc/uptime");
+            String result = "0";
+            if (StringUtils.isNotEmpty(str)) {
+                if (str.contains(" ")) {
+                    String[] re = str.split(" ");
+                    if (re.length > 0) {
+                        String first = re[0];
+                        if (first.contains(".")) {
+                            result = first.substring(0, first.indexOf("."));
+                        } else {
+                            result = first;
+                        }
+                    }
+                } else {
+                    if (str.contains(".")) {
+                        result = str.substring(0, str.indexOf("."));
+                    } else {
+                        result = str;
+                    }
+                }
+            }
+            Long l = Long.valueOf(result);
+            return l;
+        } catch (Exception exception) {
+            logger.error("获取系统cmd运行时长异常", exception);
+            return System.currentTimeMillis();
         }
-        return l;
+
     }
 
     /**

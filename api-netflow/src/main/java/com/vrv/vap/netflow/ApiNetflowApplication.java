@@ -13,7 +13,7 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 
 
 /**
- * @author wh1107066
+ * @author wh1107066h
  */
 @EnableDiscoveryClient
 @EnableFeignClients

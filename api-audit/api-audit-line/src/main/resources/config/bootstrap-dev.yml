@@ -1,36 +1,35 @@
-server:
-  port: 9432
-
 spring:
-  http:
-    multipart:
-      enabled: true
-      max-file-size: 50Mb
-      max-request-size: 50Mb
   cloud:
     nacos:
       config:
+        #username: ${NACOS_USERNAME:nacos}
+        #password: ${NACOS_PWD:ENC(mMa4jvNf/ielT0hHUaYewyz89gHSjVySyWhkt4ySxzCUrjlpGUxF7JM+3VsE0TeF)}
+        enabled: ${NACOS_CONFIG:true}
         server-addr: ${SERVER_ADDR}
-        namespace: ${NAMESPACE}
+        namespace:   ${NAMESPACE}
         file-extension: yml
-        ext-config:
-          - dataId: base-dev.yaml
+        shared-configs:
+          - data-id: base-dev.yaml
             group: DEFAULT_GROUP
             refresh: true
       discovery:
+        #username: ${NACOS_USERNAME:nacos}
+        #password: ${NACOS_PWD:ENC(mMa4jvNf/ielT0hHUaYewyz89gHSjVySyWhkt4ySxzCUrjlpGUxF7JM+3VsE0TeF)}
         server-addr: ${SERVER_ADDR}
         namespace: ${NAMESPACE}
         enabled: true
+        ip: ${LOCAL_SERVER_IP:}
 SERVER_ADDR: ${NACOS_HOST:192.168.120.201}:${NACOS_PORT:8848}
 NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
 
-logging:
-  config: classpath:logback-spring.xml
-
-debug: true
-
+# jasypt的参数配置
 jasypt:
   encryptor:
-    password: salt
-    algorithm: PBEWithMD5AndDES
-    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+    algorithm: ${ENC_ALGORITHM:PBEWithMD5AndDES}
+    password: ${ENC_SALT}
+    iv-generator-classname: ${ENC_IV_CLASS:org.jasypt.iv.RandomIvGenerator}
+    salt-generator-classname: ${ENC_SLAT_CLASS:org.jasypt.salt.RandomSaltGenerator}
+    poolSize: 3
+    keyObtentionIterations: 1000
+
+

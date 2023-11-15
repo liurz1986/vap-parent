@@ -1,6 +1,5 @@
 package com.vrv.vap.xc.client;
 
-import org.apache.log4j.Logger;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ElasticSearchManager {
-
-    private static final Logger log = Logger.getLogger(ElasticSearchManager.class);
 
     private ElasticSearchManager() {
 

@@ -2,7 +2,6 @@ package com.vrv.vap.xc.interceptor;
 
 import com.vrv.vap.toolkit.vo.VData;
 import com.vrv.vap.xc.exception.BusinessBasicException;
-import com.vrv.vap.xc.tools.JsonQueryTools;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;

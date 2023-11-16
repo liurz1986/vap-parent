@@ -2,14 +2,18 @@ package com.vrv.vap.alarmdeal.business.baseauth.service.impl;
 
 
 
+import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.util.QueueUtil;
 import com.vrv.vap.alarmdeal.business.appsys.model.AppSysManager;
 import com.vrv.vap.alarmdeal.business.appsys.model.InternetInfoManage;
 import com.vrv.vap.alarmdeal.business.appsys.service.AppSysManagerService;
 import com.vrv.vap.alarmdeal.business.appsys.service.InternetInfoManageService;
 import com.vrv.vap.alarmdeal.business.asset.datasync.util.ExportExcelUtils;
+import com.vrv.vap.alarmdeal.business.asset.model.Asset;
 import com.vrv.vap.alarmdeal.business.asset.service.AssetService;
 import com.vrv.vap.alarmdeal.business.asset.util.ImportExcelUtil;
+import com.vrv.vap.alarmdeal.business.baseauth.enums.BaseAuthEnum;
 import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthApp;
+import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthConfig;
 import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthOperation;
 import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthPrintBurn;
 import com.vrv.vap.alarmdeal.business.baseauth.service.*;
@@ -79,6 +83,8 @@ public class BaseAuthServiceImpl implements BaseAuthService {
     private BaseAuthOperationService baseAuthOperationService;
     @Autowired
     private FileConfiguration fileConfiguration;
+    @Autowired
+    private BaseAuthConfigService baseAuthConfigService;
 
     @Override
     public Map<String, List<Map<String, Object>>> checkImportData(MultipartFile file, Integer code) {
@@ -182,6 +188,11 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                 }
             default:
                 break;
+        }
+        try {
+            QueueUtil.putAuth(code);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -338,6 +349,136 @@ public class BaseAuthServiceImpl implements BaseAuthService {
         return null;
     }
 
+    @Override
+    public void dealData(List<Integer> saveList) {
+        for (Integer integer:saveList){
+            BaseAuthEnum baseAuthEnumByCode = BaseAuthEnum.getBaseAuthEnumByCode(integer);
+            Integer baseAuthType = baseAuthEnumByCode.getBaseAuthType();
+            logger.info("授权数据变动：{}", baseAuthEnumByCode.getName());
+            if (integer==1 ||integer==2){
+                List<QueryCondition> queryConditions=new ArrayList<>();
+                queryConditions.add(QueryCondition.eq("type",integer));
+                queryConditions.add(QueryCondition.eq("decide",0));
+                List<BaseAuthPrintBurn> all = authPrintBurnService.findAll(queryConditions);
+                if (all.size()>0){
+                    List<String> strings = all.stream().map(a -> a.getIp()).collect(Collectors.toList());
+                    List<Asset> assets=getAssetByIps(strings);
+                    if (assets.size()>0){
+                        List<BaseAuthConfig> baseAuthConfigs=new ArrayList<>();
+                        for (Asset asset:assets){
+                            BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
+                            baseAuthConfig.setCreateTime(new Date());
+                            baseAuthConfig.setSrcObj(asset.getResponsibleCode());
+                            baseAuthConfig.setSrcObjLabel(asset.getResponsibleName());
+                            baseAuthConfig.setDstObj(asset.getIp());
+                            baseAuthConfig.setDstObjLabel(asset.getName());
+                            baseAuthConfig.setTypeId(baseAuthType);
+                            baseAuthConfigs.add(baseAuthConfig);
+                        }
+                        deleteBaseAuthConfigByType(baseAuthType);
+                        baseAuthConfigService.save(baseAuthConfigs);
+                    }
+                }
+            }
+            if (integer==3){
+                List<BaseAuthApp> all = baseAuthAppService.findAll();
+                List<BaseAuthApp> in = all.stream().filter(m -> m.getType().equals(0)).collect(Collectors.toList());
+                List<BaseAuthApp> out = all.stream().filter(m -> m.getType().equals(1)).collect(Collectors.toList());
+                if (in.size()>0){
+                    //内部设备访问应用系统
+                    List<BaseAuthConfig> baseAuthConfigs=new ArrayList<>();
+                    for (BaseAuthApp baseAuthApp:in){
+                        Asset asset=getAssetByIp(baseAuthApp.getIp());
+                        AppSysManager appSysManager = appSysManagerService.getOne(baseAuthApp.getAppId());
+                        if (appSysManager!=null){
+                            BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
+                            baseAuthConfig.setCreateTime(new Date());
+                            baseAuthConfig.setSrcObj(baseAuthApp.getIp());
+                            if (asset!=null){
+                                baseAuthConfig.setSrcObjLabel(asset.getName());
+                            }
+                            baseAuthConfig.setDstObj(appSysManager.getAppNo());
+                            baseAuthConfig.setDstObjLabel(appSysManager.getAppName());
+                            baseAuthConfig.setTypeId(baseAuthType);
+                            baseAuthConfigs.add(baseAuthConfig);
+                        }
+                        deleteBaseAuthConfigByType(baseAuthType);
+                        baseAuthConfigService.save(baseAuthConfigs);
+                    }
+                }
+                if (out.size()>0){
+                    //外部设备访问应用系统
+                    List<BaseAuthConfig> baseAuthConfigs=new ArrayList<>();
+                    for (BaseAuthApp baseAuthApp:out){
+                        Asset asset=getAssetByIp(baseAuthApp.getIp());
+                        AppSysManager appSysManager = appSysManagerService.getOne(baseAuthApp.getAppId());
+                        if (appSysManager!=null){
+                            BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
+                            baseAuthConfig.setCreateTime(new Date());
+                            baseAuthConfig.setSrcObj(baseAuthApp.getIp());
+                            if (asset!=null){
+                                baseAuthConfig.setSrcObjLabel(asset.getName());
+                            }
+                            baseAuthConfig.setDstObj(appSysManager.getAppNo());
+                            baseAuthConfig.setDstObjLabel(appSysManager.getAppName());
+                            baseAuthConfig.setTypeId(145);
+                            baseAuthConfigs.add(baseAuthConfig);
+                        }
+                        deleteBaseAuthConfigByType(145);
+                        baseAuthConfigService.save(baseAuthConfigs);
+                    }
+                }
+            }
+            if (integer==4){
+            //ToDo 网络互联权限
+            }
+            if (integer==5){
+                List<BaseAuthOperation> all = baseAuthOperationService.findAll();
+                List<BaseAuthOperation> collect = all.stream().filter(a -> a.getType().equals(1)).collect(Collectors.toList());
+                if (collect.size()>0){
+                    List<BaseAuthConfig> baseAuthConfigs=new ArrayList<>();
+                    for (BaseAuthOperation baseAuthOperation:collect){
+                        Asset asset=getAssetByIp(baseAuthOperation.getIp());
+                        AppSysManager appSysManager=appSysManagerService.getAppByIp(baseAuthOperation.getDstIp());
+                        if (appSysManager!=null){
+                            BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
+                            baseAuthConfig.setCreateTime(new Date());
+                            baseAuthConfig.setSrcObj(baseAuthOperation.getIp());
+                            if (asset!=null){
+                                baseAuthConfig.setSrcObjLabel(asset.getName());
+                            }
+                            baseAuthConfig.setDstObj(appSysManager.getAppNo());
+                            baseAuthConfig.setDstObjLabel(appSysManager.getAppName());
+                            baseAuthConfig.setTypeId(baseAuthType);
+                            baseAuthConfigs.add(baseAuthConfig);
+                        }
+                        deleteBaseAuthConfigByType(baseAuthType);
+                        baseAuthConfigService.save(baseAuthConfigs);
+                    }
+                }
+            }
+        }
+
+    }
+
+    private Asset getAssetByIp(String ip) {
+        List<QueryCondition> queryConditions=new ArrayList<>();
+        queryConditions.add(QueryCondition.eq("ip",ip));
+        List<Asset> assetServiceAll = assetService.findAll(queryConditions);
+        if (assetServiceAll.size()>0){
+            return assetServiceAll.get(0);
+        }
+        return null;
+    }
+
+
+    private List<Asset> getAssetByIps(List<String> strings) {
+        List<QueryCondition> queryConditions=new ArrayList<>();
+        queryConditions.add(QueryCondition.in("ip",strings));
+        List<Asset> assetServiceAll = assetService.findAll(queryConditions);
+        return assetServiceAll;
+    }
+
     private String getFileNameBycode(Integer code) {
         String fileName = "";
 
@@ -439,7 +580,10 @@ public class BaseAuthServiceImpl implements BaseAuthService {
         String sql = "select ip from base_auth_print_burn where type=1;";
         return jdbcTemplate.queryForList(sql, String.class);
     }
-
+    private void deleteBaseAuthConfigByType(Integer baseAuthEnumByCode) {
+        String sql="delete from base_auth_config where type_id="+baseAuthEnumByCode+";";
+        jdbcTemplate.update(sql);
+    }
     private Map<String, List<Map<String, Object>>> checkData(List<Map<String, Object>> datas, Integer code) {
         Map<String, List<Map<String, Object>>> result = new HashMap<>();
         List<Map<String, Object>> trueList = new ArrayList<>();

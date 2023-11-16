@@ -1,6 +1,7 @@
 package com.vrv.vap.alarmdeal.business.baseauth.service.impl;
 
 
+import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.util.QueueUtil;
 import com.vrv.vap.alarmdeal.business.appsys.model.AppSysManager;
 import com.vrv.vap.alarmdeal.business.appsys.service.AppSysManagerService;
 import com.vrv.vap.alarmdeal.business.asset.model.Asset;
@@ -141,7 +142,11 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
                 dataFlase.add(s);
             }
         }
-
+        try {
+            QueueUtil.putAuth(baseAuthPrintBurnQueryVo.getType());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Map<String,List<String>> map=new HashMap<>();
         map.put("dataTrue",dataTrue);
         map.put("dataFlase",dataFlase);
@@ -163,6 +168,12 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
         baseAuthPrintBurn.setIp(baseAuthPrintBurnQueryVo.getIp());
         baseAuthPrintBurn.setDecide(baseAuthPrintBurnQueryVo.getDecide());
         baseAuthPrintBurn.setType(baseAuthPrintBurnQueryVo.getType());
+        save(baseAuthPrintBurn);
+        try {
+            QueueUtil.putAuth(baseAuthPrintBurnQueryVo.getType());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return ResultUtil.success(baseAuthPrintBurn);
     }
 
@@ -170,6 +181,12 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
     public Result<String> delPrintBurn(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
         for (Integer id:baseAuthPrintBurnQueryVo.getIds()){
             delete(id);
+        }
+        try {
+            BaseAuthPrintBurn one = getOne(baseAuthPrintBurnQueryVo.getIds().get(0));
+            QueueUtil.putAuth(one.getType());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return ResultUtil.success("success");
     }

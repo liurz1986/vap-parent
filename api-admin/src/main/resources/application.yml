@@ -1,3 +1,12 @@
+server:
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    port-header: X-Forwarded-Port
+    use-forward-headers: true
+    basedir: /data/vap/temp
+  port: 9410
+
 DATABASE_URL: jdbc:mysql://${MYSQL_HOST:192.168.120.201}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8&allowMultiQueries=true
 spring:
   datasource:
@@ -46,13 +55,7 @@ spring:
       max-file-size: 300MB      # Max file size，默认1M
       max-request-size: 300MB   # Max request size，默认10M
     
-server:
-  tomcat:
-    remote-ip-header: x-forwarded-for
-    protocol-header: x-forwarded-proto
-    port-header: X-Forwarded-Port
-    use-forward-headers: true
-    basedir: /data/vap/temp
+
 sso:
   timeout: 600000
 pkiUrl: https://192.168.118.127:444/pki

@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.vrv.vap.alarmModel.model.WarnResultLogTmpVO;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmanalysis.bean.dimension.DimensionTableInfo;
+import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.util.RedisUtil;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.bean.DimensionSync;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.bean.FilterOperator;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.bean.RiskEventRule;
@@ -75,6 +76,9 @@ public class AlarmDealKafkaServiceImpl implements AlarmDealKafkaService {
     private WarnResultCreateService warnResultCreateService;
     @Autowired
     private ElasticSearchMapManage elasticSearchMapManage;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     /**
      * 数据源变更监听
@@ -186,7 +190,7 @@ public class AlarmDealKafkaServiceImpl implements AlarmDealKafkaService {
                 String dataTopicName = sourceStatus.getDataTopicName();
                 //TODO 临时处理
                 if (dataTopicName.equals("base-line-protocol-10") || dataTopicName.equals("base-line-dip-10") || dataTopicName.equals("base-line-dport-10")
-                ||dataTopicName.equals("base_line_src_total_bytes")||dataTopicName.equals("base_line_dst_total_bytes")) {
+                        || dataTopicName.equals("base_line_src_total_bytes") || dataTopicName.equals("base_line_dst_total_bytes")) {
                     String index = sourceStatus.getIndex();
                     redissonSingleUtil.deleteByPrex(index);
                     logger.warn("{}，索引删除成功！", index);
@@ -200,8 +204,6 @@ public class AlarmDealKafkaServiceImpl implements AlarmDealKafkaService {
                     if (StringUtils.isBlank(tableName)) {
                         logger.error("{}，同步数据失败！", sourceStatus.getDataTopicName());
                     } else {
-                        // 2、同步基线维表数据
-                        dimensionSync(tableName);
                         redissonSingleUtil.deleteByPrex(tableName);
                         logger.warn("{}，索引删除成功！", tableName);
                     }
@@ -213,45 +215,6 @@ public class AlarmDealKafkaServiceImpl implements AlarmDealKafkaService {
         }
     }
 
-    /**
-     * 维表数据同步
-     *
-     * @param tableName
-     */
-    public void dimensionSync(String tableName) {
-        List<QueryCondition> conditions = new ArrayList<>();
-        conditions.add(QueryCondition.eq("dimensionTableName", tableName));
-        List<DimensionSync> dimensionSyncs = dimensionSyncService.findAll(conditions);
-        for (DimensionSync dimensionSync : dimensionSyncs) {
-            SyncRequest sync = new SyncRequest();
-            sync.setRuleCode(dimensionSync.getRuleCode());
-            sync.setFilterCode(dimensionSync.getFilterCode());
-            TypeToken<List<String>> typeToken = new TypeToken<List<String>>() {
-            };
-            sync.setConditions(gson.fromJson(dimensionSync.getConditions(), typeToken.getType()));
-            sync.setDimensionTableName(dimensionSync.getDimensionTableName());
-            try {
-                // 删除同步数据
-                deleteOldSyncData(dimensionSync.getFilterCode(), dimensionSync.getRuleCode(), dimensionSync.getDimensionTableName());
-                // 保存同步数据
-                riskEventRuleService.syncDimensionData(sync);
-            } catch (Exception ex) {
-                logger.error("{}维表数据，自动同步失败！", dimensionSync.getDimensionTableName());
-            }
-        }
-    }
-
-    /**
-     * 根据规则与策略删除原同步数据
-     *
-     * @param filterCode
-     * @param ruleCode
-     * @param dimensionTableName
-     */
-    public void deleteOldSyncData(String filterCode, String ruleCode, String dimensionTableName) {
-        String sql = "delete from " + dimensionTableName + " where is_sync = 1 and filter_code='" + filterCode + "' and rule_code = '" + ruleCode + "';";
-        jdbcTemplate.execute(sql);
-    }
 
     /**
      * 启动规则
@@ -259,20 +222,21 @@ public class AlarmDealKafkaServiceImpl implements AlarmDealKafkaService {
      * @param sourceStatus
      * @return
      */
-    public boolean startRule(FilterSourceStatusInfo sourceStatus) {
+    public void startRule(FilterSourceStatusInfo sourceStatus) {
         // 处理数据
         Integer sourceId = sourceStatus.getDataSourceId();
         Integer dataStatus = getFilterSourceStatus(sourceId);
         if (sourceStatus.getData_status() == 0 && dataStatus == 0) {
-            // 数据状态为不满足,且表中没有数据或者之前状态为不满足
-            return true;
+            logger.warn("数据源[{}]，数据状态为不满足,且表中没有数据或者之前状态为不满足！", sourceId);
+            return;
         } else if (sourceStatus.getData_status() == 0 && dataStatus == 1) {
             // 现在数据状态为不满足，之前数据状态为满足，需要停用规则
+            logger.warn("数据源[{}]，现在数据状态为不满足，之前数据状态为满足，需要停用规则!", sourceId);
             List<String> ruleIds = getRuleBySourceId(sourceId);
             logger.info("sourceId:{},ruleIds:{}", sourceId, gson.toJson(ruleIds));
             if (CollectionUtils.isEmpty(ruleIds)) {
                 logger.warn("数据源[{}]，不存在启动状态的相关规则！", sourceId);
-                return true;
+                return;
             }
             FilterOperatorGroupStartVO vo = new FilterOperatorGroupStartVO();
             vo.setGuids(String.join(",", ruleIds));
@@ -280,28 +244,155 @@ public class AlarmDealKafkaServiceImpl implements AlarmDealKafkaService {
             filterOperatorService.stopFlinkJobByEventId(vo);
             filterSourceStatusService.saveFilterSourceStatus(sourceStatus);
         } else if (sourceStatus.getData_status() == 1 && dataStatus == 1) {
-            // 现在数据状态为满足状态，之前数据状态也为满足状态，则不处理
-            return true;
+            logger.warn("数据源[{}]，现在数据状态为满足状态，之前数据状态也为满足状态，则不处理!", sourceId);
+            return;
         } else if (sourceStatus.getData_status() == 1 && dataStatus == 0) {
-            // 现在数据状态为满足状态，之前数据状态为不满足，启动规则
-            List<String> ruleIds = getRuleBySourceId(sourceId);
-            if (CollectionUtils.isEmpty(ruleIds)) {
-                logger.error("数据源[{}]，不存在启动状态的相关规则！", sourceId);
-                return true;
+            //现在数据状态为满足状态，之前数据状态为不满足，启动规则
+            logger.warn("数据源[{}]，现在数据状态为满足状态，之前数据状态为不满足，启动规则!", sourceId);
+            List<String> ruleIds = getRuleBySourceId(sourceId);   //涉及的数据源
+            DimensionTableInfo dimensionTableByIndex = dimensionTableService.getDimensionTableByIndex(sourceStatus.getIndex());
+            if (CollectionUtils.isEmpty(ruleIds) && dimensionTableByIndex == null) {
+                logger.warn("请注意：数据源[{}]，不存在启动状态的相关规则，且该数据源没有作为维表", sourceId);
+                return;
             }
-            // 判断维表是否有数据
-            FilterOperatorGroupStartVO filterOperatorGroupStartVO = new FilterOperatorGroupStartVO();
-            filterOperatorGroupStartVO.setGuids(String.join(",", ruleIds));
-            List<String> ruleIdList = filterOperatorService.startFilterCheckFilterBaseLineData(filterOperatorGroupStartVO);
-            String msg = filterOperatorService.checkRuleFilterBaseLineData(ruleIdList);
-            if (StringUtils.isNotBlank(msg)) {
-                return true;
+            //设置维表
+            if (dimensionTableByIndex != null) {
+                String nameEn = dimensionTableByIndex.getNameEn();   //维表名称
+                List<FilterOperator> results = filterOperatorService.findFilterOperatotByElementName(nameEn);
+                //1.判断这些规则的数据源是否是正常启动的状态
+                //2，如果是source正常启动状态，找到规则关联到的策略的id然后开始启动操作
+                List<String> filterOperatorCodes = getFilterOperatorCodes(results);
+                List<String> dimensionRuIds = getStartedRuleIdsByFilterIds(filterOperatorCodes);
+                if (CollectionUtils.isEmpty(dimensionRuIds) && CollectionUtils.isEmpty(ruleIds)) {
+                    logger.warn("数据源[{}]，不存在启动状态的相关规则，也不存在使用该数据源作为维表相关启动状态的规则，请检查", sourceId);
+                    return;
+                }
+                ruleIds.addAll(dimensionRuIds);
             }
-            List<String> ruleList = new ArrayList<>(Arrays.asList(filterOperatorGroupStartVO.getGuids().split(",")));
-            filterOperatorService.startFilterOperatorGroupByName(ruleList, ruleIdList);
+            checkAndStartRelateRule(ruleIds);
+            filterSourceStatusService.saveFilterSourceStatus(sourceStatus);
         }
-        return true;
+        return;
     }
+
+    /**
+     *
+     * @param ruleIds
+     */
+    private void checkAndStartRelateRule(List<String> ruleIds) {
+        ruleIds = ruleIds.stream().distinct().collect(Collectors.toList());
+        // 判断维表是否有数据
+        FilterOperatorGroupStartVO filterOperatorGroupStartVO = new FilterOperatorGroupStartVO();
+        filterOperatorGroupStartVO.setGuids(String.join(",", ruleIds));
+        List<String> ruleIdList = filterOperatorService.startFilterCheckFilterBaseLineData(filterOperatorGroupStartVO);
+        String msg = filterOperatorService.checkRuleFilterBaseLineData(ruleIdList);
+
+        if (StringUtils.isNotBlank(msg)) {
+            return;
+        }
+        List<String> ruleList = new ArrayList<>(Arrays.asList(filterOperatorGroupStartVO.getGuids().split(",")));
+        List<String> cj = getNeedStartRule(ruleList);
+        if(cj.size()>0){
+            filterOperatorService.startFilterOperatorGroupByName(cj, ruleIdList);
+        }
+    }
+
+    /**
+     * 获得需要启动的策略
+     * @param ruleList
+     * @return
+     */
+    private List<String> getNeedStartRule(List<String> ruleList) {
+        List<String> notStartRule = new ArrayList<>();  //不需要启动的规则
+        Map<Object, Object> hmget = redisUtil.hmget(FilterOperatorService.FLINK_TASK_REDIS_KEY);
+        if (hmget != null && hmget.size() > 0) {
+            for (String ruleId : ruleList) {
+                for (Map.Entry<Object, Object> entry : hmget.entrySet()) {
+                    String key = (String) entry.getKey();
+                    String value = (String) entry.getValue();
+                    if (value.contains(ruleId)) {
+                        logger.warn("规则[{}——{}]已经启动，不需要再次启动！",key,ruleId);
+                        notStartRule.add(ruleId);
+                        break;
+                    }
+                }
+            }
+        }
+        List<String> cj = ruleList.stream().filter(item -> !notStartRule.contains(item)).collect(Collectors.toList());
+        return cj;
+    }
+
+
+    /**
+     * 根据规则code获得启动状态的策略
+     *
+     * @param filterOperatorCodes
+     * @return
+     */
+    private List<String> getStartedRuleIdsByFilterIds(List<String> filterOperatorCodes) {
+        List<String> result = new ArrayList<>();
+        List<QueryCondition> ruleConditions = new ArrayList<>();
+        ruleConditions.add(QueryCondition.in("filterCode", filterOperatorCodes));
+        List<RuleFilter> ruleFilters = ruleFilterService.findAll(ruleConditions);
+        if (CollectionUtils.isEmpty(ruleFilters)) {
+            return result;
+        }
+        List<String> ruleIds = ruleFilters.stream().map(RuleFilter::getRuleId).collect(Collectors.toList());
+        List<QueryCondition> riskConditions = new ArrayList<>();
+        riskConditions.add(QueryCondition.in("id", ruleIds));
+        riskConditions.add(QueryCondition.eq("deleteFlag", true));
+        riskConditions.add(QueryCondition.eq("started", "1"));
+        List<RiskEventRule> riskEventRules = riskEventRuleService.findAll(riskConditions);
+        if (CollectionUtils.isEmpty(riskEventRules)) {
+            return result;
+        }
+        List<String> riskIds = riskEventRules.stream().map(RiskEventRule::getId).collect(Collectors.toList());
+        return riskIds;
+    }
+
+
+    /**
+     * 筛选数据源状态是正常状态的规则
+     *
+     * @param results
+     */
+    private List<String> getFilterOperatorCodes(List<FilterOperator> results) {
+        List<String> fitlerOperatorIds = new ArrayList<>();
+        results.forEach(result -> {
+            boolean q = false;
+            String content = convertSourceString(result);
+            String[] sourceArr = content.split(",");
+            for (String source : sourceArr) {
+                q = filterSourceStatusService.getFilterSourceStatusByRedis(source);
+                if (!q) {
+                    break;
+                }
+            }
+            if (q) {
+                fitlerOperatorIds.add(result.getCode());
+            }
+        });
+        return fitlerOperatorIds;
+    }
+
+    /**
+     * 转换source资源
+     * ["33",""34] ->33,34
+     *
+     * @param result
+     * @return
+     */
+    private static String convertSourceString(FilterOperator result) {
+        String sourceIds = result.getSourceIds();
+        sourceIds = sourceIds.replace("[", "").replace("]", "").replace("\"", "");
+        int[] arr = Arrays.stream(sourceIds.split(",")).mapToInt(Integer::parseInt).toArray();
+        String content = Arrays.toString(arr);
+        int begin = content.indexOf("[");
+        int end = content.indexOf("]");
+        content = content.substring(begin + 1, end);
+        return content;
+    }
+
 
     /**
      * 通过数据源ID 查询策略
@@ -317,23 +408,7 @@ public class AlarmDealKafkaServiceImpl implements AlarmDealKafkaService {
         List<FilterOperator> filterOperators = filterOperatorService.findAll(conditions);
         if (CollectionUtils.isNotEmpty(filterOperators)) {
             List<String> filterCodes = filterOperators.stream().map(FilterOperator::getCode).collect(Collectors.toList());
-            List<QueryCondition> ruleConditions = new ArrayList<>();
-            ruleConditions.add(QueryCondition.in("filterCode", filterCodes));
-            List<RuleFilter> ruleFilters = ruleFilterService.findAll(ruleConditions);
-            if (CollectionUtils.isEmpty(ruleFilters)) {
-                return result;
-            }
-            List<String> ruleIds = ruleFilters.stream().map(RuleFilter::getRuleId).collect(Collectors.toList());
-            List<QueryCondition> riskConditions = new ArrayList<>();
-            riskConditions.add(QueryCondition.in("id", ruleIds));
-            riskConditions.add(QueryCondition.eq("deleteFlag", true));
-            riskConditions.add(QueryCondition.eq("started", "1"));
-            List<RiskEventRule> riskEventRules = riskEventRuleService.findAll(riskConditions);
-            if (CollectionUtils.isEmpty(riskEventRules)) {
-                return result;
-            }
-            List<String> riskIds = riskEventRules.stream().map(RiskEventRule::getId).collect(Collectors.toList());
-            result.addAll(riskIds);
+            result = getStartedRuleIdsByFilterIds(filterCodes);
         }
         return result;
     }

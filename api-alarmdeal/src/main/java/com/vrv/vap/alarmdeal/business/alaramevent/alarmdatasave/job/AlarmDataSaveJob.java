@@ -6,6 +6,8 @@ import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.job.thread.Alarm
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.service.AlarmDataEntryService;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.service.AlarmDataHandleService;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.util.QueueUtil;
+import com.vrv.vap.alarmdeal.business.baseauth.job.BaseAuthThread;
+import com.vrv.vap.alarmdeal.business.baseauth.service.BaseAuthService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,7 @@ public class AlarmDataSaveJob implements CommandLineRunner {
      * 开始时间
      */
     private Date startTime = new Date();
+    private Date startTimeAuth = new Date();
 
     @Autowired
     private AlarmDataEntryService alarmDataEntryService;
@@ -42,9 +45,14 @@ public class AlarmDataSaveJob implements CommandLineRunner {
     @Autowired
     private AlarmDataHandleService alarmDataHandleService;
 
+    @Autowired
+    private BaseAuthService authService;
+
     private List<WarnResultLogTmpVO> saveList = new CopyOnWriteArrayList<>();
+    private List<Integer> authList = new CopyOnWriteArrayList<>();
 
     private Executor executor = ExecutorConfig.alarmExtentServiceExecutor();
+    private Executor authExecutor = ExecutorConfig.authExecutor();
 
     /**
      * 实现run方法
@@ -62,7 +70,12 @@ public class AlarmDataSaveJob implements CommandLineRunner {
                 getAlarmData();
             }
         }).start();
-
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                dealAuthData();
+            }
+        }).start();
     }
 
     /**
@@ -111,4 +124,39 @@ public class AlarmDataSaveJob implements CommandLineRunner {
             }
         }
     }
+
+    private boolean getTimeResultAuth() {
+        Date endTime = new Date();
+        long timeSpan = (endTime.getTime() - startTimeAuth.getTime()) / 1000;
+        if (timeSpan > 10) {
+            startTimeAuth = new Date();
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public void dealAuthData()  {
+        while (true) {
+            try {
+                Integer s = QueueUtil.pollAuth();
+                if (s!=null){
+                    authList.add(s);
+                }
+                logger.info("队列当中的数据为 :{}", authList.size() );
+                boolean isFiveMin = getTimeResultAuth();
+                if (isFiveMin ||authList.size()>10){
+                    List<Integer> newList = new CopyOnWriteArrayList<>();
+                    newList.addAll(authList);
+                    authExecutor.execute(new BaseAuthThread(authService,newList));
+                }
+                authList.clear();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
+
+
 }

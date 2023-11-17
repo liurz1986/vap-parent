@@ -23,6 +23,7 @@ public class BaseAuthoOperationVo implements Serializable {
     private String operationUrl;
     private String responsibleName;
     private String orgName;
+    private String treeCode;
 
 
 

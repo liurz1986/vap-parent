@@ -1,6 +1,7 @@
 package com.vrv.vap.alarmdeal.business.baseauth.service.impl;
 
 
+import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.util.QueueUtil;
 import com.vrv.vap.alarmdeal.business.appsys.model.AppSysManager;
 import com.vrv.vap.alarmdeal.business.appsys.service.AppSysManagerService;
 import com.vrv.vap.alarmdeal.business.asset.model.Asset;
@@ -105,9 +106,12 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
                     baseAuthPrintBurnVo.setOrgName(asset.getOrgName());
                     AssetType one = assetTypeService.getOne(asset.getAssetType());
                     if (one!=null){
-                        String assetType=getAssetOneType(one,assetTypeGroups);
-                        if (StringUtils.isNotBlank(assetType)){
-                            baseAuthPrintBurnVo.setAssetType(assetType);
+                        AssetTypeGroup assetOneType = getAssetOneType(one, assetTypeGroups);
+                        if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getName())){
+                            baseAuthPrintBurnVo.setAssetType(assetOneType.getName());
+                        }
+                        if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getTreeCode())){
+                            baseAuthPrintBurnVo.setTreeCode(assetOneType.getTreeCode());
                         }
                     }
                 }
@@ -141,7 +145,11 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
                 dataFlase.add(s);
             }
         }
-
+        try {
+            QueueUtil.putAuth(baseAuthPrintBurnQueryVo.getType());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Map<String,List<String>> map=new HashMap<>();
         map.put("dataTrue",dataTrue);
         map.put("dataFlase",dataFlase);
@@ -163,13 +171,25 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
         baseAuthPrintBurn.setIp(baseAuthPrintBurnQueryVo.getIp());
         baseAuthPrintBurn.setDecide(baseAuthPrintBurnQueryVo.getDecide());
         baseAuthPrintBurn.setType(baseAuthPrintBurnQueryVo.getType());
+        save(baseAuthPrintBurn);
+        try {
+            QueueUtil.putAuth(baseAuthPrintBurnQueryVo.getType());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return ResultUtil.success(baseAuthPrintBurn);
     }
 
     @Override
     public Result<String> delPrintBurn(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
+        BaseAuthPrintBurn one = getOne(baseAuthPrintBurnQueryVo.getIds().get(0));
         for (Integer id:baseAuthPrintBurnQueryVo.getIds()){
             delete(id);
+        }
+        try {
+            QueueUtil.putAuth(one.getType());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return ResultUtil.success("success");
     }
@@ -254,13 +274,13 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
         return ResultUtil.success(null);
     }
 
-    private String getAssetOneType(AssetType one, List<AssetTypeGroup> assetTypeGroups) {
+    private AssetTypeGroup getAssetOneType(AssetType one, List<AssetTypeGroup> assetTypeGroups) {
         String treeCode = one.getTreeCode();
         int indexTwo = treeCode.lastIndexOf('-');
         String treeCodeGroup =  treeCode.substring(0, indexTwo);
         for(AssetTypeGroup group : assetTypeGroups){
             if(treeCodeGroup.equals(group.getTreeCode())){
-                return group.getName();
+                return group;
             }
         }
         return null;

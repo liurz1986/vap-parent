@@ -19,4 +19,6 @@ public interface BaseAuthService {
     void saveList(Map<String, Object> map);
 
     Result<String> exportInfo(Map<String, Object> map);
+
+    void dealData(List<Integer> saveList);
 }

@@ -3996,4 +3996,7 @@ CREATE TABLE IF NOT EXISTS `base_auth_print_burn` (
   `decide` int(1) DEFAULT 0 COMMENT '0允许 1不允许',
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-  )
+  );
+
+--changeset liujinhui:20231117-apiAdmin  labels:4.23.0
+ALTER TABLE sys_log MODIFY COLUMN params_value TEXT COMMENT '请求参数值';

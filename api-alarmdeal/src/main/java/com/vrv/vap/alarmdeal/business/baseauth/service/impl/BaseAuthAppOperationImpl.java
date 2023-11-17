@@ -95,9 +95,12 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
                 baseAuthoOperationVo.setOperationUrl(asset.getOperationUrl());
                 AssetType one = assetTypeService.getOne(asset.getAssetType());
                 if (one!=null){
-                    String assetType=getAssetOneType(one,assetTypeGroups);
-                    if (StringUtils.isNotBlank(assetType)){
-                        baseAuthoOperationVo.setAssetType(assetType);
+                    AssetTypeGroup assetOneType = getAssetOneType(one, assetTypeGroups);
+                    if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getName())){
+                        baseAuthoOperationVo.setAssetType(assetOneType.getName());
+                    }
+                    if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getTreeCode())){
+                        baseAuthoOperationVo.setTreeCode(assetOneType.getTreeCode());
                     }
                 }
             }
@@ -106,6 +109,7 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
             queryConditionList.add(QueryCondition.eq("domainName",baseAuthOperation.getDstIp()));
             List<AppSysManager> appSysManagers = appSysManagerService.findAll(queryConditionList);
             baseAuthoOperationVo.setAssetType("应用系统");
+            baseAuthoOperationVo.setTreeCode("app-server");
             if (appSysManagers.size()>0){
                 baseAuthoOperationVo.setOperationUrl(appSysManagers.get(0).getOperationUrl());
                 baseAuthoOperationVo.setOrgName(appSysManagers.get(0).getDepartmentName());
@@ -155,9 +159,12 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
                 baseAuthoOperationVo.setOperationUrl(asset.getOperationUrl());
                 AssetType one = assetTypeService.getOne(asset.getAssetType());
                 if (one!=null){
-                    String assetType=getAssetOneType(one,assetTypeGroups);
-                    if (StringUtils.isNotBlank(assetType)){
-                        baseAuthoOperationVo.setAssetType(assetType);
+                    AssetTypeGroup assetOneType = getAssetOneType(one, assetTypeGroups);
+                    if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getName())){
+                        baseAuthoOperationVo.setAssetType(assetOneType.getName());
+                    }
+                    if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getTreeCode())){
+                        baseAuthoOperationVo.setTreeCode(assetOneType.getTreeCode());
                     }
                 }
             }
@@ -166,6 +173,7 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
             queryConditionList.add(QueryCondition.eq("domainName",baseAuthOperation.getDstIp()));
             List<AppSysManager> appSysManagers = appSysManagerService.findAll(queryConditionList);
             baseAuthoOperationVo.setAssetType("应用系统");
+            baseAuthoOperationVo.setTreeCode("app-server");
             if (appSysManagers.size()>0){
                 baseAuthoOperationVo.setOperationUrl(appSysManagers.get(0).getOperationUrl());
                 baseAuthoOperationVo.setOrgName(appSysManagers.get(0).getDepartmentName());
@@ -223,9 +231,12 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
                         baseAuthoOperationVo.setOperationUrl(asset.getOperationUrl());
                         AssetType one = assetTypeService.getOne(asset.getAssetType());
                         if (one!=null){
-                            String assetType=getAssetOneType(one,assetTypeGroups);
-                            if (StringUtils.isNotBlank(assetType)){
-                                baseAuthoOperationVo.setAssetType(assetType);
+                            AssetTypeGroup assetOneType = getAssetOneType(one, assetTypeGroups);
+                            if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getName())){
+                                baseAuthoOperationVo.setAssetType(assetOneType.getName());
+                            }
+                            if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getTreeCode())){
+                                baseAuthoOperationVo.setTreeCode(assetOneType.getTreeCode());
                             }
                         }
                     }
@@ -234,6 +245,7 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
                     queryConditionList.add(QueryCondition.eq("domainName",baseAuthOperation.getDstIp()));
                     List<AppSysManager> appSysManagers = appSysManagerService.findAll(queryConditionList);
                     baseAuthoOperationVo.setAssetType("应用系统");
+                    baseAuthoOperationVo.setTreeCode("app-server");
                     if (appSysManagers.size()>0){
                         baseAuthoOperationVo.setOperationUrl(appSysManagers.get(0).getOperationUrl());
                         baseAuthoOperationVo.setOrgName(appSysManagers.get(0).getDepartmentName());
@@ -247,13 +259,13 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
         return pageRes;
     }
 
-    private String getAssetOneType(AssetType one, List<AssetTypeGroup> assetTypeGroups) {
+    private AssetTypeGroup getAssetOneType(AssetType one, List<AssetTypeGroup> assetTypeGroups) {
         String treeCode = one.getTreeCode();
         int indexTwo = treeCode.lastIndexOf('-');
         String treeCodeGroup =  treeCode.substring(0, indexTwo);
         for(AssetTypeGroup group : assetTypeGroups){
             if(treeCodeGroup.equals(group.getTreeCode())){
-                return group.getName();
+                return group;
             }
         }
         return null;

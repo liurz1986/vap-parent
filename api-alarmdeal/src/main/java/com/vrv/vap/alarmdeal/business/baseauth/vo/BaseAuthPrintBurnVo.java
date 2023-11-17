@@ -35,4 +35,5 @@ public class BaseAuthPrintBurnVo implements Serializable {
     private String orgName;
     private String decideCN;
     private Date createTime; //创建时间
+    private String treeCode;
 }

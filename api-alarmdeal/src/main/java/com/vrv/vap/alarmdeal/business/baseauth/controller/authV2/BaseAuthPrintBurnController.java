@@ -83,7 +83,7 @@ public class BaseAuthPrintBurnController {
     @PostMapping(value="updatePrintBurn")
     @SysRequestLog(description="打印刻录审批信息编辑", actionType = ActionType.ADD,manually=false)
     @ApiOperation(value="打印刻录审批信息编辑",notes="")
-    public Result<BaseAuthPrintBurn> updatePrintBurn(@RequestBody BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo){
+    public Result<List<BaseAuthPrintBurn>> updatePrintBurn(@RequestBody BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo){
         try{
             return baseAuthPrintBurnService.updatePrintBurn(baseAuthPrintBurnQueryVo);
         }catch (Exception e){

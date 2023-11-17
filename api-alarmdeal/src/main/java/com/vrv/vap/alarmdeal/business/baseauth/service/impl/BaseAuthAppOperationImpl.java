@@ -73,7 +73,7 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
         baseAuthOperation1.setCreateTime(new Date());
         baseAuthOperation1.setIp(baseAuthOperation.getIp());
         baseAuthOperation1.setDstIp(baseAuthOperation.getDstIp());
-        if (baseAuthOperation.getAssetType().equals("应用系统")){
+        if (baseAuthOperation.getAssetType().equals("app-server")){
             baseAuthOperation1.setType(1);
         }else {
             baseAuthOperation1.setType(0);
@@ -137,7 +137,7 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
         BaseAuthOperation baseAuthOperation1 = getOne(baseAuthOperation.getId());
         baseAuthOperation1.setDstIp(baseAuthOperation.getDstIp());
         baseAuthOperation1.setIp(baseAuthOperation.getIp());
-        if (baseAuthOperation.getAssetType().equals("应用系统")){
+        if (baseAuthOperation.getAssetType().equals("app-server")){
             baseAuthOperation1.setType(1);
         }else {
             baseAuthOperation1.setType(0);

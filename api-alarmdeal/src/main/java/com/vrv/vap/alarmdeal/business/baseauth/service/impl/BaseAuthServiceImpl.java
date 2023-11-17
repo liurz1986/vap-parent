@@ -601,7 +601,7 @@ public class BaseAuthServiceImpl implements BaseAuthService {
     }
 
     private List<String> getBrunIps() {
-        String sql = "select ip from base_auth_print_burn where type=1;";
+        String sql = "select ip from base_auth_print_burn where type=2;";
         return jdbcTemplate.queryForList(sql, String.class);
     }
     private void deleteBaseAuthConfigByType(Integer baseAuthEnumByCode) {

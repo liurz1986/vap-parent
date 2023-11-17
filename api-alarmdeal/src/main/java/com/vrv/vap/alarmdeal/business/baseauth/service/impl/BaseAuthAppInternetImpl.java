@@ -196,6 +196,7 @@ public class BaseAuthAppInternetImpl extends BaseServiceImpl<BaseAuthInternet, I
             for (InternetInfoManage internetInfoManage:list){
                 BaseAuthInternetVo baseAuthInternetVo=new BaseAuthInternetVo();
                 baseAuthInternetVo.setId(internetInfoManage.getId());
+                baseAuthInternetVo.setInternetId(internetInfoManage.getId());
                 baseAuthInternetVo.setSecretLevel(getSecretLevel(internetInfoManage.getSecretLevel()));
                 baseAuthInternetVo.setName(internetInfoManage.getName());
                 baseAuthInternetVo.setIp(internetInfoManage.getIp());

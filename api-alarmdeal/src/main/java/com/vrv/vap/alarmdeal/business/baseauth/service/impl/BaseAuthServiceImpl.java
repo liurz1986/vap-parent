@@ -30,6 +30,7 @@ import com.vrv.vap.alarmdeal.frameworks.config.FileConfiguration;
 import com.vrv.vap.alarmdeal.frameworks.exception.AlarmDealException;
 import com.vrv.vap.exportAndImport.excel.exception.ExcelException;
 import com.vrv.vap.jpa.web.Result;
+import com.vrv.vap.jpa.web.ResultCodeEnum;
 import com.vrv.vap.jpa.web.ResultUtil;
 import com.vrv.vap.jpa.web.page.PageRes;
 import com.vrv.vap.jpa.web.page.QueryCondition;
@@ -198,8 +199,16 @@ public class BaseAuthServiceImpl implements BaseAuthService {
 
     @Override
     public Result<String> exportInfo(Map<String, Object> map) {
-        String responsibleName = map.get("responsibleName").toString();
-        String ip = map.get("ip").toString();
+        Object responsibleNameO = map.get("responsibleName");
+        Object ipO = map.get("ip");
+        String responsibleName="";
+        String ip="";
+        if (responsibleNameO!=null){
+            responsibleName=responsibleNameO.toString();
+        }
+        if (ipO!=null){
+            ip=ipO.toString();
+        }
         Integer code = (Integer) map.get("code");
         String fileName =getFileNameBycode(code);
         String rootPath = fileConfiguration.getAsset();
@@ -222,6 +231,9 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                     }
                     PageRes<BaseAuthPrintBurnVo> pager = authPrintBurnService.getPager(baseAuthPrintBurnQueryVo);
                     List<BaseAuthPrintBurnVo> list = pager.getList();
+                    if (list==null){
+                        return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(),"导出数据为空，无法导出");
+                    }
                     List<BaseAuthPrintExport> baseAuthPrintExports = new ArrayList<>();
                     if (list.size() > 0) {
                         for (BaseAuthPrintBurnVo baseAuthPrintBurnVo : list) {
@@ -254,6 +266,9 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                     }
                     PageRes<BaseAuthPrintBurnVo> pager = authPrintBurnService.getPager(baseAuthPrintBurnQueryVo);
                     List<BaseAuthPrintBurnVo> list = pager.getList();
+                    if (list==null){
+                        return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(),"导出数据为空，无法导出");
+                    }
                     List<BaseAuthBurnExport> baseAuthPrintExports = new ArrayList<>();
                     if (list.size() > 0) {
                         for (BaseAuthPrintBurnVo baseAuthPrintBurnVo : list) {
@@ -283,6 +298,9 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                     PageRes<BaseAuthAppVo> pager = baseAuthAppService.getPager(baseAuthAppQueryVo);
                     List<BaseAuthAppExport> baseAuthAppExports = new ArrayList<>();
                     List<BaseAuthAppVo> list = pager.getList();
+                    if (list==null){
+                        return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(),"导出数据为空，无法导出");
+                    }
                     if (list.size() > 0) {
                         for (BaseAuthAppVo baseAuthAppVo : list) {
                             BaseAuthAppExport baseAuthAppExport = new BaseAuthAppExport();
@@ -307,6 +325,9 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                     PageRes<BaseAuthInternetVo> pageRes = baseAuthInternetService.intPage(baseAuthInternetQueryVo);
                     List<BaseAuthInternetExport> baseAuthAppExports = new ArrayList<>();
                     List<BaseAuthInternetVo> list = pageRes.getList();
+                    if (list==null){
+                        return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(),"导出数据为空，无法导出");
+                    }
                     if (list.size() > 0) {
                         for (BaseAuthInternetVo baseAuthAppVo : list) {
                             BaseAuthInternetExport baseAuthInternetExport = new BaseAuthInternetExport();
@@ -330,6 +351,9 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                     PageRes<BaseAuthoOperationVo> pageRes = baseAuthOperationService.operationPage(baseAuthInternetQueryVo);
                     List<BaseAuthOperationExport> baseAuthOperationExports = new ArrayList<>();
                     List<BaseAuthoOperationVo> list = pageRes.getList();
+                    if (list==null){
+                        return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(),"导出数据为空，无法导出");
+                    }
                     if (list.size() > 0) {
                         for (BaseAuthoOperationVo baseAuthAppVo : list) {
                             BaseAuthOperationExport baseAuthInternetExport = new BaseAuthOperationExport();

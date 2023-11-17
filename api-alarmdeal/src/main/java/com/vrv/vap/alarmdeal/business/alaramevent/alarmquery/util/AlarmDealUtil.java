@@ -158,6 +158,9 @@ public class AlarmDealUtil {
      */
     public static List<String> initConditions(List<String> conditionStr){
         List<String> conditions = new ArrayList<>();
+        if(conditionStr == null || conditionStr.size() == 0){
+            return conditions;
+        }
         conditionStr.forEach(item->{
             TypeToken<List<FieldConditionBean>> type = new TypeToken<List<FieldConditionBean>>(){};
             List<FieldConditionBean> fieldConditionBeans = gson.fromJson(item,type.getType());

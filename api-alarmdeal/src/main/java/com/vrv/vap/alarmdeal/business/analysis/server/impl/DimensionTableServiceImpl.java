@@ -71,8 +71,17 @@ public class DimensionTableServiceImpl extends BaseServiceImpl<DimensionTableInf
 		}
 		return dimensionTableInfo;
 	}
-	
-	
-	
+
+	@Override
+	public DimensionTableInfo getDimensionTableByIndex(String indexName) {
+		List<QueryCondition> conditions = new ArrayList<>();
+		conditions.add(QueryCondition.eq("baselineIndex", indexName));
+		List<DimensionTableInfo> dimensionTableInfos = findAll(conditions);
+		if(dimensionTableInfos != null && dimensionTableInfos.size() > 0) {
+			return dimensionTableInfos.get(0);
+		}
+		return null;
+	}
+
 
 }

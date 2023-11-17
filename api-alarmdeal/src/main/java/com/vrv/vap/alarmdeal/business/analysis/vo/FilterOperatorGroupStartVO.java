@@ -9,9 +9,9 @@ import lombok.Data;
 @Data
 public class FilterOperatorGroupStartVO {
 
-    private String riskEventId; //策略Id
+    private String riskEventId; //二级事件分类Id
 
-    private String guids;   //规则id
+    private String guids;   //策略id
 
     private Integer sourceId; //规则关联的数据源id
 

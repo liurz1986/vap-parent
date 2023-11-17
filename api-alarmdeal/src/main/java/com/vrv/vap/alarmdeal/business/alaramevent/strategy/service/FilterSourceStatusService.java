@@ -20,4 +20,8 @@ public interface FilterSourceStatusService extends BaseService<FilterSourceStatu
     void saveFilterSourceStatus(FilterSourceStatusInfo filterSourceStatusInfo);
 
     String filterChange(String indexName,String insertTime);
+
+
+
+
 }

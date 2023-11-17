@@ -614,6 +614,7 @@ public class FilterOperatorService extends BaseServiceImpl<FilterOperator, Strin
         judgeFilterStatus(filterOpertorVO);
         //对字段进行排序
         filterOpertorVO = orderColumnByFilterOperator(filterOpertorVO);
+
         // 2、复制新对象
         FilterOperator newFilterOperator = new FilterOperator();
         FilterOperator filterOperator = getOne(guid);
@@ -683,11 +684,9 @@ public class FilterOperatorService extends BaseServiceImpl<FilterOperator, Strin
         newFilterOperator.setLabel(filterOpertorVO.getLabel());
         newFilterOperator.setFilterType(filterOpertorVO.getFilterType());
         newFilterOperator.setRuleFilterType(filterOpertorVO.getRuleFilterType());
-        if (StringUtils.isNotEmpty(newFilterOperator.getRuleType()) && newFilterOperator.getRuleType().equals(FilterOperator.MODEL)) {
-            String filterConfig = new Gson().toJson(filterOpertorVO.getFilterConfig());
-            newFilterOperator.setFilterConfigTemplate(filterConfig);
-            newFilterOperator.setParamConfig(gson.toJson(filterOpertorVO.getParamConfig()));
-        }
+        String filterConfig = new Gson().toJson(filterOpertorVO.getFilterConfig());
+        newFilterOperator.setFilterConfigTemplate(filterConfig);
+        newFilterOperator.setParamConfig(gson.toJson(filterOpertorVO.getParamConfig()));
         newFilterOperator.setNewlineFlag(filterOpertorVO.getNewlineFlag());
         List<Outputs> outputsList = outputs.stream().filter(output -> output.getType().equals("alarmdeal")).collect(Collectors.toList());
         if (outputsList.size() > 0) {
@@ -2153,7 +2152,7 @@ public class FilterOperatorService extends BaseServiceImpl<FilterOperator, Strin
      * @param map                  参数值
      */
     private String replacefilterConfigTemplate(Map<String, Object> map, String filterConfigTemplate) {
-        FilterConfigObject filterConfigObject = new Gson().fromJson(filterConfigTemplate, FilterConfigObject.class);
+        /*FilterConfigObject filterConfigObject = new Gson().fromJson(filterConfigTemplate, FilterConfigObject.class);
         Exchanges[][] exchanges = filterConfigObject.getExchanges();
         for (int i = 0; i < exchanges.length; i++) {
             for (int j = 0; j < (exchanges[i]).length; j++) {
@@ -2164,8 +2163,8 @@ public class FilterOperatorService extends BaseServiceImpl<FilterOperator, Strin
                     dealExchangeParams(exchange, logicOperator);
                 }
             }
-        }
-        filterConfigTemplate = processTemplate((new Gson()).toJson(filterConfigObject), map);
+        }*/
+        filterConfigTemplate = processTemplate(filterConfigTemplate, map);
         filterConfigTemplate = filterConfigTemplate.replaceAll("#@#", "\\${");
         return filterConfigTemplate;
     }
@@ -3060,5 +3059,20 @@ public class FilterOperatorService extends BaseServiceImpl<FilterOperator, Strin
         }
         return riskEventId;
     }
+
+
+    /**
+     * 在config当中模糊匹配对应的元素
+     * @param element
+     * @return
+     */
+    public List<FilterOperator> findFilterOperatotByElementName(String element){
+       List<QueryCondition> conditions = new ArrayList<>();
+       conditions.add(QueryCondition.like("filterConfig",element));
+        conditions.add(QueryCondition.eq("deleteFlag",1));
+        List<FilterOperator> result = findAll(conditions);
+        return result;
+    }
+
 
 }

@@ -29,5 +29,14 @@ public interface DimensionTableService extends BaseService<DimensionTableInfo, S
 	 * @return
 	 */
     public DimensionTableInfo deleteDimensionById(String id);
+
+
+	/**
+	 * 根据indexName查询到对应的维表名称
+	 * @param indexName
+	 * @return
+	 */
+	public DimensionTableInfo getDimensionTableByIndex(String indexName);
+
 	
 }

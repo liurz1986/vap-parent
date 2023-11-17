@@ -92,4 +92,6 @@ public interface AppSysManagerService extends  AbstractBaseService<AppSysManager
     public void deleteRefByAppIds(List<Integer> appIds);
 
     public Result<List<Map<String, Object>>> getAppsAuth();
+
+    AppSysManager getAppByIp(String dstIp);
 }

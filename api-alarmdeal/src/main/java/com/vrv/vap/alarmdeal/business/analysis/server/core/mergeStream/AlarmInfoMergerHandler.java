@@ -350,12 +350,14 @@ public class AlarmInfoMergerHandler implements CommandLineRunner {
      */
     private void setParenOrgName(WarnResultLogTmpVO warnResultLogTmpVO) {
         Map<String, Object> extendParams = warnResultLogTmpVO.getExtendParams();
-        extendParams = setRelateField(extendParams, "std_org_code");
-        extendParams = setRelateField(extendParams, "src_std_org_code");
-        extendParams = setRelateField(extendParams, "dst_std_org_code");
-		Gson gson  = new Gson();
-		logger.info("extendParams Value:{}", gson.toJson(extendParams));
-		warnResultLogTmpVO.setExtendParams(extendParams);
+        if (extendParams!=null){
+            extendParams = setRelateField(extendParams, "std_org_code");
+            extendParams = setRelateField(extendParams, "src_std_org_code");
+            extendParams = setRelateField(extendParams, "dst_std_org_code");
+            Gson gson  = new Gson();
+            logger.info("extendParams Value:{}", gson.toJson(extendParams));
+            warnResultLogTmpVO.setExtendParams(extendParams);
+        }
     }
 
     /**

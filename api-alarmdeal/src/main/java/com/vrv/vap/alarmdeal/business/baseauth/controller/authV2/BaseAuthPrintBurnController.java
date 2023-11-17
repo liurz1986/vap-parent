@@ -1,6 +1,7 @@
 package com.vrv.vap.alarmdeal.business.baseauth.controller.authV2;
 
 
+import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.util.QueueUtil;
 import com.vrv.vap.alarmdeal.business.asset.model.AssetTypeGroup;
 import com.vrv.vap.alarmdeal.business.asset.service.AssetService;
 import com.vrv.vap.alarmdeal.business.baseauth.enums.BaseAuthEnum;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.SynchronousQueue;
 
 
 @Api(description = "审批信息")
@@ -284,16 +286,17 @@ public class BaseAuthPrintBurnController {
         }
     }
     @PostMapping(value="/operationPage")
-    @SysRequestLog(description="网络互联审批信息分页查询", actionType = ActionType.SELECT,manually=false)
-    @ApiOperation(value="网络互联审批信息分页查询",notes="")
+    @SysRequestLog(description="运维审批信息分页查询", actionType = ActionType.SELECT,manually=false)
+    @ApiOperation(value="运维审批信息分页查询",notes="")
     public PageRes<BaseAuthoOperationVo> operationPage(@RequestBody BaseAuthInternetQueryVo baseAuthInternetQueryVo){
         PageRes<BaseAuthoOperationVo> pageRes = baseAuthOperationService.operationPage(baseAuthInternetQueryVo);
         return pageRes;
     }
     @PostMapping(value="/exportInfo")
-    @ApiOperation(value="生成应用系统导出文件",notes="")
-    @SysRequestLog(description="生成应用系统导出文件", actionType = ActionType.EXPORT,manually=false)
+    @ApiOperation(value="审批信息文件导出",notes="")
+    @SysRequestLog(description="审批信息文件导出", actionType = ActionType.EXPORT,manually=false)
     public  Result<String> exportInfo(@RequestBody Map<String,Object> map){
         return baseAuthService.exportInfo(map);
     }
+
 }

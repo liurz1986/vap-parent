@@ -51,4 +51,16 @@ public class ExecutorConfig {
         threadPoolTaskExecutor.initialize();
         return threadPoolTaskExecutor;
     }
+    public static Executor authExecutor(){
+        logger.info("ExecutorConfig start");
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        threadPoolTaskExecutor.setCorePoolSize(2);
+        threadPoolTaskExecutor.setMaxPoolSize(4);
+        threadPoolTaskExecutor.setKeepAliveSeconds(60);
+        threadPoolTaskExecutor.setQueueCapacity(32);
+        threadPoolTaskExecutor.setThreadNamePrefix("auth-Executor-");
+        threadPoolTaskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        threadPoolTaskExecutor.initialize();
+        return threadPoolTaskExecutor;
+    }
 }

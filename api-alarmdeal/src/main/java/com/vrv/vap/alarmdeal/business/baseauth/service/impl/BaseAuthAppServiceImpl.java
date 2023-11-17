@@ -2,6 +2,7 @@ package com.vrv.vap.alarmdeal.business.baseauth.service.impl;
 
 
 
+import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.util.QueueUtil;
 import com.vrv.vap.alarmdeal.business.appsys.model.AppSysManager;
 import com.vrv.vap.alarmdeal.business.appsys.service.AppSysManagerService;
 import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthApp;
@@ -157,6 +158,11 @@ public class BaseAuthAppServiceImpl extends BaseServiceImpl<BaseAuthApp, Integer
             }
          save(baseAuthAppList);
         }
+        try {
+            QueueUtil.putAuth(3);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         baseAuthAppVo.setAppName(all.get(0).getAppName());
         return ResultUtil.success(baseAuthAppVo);
     }
@@ -213,6 +219,11 @@ public class BaseAuthAppServiceImpl extends BaseServiceImpl<BaseAuthApp, Integer
             save(baseAuthAppList);
         }
         baseAuthAppVo.setAppName(appSysManagers.get(0).getAppName());
+        try {
+            QueueUtil.putAuth(3);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return ResultUtil.success(baseAuthAppVo);
     }
 
@@ -225,6 +236,11 @@ public class BaseAuthAppServiceImpl extends BaseServiceImpl<BaseAuthApp, Integer
             for (BaseAuthApp baseAuthApp:all){
                 delete(baseAuthApp.getId());
             }
+        }
+        try {
+            QueueUtil.putAuth(3);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return ResultUtil.success("success");
     }

@@ -839,6 +839,17 @@ public class AppSysManagerServiceImpl extends AbstractBaseServiceImpl<AppSysMana
         return ResultUtil.successList(appSysManagerDao.getAppsAuth());
     }
 
+    @Override
+    public AppSysManager getAppByIp(String dstIp) {
+        List<QueryCondition> queryConditions=new ArrayList<>();
+        queryConditions.add(QueryCondition.eq("domainName",dstIp));
+        List<AppSysManager> appSysManagers = findAll(queryConditions);
+        if (appSysManagers.size()>0){
+            return appSysManagers.get(0);
+        }
+        return null;
+    }
+
 }
 
 

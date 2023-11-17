@@ -1,3 +1,11 @@
+server:
+  port: 9430
+  http:
+    multipart:
+      enabled: true
+      max-file-size: 200Mb
+      max-request-size: 200Mb
+
 dir:
   base: vap_server_dir
   upload: /upload
@@ -19,10 +27,6 @@ param:
   #flume domain文件存放路径
   flume-domain-path: /usr/local/vap/flume/file/default/domain.yml
 
-liquibase:
-  enabled: false
-  change-log: classpath:sql/changelog-master.xml
-  url: jdbc:mysql://${MYSQL_HOST:192.168.119.213}:${MYSQL_PORT:3306}/ajb_vap?user=${MYSQL_USER:root}&password=${MYSQL_PASSWORD:mysql}&useUnicode=true&useSSL=false&characterEncoding=UTF-8
 
 database:
   type: mysql
@@ -317,8 +321,15 @@ outThread:
     - 08:远程登录/teaviewer
     - 09:远程登录/向日葵
 
+logging:
+  config: classpath:logback-spring.xml
 
-
+info:
+  app:
+    name: "api-audit-xc"
+    description: "态势感知核心业务服务"
+    version: "1.9-SNAPSHOT"
+    spring-boot-version: "1.9-SNAPSHOT"
 
 message:
   vapSourceKey: vap_source_message

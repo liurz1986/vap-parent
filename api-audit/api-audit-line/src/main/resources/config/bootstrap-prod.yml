@@ -2,8 +2,6 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://${EUREKA_HOST:vap}:${EUREKA_PORT:8761}/eureka/
-server:
-  port: 9431
 
 spring:
   cloud:

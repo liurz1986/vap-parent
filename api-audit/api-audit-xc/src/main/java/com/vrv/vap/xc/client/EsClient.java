@@ -8,10 +8,11 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.log4j.Logger;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,7 @@ public class  EsClient{
 
     private static EsClient esClient;
 
-    private static final Logger log = Logger.getLogger(EsClient.class);
+    private static final Logger log = LoggerFactory.getLogger(EsClient.class);
 
 
     private static final int CONNECT_TIME_OUT = 300000;

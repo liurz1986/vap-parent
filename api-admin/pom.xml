@@ -588,15 +588,6 @@
 	</distributionManagement>
 
 	<build>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.10</version>
-			</extension>
-		</extensions>
-
-		<!-- 运行package打包的同时运行upload-single和sshexec -->
 		<plugins>
 			<!-- 插件可以让git的打包提交打入到源码包中 -->
 			<plugin>
@@ -633,8 +624,6 @@
 				</configuration>
 			</plugin>
 
-
-			<!-- 打包复制application.yml到template目录下 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -653,6 +642,7 @@
 									<directory>src/main/resources</directory>
 									<includes>
 										<include>application.yml</include>
+										<include>application-*.yml</include>
 									</includes>
 									<filtering>false</filtering>
 								</resource>
@@ -662,6 +652,7 @@
 				</executions>
 			</plugin>
 
+
 			<!-- 打包排除application.yml文件，本地启动可以直接使用。如果需要可以直接从源码文件进行拷贝 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -669,18 +660,17 @@
 				<configuration>
 					<excludes>
 						<exclude>application.yml</exclude>
+						<exclude>bootstrap-dev.yml</exclude>
+						<exclude>bootstrap-cluster.yml</exclude>
+						<exclude>bootstrap-*.yml</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
 
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<!-- 排除依赖，在打包的时候排除，在sts中启动还是会执行liquibase方案。
-				不把liquibase打包，在上传的时候会直接一键打安装包的方式进行打包，本地可以把这个注释掉，然后看下liquibase的问题 -->
-				<configuration>
-					<includeSystemScope>true</includeSystemScope>
-				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -688,15 +678,18 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
+				<!-- 排除lombok -->
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+					<includeSystemScope>true</includeSystemScope>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>external.atlassian.jgitflow</groupId>
 				<artifactId>jgitflow-maven-plugin</artifactId>
@@ -713,5 +706,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build> 
+	</build>
 </project>

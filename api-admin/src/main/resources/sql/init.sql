@@ -1420,3 +1420,5 @@ ALTER TABLE `base_security_domain` ADD COLUMN `org_code`  varchar(100) NULL COMM
 ALTER TABLE collector_data_access ADD latest_receive_mgs_time VARCHAR(50) DEFAULT '-';
 ALTER TABLE collector_data_access ADD latest_receive_max_count BIGINT DEFAULT 0;
 
+--changeset liujinhui:20231117-apiAdmin  labels:4.23.0
+ALTER TABLE sys_log MODIFY COLUMN params_value TEXT COMMENT '请求参数值';

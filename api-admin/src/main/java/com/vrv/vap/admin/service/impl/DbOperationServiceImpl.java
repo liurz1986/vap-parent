@@ -15,7 +15,6 @@ import com.vrv.vap.admin.vo.BackupTableVO;
 import com.vrv.vap.base.BaseServiceImpl;
 import com.vrv.vap.common.constant.Global;
 import com.vrv.vap.common.vo.Result;
-import com.vrv.vap.syslog.common.utils.SyslogSenderUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -72,7 +71,7 @@ public class DbOperationServiceImpl extends BaseServiceImpl<DbOperationInfo> imp
             }
             logger.info("start backup config");
             // 备份系统表信息
-            Map<String,Object> infoMap = new HashMap<>();
+            Map<String, Object> infoMap = new HashMap<>();
             Map<String, List<Map>> sysInfoMap = new HashMap<>();
             for (String tableName : tables) {
                 logger.info("start backup vap table：" + tableName);
@@ -84,8 +83,8 @@ public class DbOperationServiceImpl extends BaseServiceImpl<DbOperationInfo> imp
             if (fs.exists()) {
                 fs.delete();
             }
-            infoMap.put("tables",sysInfoMap);
-            infoMap.put("dataTypes",dbOperationInfo.getDataTypes());
+            infoMap.put("tables", sysInfoMap);
+            infoMap.put("dataTypes", dbOperationInfo.getDataTypes());
             BackupUtil.createBakFile(filePath, foldName, "sys", JsonUtil.objToJson(infoMap));
             logger.info("start compress backup sql");
             String zipPath = BackupUtil.createBackZip(filePath, foldName, "qazwsx");
@@ -144,7 +143,7 @@ public class DbOperationServiceImpl extends BaseServiceImpl<DbOperationInfo> imp
             }
 
             logger.info("start decompress backup sql");
-            Map<String,Object> infoMap;
+            Map<String, Object> infoMap;
             final Map<String, List<Map<String, Object>>> sysInfoMap;
 
             String folderPath = fileFullPath.replace(FILE_SUFFIX, "");
@@ -188,7 +187,7 @@ public class DbOperationServiceImpl extends BaseServiceImpl<DbOperationInfo> imp
             restartService(dbOperation);
             return Global.OK;
         } catch (Exception e) {
-            logger.error("数据还原失败",e);
+            logger.error("数据还原失败", e);
             dbOperation.setOperationStatus(2);
             dbOperation.setMessage("系统异常：文件内容格式异常！");
             dbOperation.setEndTime(new Date());
@@ -264,7 +263,7 @@ public class DbOperationServiceImpl extends BaseServiceImpl<DbOperationInfo> imp
 
     @Override
     public Result downloadFile(String uuid, HttpServletResponse response) {
-        List<DbOperationInfo> infoList = this.findByProperty(DbOperationInfo.class,"uuid",uuid);
+        List<DbOperationInfo> infoList = this.findByProperty(DbOperationInfo.class, "uuid", uuid);
         if (CollectionUtils.isEmpty(infoList)) {
             return new Result("-1", "无此备份记录");
         }

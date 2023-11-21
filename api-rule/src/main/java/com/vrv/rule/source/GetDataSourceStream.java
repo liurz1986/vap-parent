@@ -262,6 +262,7 @@ public class GetDataSourceStream {
 		sTableEnv.registerFunction("stringResourceFunction", new StringResourceFunction());
 		sTableEnv.registerFunction("timeStampFunction",new TimeStampFunction());
 		sTableEnv.registerFunction("timeStampConvertDateFunction",new TimeStampConvertDateFunction());
+		sTableEnv.registerFunction("appVisitFunction",new AppVisitFunction());
 		Table sqlQuery = sTableEnv.sqlQuery(sql);
 		DataStream<Tuple2<Boolean,Row>> retractStream = sTableEnv.toRetractStream(sqlQuery, Row.class);
 		TypeInformation<Row> outTypeInformation = TypeInformationClass.getTypeInformationTypes(outputFieldInfos);

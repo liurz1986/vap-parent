@@ -89,6 +89,7 @@ public class BaseAuthAppServiceImpl extends BaseServiceImpl<BaseAuthApp, Integer
                 baseAuthAppVo.setOutIp(out);
                 baseAuthAppVo.setInsideIp(in);
                 baseAuthAppVo.setId(appSysManager.getId());
+                baseAuthAppVo.setAppId(appSysManager.getId());
                 baseAuthAppVos.add(baseAuthAppVo);
             }
         }

@@ -67,15 +67,15 @@ public class FlinkRuleOperatorFunction {
 
 
     private static FlinkStartVO getFlinkStartVO() {
-        String codes = "bef7692eaf8242c2aca49dcfea128198";  //d6b4496d7c35420b801a18b7f4eca0eb b17007441aec42dfab32a8dbc28c39a7
+        String codes = "5934b6735b1e4cfdb98f3baf78a24fd5";  //d6b4496d7c35420b801a18b7f4eca0eb b17007441aec42dfab32a8dbc28c39a7
         FlinkStartVO flinkStartVO = new FlinkStartVO();
         Map<String, String> map = new HashMap<>();
-        map.put("维表高级测试", codes);
+        map.put("首访序列", codes);
         //List<FilterOperator> filterOperators = getFilterOperators();
         flinkStartVO.setFilterOperators(null);
         flinkStartVO.setCodeObj(map);
         flinkStartVO.setParallelism(2);
-        flinkStartVO.setJobName("不在线");
+        flinkStartVO.setJobName("首访序列");
         flinkStartVO.setType("category");
         return flinkStartVO;
     }
@@ -85,7 +85,7 @@ public class FlinkRuleOperatorFunction {
 //       Configuration configuration = new Configuration();
 //       configuration.setInteger(RestOptions.PORT, 8089);
 //       StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
-       StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.AUTOMATIC);
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime); //设置对应的时间类型(处理时间)
         env.setRestartStrategy(RestartStrategies.failureRateRestart(10, Time.of(5, TimeUnit.MINUTES), Time.of(10, TimeUnit.SECONDS))); //故障率重启（每5分钟最大失败次数5次）env.setRestartStrategy(RestartStrategies.failureRateRestart(10, Time.of(5, TimeUnit.MINUTES),Time.of(10, TimeUnit.SECONDS))); //故障率重启（每5分钟最大失败次数5次）
@@ -93,7 +93,7 @@ public class FlinkRuleOperatorFunction {
         String json = args[0];   //args[0]
         logger.info("json:" + json);
         try {
-             //flinkStartVO = getFlinkStartVO(); //TODO 模拟数据
+            //flinkStartVO = getFlinkStartVO(); //TODO 模拟数据
             flinkStartVO=gson.fromJson(json, FlinkStartVO.class);
         } catch (Exception e) {
             logger.info("进入异常处理流程:{}", e);

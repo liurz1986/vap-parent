@@ -6,6 +6,7 @@ logs/
 *.log
 work
 derby.log
+vap_server_dir
 
 ### vscode ###
 .vscode

@@ -74,7 +74,8 @@
         <lombok.version>1.18.4</lombok.version>
         <jna-platform.version>5.5.0</jna-platform.version>
         <jna.version>5.5.0</jna.version>
-        <jasypt.version>3.0.4</jasypt.version>
+<!--        <jasypt.version>3.0.4</jasypt.version>-->
+        <jasypt.version>1.18</jasypt.version>
         <xtool.version>1.0.0</xtool.version>
         <security-oauth2.version>2.3.8.RELEASE</security-oauth2.version>
         <security-jwt.version>1.1.0.RELEASE</security-jwt.version>

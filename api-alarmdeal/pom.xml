@@ -123,7 +123,6 @@
         <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.15</version>
         </dependency>
 
         <dependency>

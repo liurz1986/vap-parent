@@ -21,7 +21,7 @@ public interface BaseAuthPrintBurnService extends BaseService<BaseAuthPrintBurn,
 
     Result<Map<String,List<String>>> saveData(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo);
 
-    Result<BaseAuthPrintBurn> updatePrintBurn(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo);
+    Result<List<BaseAuthPrintBurn>> updatePrintBurn(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo);
 
     Result<String> delPrintBurn(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo);
 

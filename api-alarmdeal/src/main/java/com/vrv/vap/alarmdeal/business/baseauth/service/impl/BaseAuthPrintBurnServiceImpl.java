@@ -24,6 +24,7 @@ import com.vrv.vap.jpa.web.page.PageRes;
 import com.vrv.vap.jpa.web.page.QueryCondition;
 import com.vrv.vap.utils.dozer.MapperUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -38,8 +39,9 @@ import java.util.stream.Collectors;
 
 /**
  * 审批类型配置
- *
+ * <p>
  * 2023-08-25
+ *
  * @Author liurz
  */
 @Service
@@ -51,97 +53,99 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
     private BaseAuthPrintBurnRepository baseAuthPrintBurnRepository;
     @Autowired
     private MapperUtil mapper;
+
     @Override
     public BaseRepository<BaseAuthPrintBurn, Integer> getRepository() {
         return this.baseAuthPrintBurnRepository;
     }
+
     @Autowired
     private AssetService assetService;
     @Autowired
     private AssetTypeService assetTypeService;
     @Autowired
     private AssetTypeGroupService assetTypeGroupService;
-    private List<String> printBrunAssetTypeCode=Arrays.asList("asset-Host","asset-service","asset-MaintenHost");
-    private List<String> maintenAssetTypeCode=Arrays.asList("asset-Host","asset-service","asset-MaintenHost","asset-NetworkDevice","asset-SafeDevice");
-    private final String APP_TYPE_CODE="app-server";
+    private List<String> printBrunAssetTypeCode = Arrays.asList("asset-Host", "asset-service", "asset-MaintenHost");
+    private List<String> maintenAssetTypeCode = Arrays.asList("asset-Host", "asset-service", "asset-MaintenHost", "asset-NetworkDevice", "asset-SafeDevice");
+    private final String APP_TYPE_CODE = "app-server";
     @Autowired
     private AppSysManagerService appSysManagerService;
 
     @Override
     public PageRes<BaseAuthPrintBurnVo> getPager(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
-        PageRes<BaseAuthPrintBurnVo> printBurnPageRes=new PageRes<>();
-        List<QueryCondition> queryConditions=new ArrayList<>();
-        queryConditions.add(QueryCondition.eq("type",baseAuthPrintBurnQueryVo.getType()));
+        PageRes<BaseAuthPrintBurnVo> printBurnPageRes = new PageRes<>();
+        List<QueryCondition> queryConditions = new ArrayList<>();
+        queryConditions.add(QueryCondition.eq("type", baseAuthPrintBurnQueryVo.getType()));
         if (StringUtils.isNotBlank(baseAuthPrintBurnQueryVo.getIp()))
-        queryConditions.add(QueryCondition.eq("ip",baseAuthPrintBurnQueryVo.getIp()));
-        if (StringUtils.isNotBlank(baseAuthPrintBurnQueryVo.getResponsibleName())){
-            List<QueryCondition> assetQueryConditions=new ArrayList<>();
-            assetQueryConditions.add(QueryCondition.like("responsibleName",baseAuthPrintBurnQueryVo.getResponsibleName()));
+            queryConditions.add(QueryCondition.eq("ip", baseAuthPrintBurnQueryVo.getIp()));
+        if (StringUtils.isNotBlank(baseAuthPrintBurnQueryVo.getResponsibleName())) {
+            List<QueryCondition> assetQueryConditions = new ArrayList<>();
+            assetQueryConditions.add(QueryCondition.like("responsibleName", baseAuthPrintBurnQueryVo.getResponsibleName()));
             List<Asset> assetServiceAll = assetService.findAll(assetQueryConditions);
-            if (assetServiceAll.size()>0){
+            if (assetServiceAll.size() > 0) {
                 List<String> strings = assetServiceAll.stream().map(a -> a.getIp()).collect(Collectors.toList());
-                queryConditions.add(QueryCondition.in("ip",strings));
-            }else {
+                queryConditions.add(QueryCondition.in("ip", strings));
+            } else {
                 queryConditions.add(QueryCondition.isNull("ip"));
             }
         }
-        Page<BaseAuthPrintBurn> all = this.findAll(queryConditions,baseAuthPrintBurnQueryVo.getPageable());
+        Page<BaseAuthPrintBurn> all = this.findAll(queryConditions, baseAuthPrintBurnQueryVo.getPageable());
         PageRes<BaseAuthPrintBurn> res = PageRes.toRes(all);
         List<BaseAuthPrintBurn> list = res.getList();
         printBurnPageRes.setCode(res.getCode());
         printBurnPageRes.setMessage(res.getMessage());
         printBurnPageRes.setTotal(res.getTotal());
-        if (list.size()>0){
-            List<BaseAuthPrintBurnVo> baseAuthPrintBurnVos=new ArrayList<>();
+        List<BaseAuthPrintBurnVo> baseAuthPrintBurnVos = new ArrayList<>();
+        if (list.size() > 0) {
             List<AssetTypeGroup> assetTypeGroups = assetTypeGroupService.findAll();
-            for (BaseAuthPrintBurn baseAuthPrintBurn:list){
-                BaseAuthPrintBurnVo baseAuthPrintBurnVo=new BaseAuthPrintBurnVo();
-                BeanUtils.copyProperties(baseAuthPrintBurn,baseAuthPrintBurnVo);
-                List<QueryCondition> queryConditionList=new ArrayList<>();
-                queryConditionList.add(QueryCondition.eq("ip",baseAuthPrintBurn.getIp()));
+            for (BaseAuthPrintBurn baseAuthPrintBurn : list) {
+                BaseAuthPrintBurnVo baseAuthPrintBurnVo = new BaseAuthPrintBurnVo();
+                BeanUtils.copyProperties(baseAuthPrintBurn, baseAuthPrintBurnVo);
+                List<QueryCondition> queryConditionList = new ArrayList<>();
+                queryConditionList.add(QueryCondition.eq("ip", baseAuthPrintBurn.getIp()));
                 List<Asset> assetServiceAll = assetService.findAll(queryConditionList);
-                if (assetServiceAll.size()>0){
+                if (assetServiceAll.size() > 0) {
                     Asset asset = assetServiceAll.get(0);
                     baseAuthPrintBurnVo.setResponsibleName(asset.getResponsibleName());
                     baseAuthPrintBurnVo.setOrgName(asset.getOrgName());
                     AssetType one = assetTypeService.getOne(asset.getAssetType());
-                    if (one!=null){
+                    if (one != null) {
                         AssetTypeGroup assetOneType = getAssetOneType(one, assetTypeGroups);
-                        if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getName())){
+                        if (assetOneType != null && StringUtils.isNotBlank(assetOneType.getName())) {
                             baseAuthPrintBurnVo.setAssetType(assetOneType.getName());
                         }
-                        if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getTreeCode())){
+                        if (assetOneType != null && StringUtils.isNotBlank(assetOneType.getTreeCode())) {
                             baseAuthPrintBurnVo.setTreeCode(assetOneType.getTreeCode());
                         }
                     }
                 }
                 baseAuthPrintBurnVos.add(baseAuthPrintBurnVo);
             }
-            printBurnPageRes.setList(baseAuthPrintBurnVos);
         }
+        printBurnPageRes.setList(baseAuthPrintBurnVos);
         return printBurnPageRes;
     }
 
     @Override
-    public Result<Map<String,List<String>>> saveData(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
-        Result<Map<String,List<String>>> isMust = isMustValidate(baseAuthPrintBurnQueryVo);
-        if(ResultCodeEnum.UNKNOW_FAILED.getCode().equals(isMust.getCode())){
+    public Result<Map<String, List<String>>> saveData(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
+        Result<Map<String, List<String>>> isMust = isMustValidate(baseAuthPrintBurnQueryVo);
+        if (ResultCodeEnum.UNKNOW_FAILED.getCode().equals(isMust.getCode())) {
             return isMust;
         }
         List<String> ips = baseAuthPrintBurnQueryVo.getIps();
-        List<String> dataTrue=new ArrayList<>();
-        List<String> dataFlase=new ArrayList<>();
-        for (String s:ips){
-            long count=getAssetCount(s,baseAuthPrintBurnQueryVo);
-            if (count==0){
-                BaseAuthPrintBurn baseAuthPrintBurn=new BaseAuthPrintBurn();
+        List<String> dataTrue = new ArrayList<>();
+        List<String> dataFlase = new ArrayList<>();
+        for (String s : ips) {
+            long count = getAssetCount(s, baseAuthPrintBurnQueryVo);
+            if (count == 0) {
+                BaseAuthPrintBurn baseAuthPrintBurn = new BaseAuthPrintBurn();
                 baseAuthPrintBurn.setDecide(baseAuthPrintBurnQueryVo.getDecide());
                 baseAuthPrintBurn.setType(baseAuthPrintBurnQueryVo.getType());
                 baseAuthPrintBurn.setCreateTime(new Date());
                 baseAuthPrintBurn.setIp(s);
                 this.save(baseAuthPrintBurn);
                 dataTrue.add(s);
-            }else {
+            } else {
                 dataFlase.add(s);
             }
         }
@@ -150,40 +154,59 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        Map<String,List<String>> map=new HashMap<>();
-        map.put("dataTrue",dataTrue);
-        map.put("dataFlase",dataFlase);
-        Result result=new Result();
+        Map<String, List<String>> map = new HashMap<>();
+        map.put("dataTrue", dataTrue);
+        map.put("dataFlase", dataFlase);
+        Result result = new Result();
         result.setData(map);
-        result.setMsg("成功添加"+dataTrue.size()+"个审批信息，失败添加"+dataFlase.size()+"个审批信息。");
+        result.setMsg("成功添加" + dataTrue.size() + "个审批信息，失败添加" + dataFlase.size() + "个审批信息。");
         result.setCode(0);
         return result;
     }
 
     @Override
-    public Result<BaseAuthPrintBurn> updatePrintBurn(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
-        long count=cheakUpdate(baseAuthPrintBurnQueryVo);
-        if (count>0){
-            return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "该设备ip审批信息已存在");
+    public Result<List<BaseAuthPrintBurn>> updatePrintBurn(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
+        Result<Map<String, List<String>>> isMust = isMustValidate(baseAuthPrintBurnQueryVo);
+        if (ResultCodeEnum.UNKNOW_FAILED.getCode().equals(isMust.getCode())) {
+            return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "参数不全");
         }
-        BaseAuthPrintBurn baseAuthPrintBurn = getOne(baseAuthPrintBurnQueryVo.getId());
-        baseAuthPrintBurn.setId(baseAuthPrintBurnQueryVo.getId());
-        baseAuthPrintBurn.setIp(baseAuthPrintBurnQueryVo.getIp());
-        baseAuthPrintBurn.setDecide(baseAuthPrintBurnQueryVo.getDecide());
-        baseAuthPrintBurn.setType(baseAuthPrintBurnQueryVo.getType());
-        save(baseAuthPrintBurn);
+        List<BaseAuthPrintBurn> baseAuthPrintBurns = new ArrayList<>();
+        delete(baseAuthPrintBurnQueryVo.getId());
+        List<String> ips = baseAuthPrintBurnQueryVo.getIps();
+        for (String ip : ips) {
+            List<QueryCondition> queryConditions = new ArrayList<>();
+            queryConditions.add(QueryCondition.eq("ip", ip));
+            queryConditions.add(QueryCondition.eq("type", baseAuthPrintBurnQueryVo.getType()));
+            List<BaseAuthPrintBurn> all = this.findAll(queryConditions);
+            BaseAuthPrintBurn baseAuthPrintBurn = new BaseAuthPrintBurn();
+            if (all.size()>0){
+                baseAuthPrintBurn.setId(all.get(0).getId());
+            }
+            baseAuthPrintBurn.setIp(ip);
+            baseAuthPrintBurn.setDecide(baseAuthPrintBurnQueryVo.getDecide());
+            baseAuthPrintBurn.setType(baseAuthPrintBurnQueryVo.getType());
+            baseAuthPrintBurn.setCreateTime(new Date());
+            baseAuthPrintBurns.add(baseAuthPrintBurn);
+        }
+        save(baseAuthPrintBurns);
         try {
             QueueUtil.putAuth(baseAuthPrintBurnQueryVo.getType());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return ResultUtil.success(baseAuthPrintBurn);
+
+        try {
+            QueueUtil.putAuth(baseAuthPrintBurnQueryVo.getType());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return ResultUtil.success(baseAuthPrintBurns);
     }
 
     @Override
     public Result<String> delPrintBurn(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
         BaseAuthPrintBurn one = getOne(baseAuthPrintBurnQueryVo.getIds().get(0));
-        for (Integer id:baseAuthPrintBurnQueryVo.getIds()){
+        for (Integer id : baseAuthPrintBurnQueryVo.getIds()) {
             delete(id);
         }
         try {
@@ -197,11 +220,11 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
     @Override
     public Result<List<String>> getIpsByAssetType(AssetTypeGroup assetTypeGroup) {
         String treeCode = assetTypeGroup.getTreeCode();
-        if (treeCode.equals(APP_TYPE_CODE)){
+        if (treeCode.equals(APP_TYPE_CODE)) {
             List<AppSysManager> appSysManagers = appSysManagerService.findAll();
             List<String> strings = appSysManagers.stream().map(a -> a.getDomainName()).collect(Collectors.toList());
             return ResultUtil.successList(strings);
-        }else {
+        } else {
             List<QueryCondition> conditions = new ArrayList<>();
             List<QueryCondition> con = new ArrayList<>();
             con.add(QueryCondition.likeBegin("treeCode", treeCode + "-"));
@@ -214,7 +237,7 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
             }
             if (!guids.isEmpty()) {
                 conditions.add(QueryCondition.in("assetType", guids));
-            }else{
+            } else {
                 conditions.add(QueryCondition.isNull("assetType"));
             }
             List<Asset> assetServiceAll = assetService.findAll(conditions);
@@ -225,50 +248,56 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
 
     @Override
     public Result<List<AssetTypeGroup>> getPrintBrunAssetType() {
-        List<QueryCondition> queryConditions=new ArrayList<>();
-        queryConditions.add(QueryCondition.in("treeCode",printBrunAssetTypeCode));
+        List<QueryCondition> queryConditions = new ArrayList<>();
+        queryConditions.add(QueryCondition.in("treeCode", printBrunAssetTypeCode));
         List<AssetTypeGroup> all = assetTypeGroupService.findAll(queryConditions);
         return ResultUtil.successList(all);
     }
 
     @Override
     public Result<List<AssetTypeGroup>> getMaintenAssetType() {
-        List<QueryCondition> queryConditions=new ArrayList<>();
-        queryConditions.add(QueryCondition.in("treeCode",maintenAssetTypeCode));
+        List<QueryCondition> queryConditions = new ArrayList<>();
+        queryConditions.add(QueryCondition.in("treeCode", maintenAssetTypeCode));
         List<AssetTypeGroup> all = assetTypeGroupService.findAll(queryConditions);
-        AssetTypeGroup assetTypeGroup =new AssetTypeGroup();
+        AssetTypeGroup assetTypeGroup = new AssetTypeGroup();
         assetTypeGroup.setTreeCode(APP_TYPE_CODE);
         assetTypeGroup.setName("应用系统");
         all.add(assetTypeGroup);
         return ResultUtil.successList(all);
     }
 
-    private long cheakUpdate(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
+    private Boolean cheakUpdate(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
         BaseAuthPrintBurn one = this.getOne(baseAuthPrintBurnQueryVo.getId());
-        List<QueryCondition> queryConditions=new ArrayList<>();
-        queryConditions.add(QueryCondition.eq("ip",baseAuthPrintBurnQueryVo.getIp()));
-        queryConditions.add(QueryCondition.eq("type",baseAuthPrintBurnQueryVo.getType()));
-        queryConditions.add(QueryCondition.notEq("ip",one.getIp()));
+        List<String> ips = baseAuthPrintBurnQueryVo.getIps();
+        for (String ip : ips) {
+            List<QueryCondition> queryConditions = new ArrayList<>();
+            queryConditions.add(QueryCondition.eq("ip", ip));
+            queryConditions.add(QueryCondition.eq("type", baseAuthPrintBurnQueryVo.getType()));
+            queryConditions.add(QueryCondition.eq("decide", baseAuthPrintBurnQueryVo.getDecide()));
+            long count = this.count(queryConditions);
+            if (count == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private long getAssetCount(String s, BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
+        List<QueryCondition> queryConditions = new ArrayList<>();
+        queryConditions.add(QueryCondition.eq("ip", s));
+        queryConditions.add(QueryCondition.eq("type", baseAuthPrintBurnQueryVo.getType()));
         long count = this.count(queryConditions);
         return count;
     }
 
-    private long getAssetCount(String s,BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
-        List<QueryCondition> queryConditions=new ArrayList<>();
-        queryConditions.add(QueryCondition.eq("ip",s));
-        queryConditions.add(QueryCondition.eq("type",baseAuthPrintBurnQueryVo.getType()));
-        long count = this.count(queryConditions);
-        return count;
-    }
-
-    private  Result<Map<String,List<String>>> isMustValidate(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
-        if(baseAuthPrintBurnQueryVo.getIps().size()==0){
+    private Result<Map<String, List<String>>> isMustValidate(BaseAuthPrintBurnQueryVo baseAuthPrintBurnQueryVo) {
+        if (baseAuthPrintBurnQueryVo.getIps().size() == 0) {
             return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "设备ip不能为空");
         }
-        if(baseAuthPrintBurnQueryVo.getType()==null){
+        if (baseAuthPrintBurnQueryVo.getType() == null) {
             return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "打印刻录类型需要确定");
         }
-        if(baseAuthPrintBurnQueryVo.getDecide()==null){
+        if (baseAuthPrintBurnQueryVo.getDecide() == null) {
             return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "权限选择不能为空");
         }
         return ResultUtil.success(null);
@@ -277,9 +306,9 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
     private AssetTypeGroup getAssetOneType(AssetType one, List<AssetTypeGroup> assetTypeGroups) {
         String treeCode = one.getTreeCode();
         int indexTwo = treeCode.lastIndexOf('-');
-        String treeCodeGroup =  treeCode.substring(0, indexTwo);
-        for(AssetTypeGroup group : assetTypeGroups){
-            if(treeCodeGroup.equals(group.getTreeCode())){
+        String treeCodeGroup = treeCode.substring(0, indexTwo);
+        for (AssetTypeGroup group : assetTypeGroups) {
+            if (treeCodeGroup.equals(group.getTreeCode())) {
                 return group;
             }
         }

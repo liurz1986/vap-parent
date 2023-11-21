@@ -1,15 +1,16 @@
 package com.vrv.vap.admin.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vrv.vap.admin.service.kafka.KafkaSenderService;
+import com.vrv.vap.admin.vo.EventTaVo;
 import com.vrv.vap.base.BaseServiceImpl;
+import com.vrv.vap.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -42,7 +43,7 @@ public class BaseDictAllServiceImpl extends BaseServiceImpl<BaseDictAll> impleme
 
 	@Autowired
 	StringRedisTemplate redisTemplate;
-	
+
 	@Override
 	public List<BaseDictAllTreeVO> getTree() {
 		List<BaseDictAll> findAll = findAll();
@@ -55,7 +56,7 @@ public class BaseDictAllServiceImpl extends BaseServiceImpl<BaseDictAll> impleme
 		}
 		return buildTree(mapList);
 	}
-	
+
 	@Override
 	public List<BaseDictAllTreeVO> findByRootName(String name) {
 		Example example = new Example(BaseDictAll.class);
@@ -64,9 +65,9 @@ public class BaseDictAllServiceImpl extends BaseServiceImpl<BaseDictAll> impleme
         List<BaseDictAll> list= findByExample(example);
         List<BaseDictAll> result = new ArrayList<>();
         for(BaseDictAll baseDictAll:list) {
-        	result.addAll(getOneTree(baseDictAll.getType()));
-        	
-        }
+			result.addAll(getOneTree(baseDictAll.getType()));
+
+		}
         BaseDictAllTreeVO baseDictAllTreeVO = null;
         List<BaseDictAllTreeVO> mapList = new ArrayList<>();
 		for(BaseDictAll baseDictAll:result) {
@@ -109,7 +110,7 @@ public class BaseDictAllServiceImpl extends BaseServiceImpl<BaseDictAll> impleme
 		return dicValueToCodeMap;
 	}
 
-	
+
 	private List<BaseDictAll> getOneTree(String type){
 		Example example = new Example(BaseDictAll.class);
         Example.Criteria criteria = example.createCriteria();
@@ -117,6 +118,7 @@ public class BaseDictAllServiceImpl extends BaseServiceImpl<BaseDictAll> impleme
         List<BaseDictAll> list= findByExample(example);
         return list;
 	}
+
 	private List<BaseDictAllTreeVO> buildTree(List<BaseDictAllTreeVO> treeNodes){
 		List<BaseDictAllTreeVO> result = new ArrayList<>();
 		Map<String, BaseDictAllTreeVO> tmp = new HashMap<>();
@@ -155,5 +157,63 @@ public class BaseDictAllServiceImpl extends BaseServiceImpl<BaseDictAll> impleme
 		} catch (Exception e) {
 			log.error("",e);
 		}
+	}
+
+	@Override
+	public List<EventTaVo> queryEventDict(List<EventTaVo> eventTaVos) {
+		for (EventTaVo eventTaVo:eventTaVos){
+            if (eventTaVo.getFieldValue().startsWith("[")){
+				List<Map<String, String>> maps = parseStringToListOfMaps(eventTaVo.getFieldValue());
+				for (Map<String, String> map:maps){
+					Set<Map.Entry<String, String>> entries = map.entrySet();
+					for (Map.Entry<String, String> m:entries){
+						String value=getFieldValueByCode(m.getKey(),m.getValue());
+						if (StringUtils.isNotBlank(value)){
+							map.put(m.getKey(),value);
+						}
+					}
+				}
+				eventTaVo.setFieldValue(maps.toString());
+			}else {
+				String value=getFieldValueByCode(eventTaVo.getFieldName(),eventTaVo.getFieldValue());
+			    if (StringUtils.isNotBlank(value)){
+					eventTaVo.setFieldValue(value);
+				}
+			}
+		}
+		return eventTaVos;
+	}
+
+	private String getFieldValueByCode(String fieldName, String fieldValue) {
+		Example example=new Example(BaseDictAll.class);
+		example.createCriteria().andEqualTo("codeValue",fieldName).andEqualTo("parentType",0);
+		List<BaseDictAll> byExample = findByExample(example);
+		if (byExample.size()>0){
+			BaseDictAll baseDictAll = byExample.get(0);
+			Example exampleCh=new Example(BaseDictAll.class);
+			exampleCh.createCriteria().andEqualTo("parentType",baseDictAll.getType())
+					.andEqualTo("code",fieldValue);
+			List<BaseDictAll> baseDictAlls = findByExample(exampleCh);
+			if (baseDictAlls.size()>0){
+				return baseDictAlls.get(0).getCodeValue();
+			}
+		}
+		return null;
+	}
+
+	public static List<Map<String, String>> parseStringToListOfMaps(String input) {
+		List<Map<String, String>> list = new ArrayList<>();
+		Pattern pattern = Pattern.compile("\\{([^}]+)\\}");
+		Matcher matcher = pattern.matcher(input);
+		while (matcher.find()) {
+			Map<String, String> map = new HashMap<>();
+			String[] keyValuePairs = matcher.group(1).split(",");
+			for (String keyValuePair : keyValuePairs) {
+				String[] keyValue = keyValuePair.split("=");
+				map.put(keyValue[0].trim(), keyValue[1].trim());
+			}
+			list.add(map);
+		}
+		return list;
 	}
 }

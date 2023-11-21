@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.vrv.vap.admin.model.BaseDictAll;
 import com.vrv.vap.admin.vo.BaseDictAllTreeVO;
+import com.vrv.vap.admin.vo.EventTaVo;
 import com.vrv.vap.base.BaseService;
 
 /**
@@ -33,4 +34,6 @@ public interface BaseDictAllService extends BaseService<BaseDictAll> {
 	void cacheDict();
 
 	void sendChangeMessage();
+
+    List<EventTaVo> queryEventDict(List<EventTaVo> eventTaVos);
 }

@@ -7,6 +7,7 @@ import com.vrv.vap.admin.service.BaseDictAllService;
 import com.vrv.vap.admin.util.LogForgingUtil;
 import com.vrv.vap.admin.vo.BaseDictAllQuery;
 import com.vrv.vap.admin.vo.BaseDictAllTreeVO;
+import com.vrv.vap.admin.vo.EventTaVo;
 import com.vrv.vap.common.constant.Global;
 import com.vrv.vap.common.controller.ApiController;
 import com.vrv.vap.common.vo.DeleteQuery;
@@ -142,6 +143,13 @@ public class BaseDictAllController extends ApiController{
 		SyslogSenderUtils.sendSelectSyslog();
 		Example example = this.pageQuery(query,BaseDictAll.class);
 		return this.vList(baseDictAllService.findByExample(example));
+	}
+	@ApiOperation(value = "通过code_value和CODE查询（告警事件对象查询）")
+	@PostMapping("/event")
+	@SysRequestLog(description = "通过code_value和CODE查询（事件对象查询）", actionType = ActionType.SELECT)
+	public VData<List<EventTaVo>> queryEventDict(@RequestBody List<EventTaVo> eventTaVos){
+		SyslogSenderUtils.sendSelectSyslog();
+		return this.vData(baseDictAllService.queryEventDict(eventTaVos));
 	}
 
 

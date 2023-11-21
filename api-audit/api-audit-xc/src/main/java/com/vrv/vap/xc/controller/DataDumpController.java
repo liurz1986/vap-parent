@@ -1,7 +1,15 @@
 package com.vrv.vap.xc.controller;
 
 import com.vrv.vap.toolkit.annotations.Ignore;
+import com.vrv.vap.toolkit.constant.RetMsgEnum;
+import com.vrv.vap.toolkit.tools.CommonTools;
+import com.vrv.vap.toolkit.vo.Result;
+import com.vrv.vap.toolkit.vo.VData;
+import com.vrv.vap.toolkit.vo.VList;
+import com.vrv.vap.toolkit.vo.VoBuilder;
+import com.vrv.vap.xc.fegin.ApiDataClient;
 import com.vrv.vap.xc.model.DeleteModel;
+import com.vrv.vap.xc.model.Source;
 import com.vrv.vap.xc.pojo.DataCleanLog;
 import com.vrv.vap.xc.pojo.DataDumpLog;
 import com.vrv.vap.xc.pojo.DataDumpStrategy;
@@ -9,12 +17,6 @@ import com.vrv.vap.xc.service.DataDumpService;
 import com.vrv.vap.xc.vo.DataCleanLogQuery;
 import com.vrv.vap.xc.vo.DataDumpLogQuery;
 import com.vrv.vap.xc.vo.DataDumpStrategyQuery;
-import com.vrv.vap.toolkit.constant.RetMsgEnum;
-import com.vrv.vap.toolkit.tools.CommonTools;
-import com.vrv.vap.toolkit.vo.Result;
-import com.vrv.vap.toolkit.vo.VData;
-import com.vrv.vap.toolkit.vo.VList;
-import com.vrv.vap.toolkit.vo.VoBuilder;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -26,7 +28,6 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest;
-import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,10 +50,34 @@ public class DataDumpController {
     @Autowired
     private DataDumpService dataDumpService;
 
+    @Autowired
+    private ApiDataClient apiDataClient;
+
     @Ignore
     @InitBinder
     private void populateCustomerRequest(WebDataBinder binder) {
         binder.setDisallowedFields(new String[]{});
+    }
+
+    /**
+     * 以免影响到搜索与探索的es的索引，新增一个接口，在加入监管事件的es索引。
+     * @return listVData
+     */
+    @PostMapping("/source")
+    @ApiOperation("查询数据备份策略列表")
+    public  VData<List<Source>> queryAllSource() {
+        VData<List<Source>> listVData = apiDataClient.queryAllSource();
+        // 新增监管事件备份，alarmeventmanagement 索引
+        Source source = new Source();
+        source.setId(0);
+        source.setName("alarmeventmanagement");
+        source.setTitle("监管事件");
+        source.setType(1);
+        source.setTimeField("event_time");
+        source.setTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        source.setDataType(1);
+        listVData.getData().add(source);
+        return listVData;
     }
 
     @PostMapping("/strategy")

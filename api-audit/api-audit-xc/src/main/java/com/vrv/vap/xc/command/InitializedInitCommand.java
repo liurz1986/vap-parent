@@ -53,14 +53,10 @@ public class InitializedInitCommand implements CommandLineRunner {
         //部署到东方通等容器时必须手动注册到nacos
         taskLoader.start();
         registNacos(args);
-
         // -----------------------初始化-----------------------
         PathTools.setPathConfig(pathConfig);
-
         Export.startWatcher();
         BaseAreaTools.startOnce();
-
-
 //		EsClient.printClusterStatus(client, indexConfig);
         IndexCache.cache(client, indexConfig);
 

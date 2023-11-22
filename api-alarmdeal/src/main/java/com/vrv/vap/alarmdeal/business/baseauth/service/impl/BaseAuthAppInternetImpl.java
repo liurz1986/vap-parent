@@ -2,6 +2,7 @@ package com.vrv.vap.alarmdeal.business.baseauth.service.impl;
 
 
 
+import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.util.QueueUtil;
 import com.vrv.vap.alarmdeal.business.appsys.model.InternetInfoManage;
 import com.vrv.vap.alarmdeal.business.appsys.service.InternetInfoManageService;
 import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthInternet;
@@ -82,6 +83,11 @@ public class BaseAuthAppInternetImpl extends BaseServiceImpl<BaseAuthInternet, I
         baseAuthInternetVo.setSecretLevel(one.getSecretLevel());
         baseAuthInternetVo.setName(one.getName());
         baseAuthInternetVo.setIp(one.getIp());
+        try {
+            QueueUtil.putAuth(4);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return ResultUtil.success(baseAuthInternetVo);
     }
     @Override
@@ -116,10 +122,14 @@ public class BaseAuthAppInternetImpl extends BaseServiceImpl<BaseAuthInternet, I
         List<QueryCondition> queryConditions=new ArrayList<>();
         queryConditions.add(QueryCondition.eq("internetId",baseAuthInternet.getId()));
         List<BaseAuthInternet> all = findAll(queryConditions);
+        deleteInBatch(all);
         if (all.size()>0){
-            for (BaseAuthInternet baseAuthInternet1:all){
-                delete(baseAuthInternet1);
-            }
+            deleteInBatch(all);
+        }
+        try {
+            QueueUtil.putAuth(4);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return ResultUtil.success("success");
     }
@@ -127,22 +137,17 @@ public class BaseAuthAppInternetImpl extends BaseServiceImpl<BaseAuthInternet, I
     @Override
     public Result<BaseAuthInternetVo> updateAuthInt(BaseAuthInternetQueryVo baseAuthInternetQueryVo) {
         BaseAuthInternetVo baseAuthInternetVo=new BaseAuthInternetVo();
-        InternetInfoManage one = internetInfoManageService.getOne(baseAuthInternetQueryVo.getId());
         List<QueryCondition> queryConditions=new ArrayList<>();
         queryConditions.add(QueryCondition.eq("internetId",baseAuthInternetQueryVo.getId()));
         List<BaseAuthInternet> all = findAll(queryConditions);
         if (all.size()>0){
-            for (BaseAuthInternet baseAuthApp:all){
-                delete(baseAuthApp.getId());
-            }
+            deleteInBatch(all);
         }
         List<QueryCondition> queryConditions1=new ArrayList<>();
         queryConditions1.add(QueryCondition.eq("internetId",baseAuthInternetQueryVo.getInternetId()));
         List<BaseAuthInternet> all1 = findAll(queryConditions1);
         if (all1.size()>0){
-            for (BaseAuthInternet baseAuthApp:all1){
-                delete(baseAuthApp.getId());
-            }
+           deleteInBatch(all1);
         }
         String[] split = baseAuthInternetQueryVo.getIps().split(",");
         List<BaseAuthInternet> baseAuthInternets=new ArrayList<>();
@@ -154,12 +159,18 @@ public class BaseAuthAppInternetImpl extends BaseServiceImpl<BaseAuthInternet, I
             baseAuthInternets.add(baseAuthInternet1);
         }
         save(baseAuthInternets);
+        InternetInfoManage one = internetInfoManageService.getOne(baseAuthInternetQueryVo.getId());
         baseAuthInternetVo.setInternetName(one.getInternetName());
         baseAuthInternetVo.setId(one.getId());
         baseAuthInternetVo.setIps(baseAuthInternetQueryVo.getIps());
         baseAuthInternetVo.setSecretLevel(one.getSecretLevel());
         baseAuthInternetVo.setName(one.getName());
         baseAuthInternetVo.setIp(one.getIp());
+        try {
+            QueueUtil.putAuth(4);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return ResultUtil.success(baseAuthInternetVo);
     }
 

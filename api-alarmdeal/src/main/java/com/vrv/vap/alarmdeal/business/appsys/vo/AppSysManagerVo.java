@@ -18,8 +18,8 @@ import java.util.List;
 @ApiModel(value = "应用系统管理VO")
 public class AppSysManagerVo {
 
-    public static final List<String> HEADERS =  new ArrayList<String>(Arrays.asList("应用系统id","应用编号", "应用名称", "单位名称", "涉密等级","涉密厂商","域名","业务入口","管理入口"));
-    public static final String[] KEYS= new String[]{"id","appNo","appName","departmentName","secretLevel","secretCompany","domainName","appUrl","operationUrl"};
+    public static final List<String> HEADERS =  new ArrayList<String>(Arrays.asList("应用系统id","应用编号", "应用名称", "单位名称", "涉密等级","涉密厂商","域名","业务入口","管理入口","责任人","应用类型","应用IP"));
+    public static final String[] KEYS= new String[]{"id","appNo","appName","departmentName","secretLevel","secretCompany","domainName","appUrl","operationUrl","personName","appType","ip"};
     public static final String  APP_SYS_MANAGER="应用系统信息";
 
     private Integer id;
@@ -102,6 +102,12 @@ public class AppSysManagerVo {
      */
     @ApiModelProperty(value = "责任人")
     private String personName;
+    @ApiModelProperty(value = "责任人code")
+    private String personCode;
+    @ApiModelProperty(value = "应用类型")
+    private String appType;
+    @ApiModelProperty(value = "ip")
+    private String ip;
 
     /**
      * 事件数量

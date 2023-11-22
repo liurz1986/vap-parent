@@ -11,17 +11,14 @@ import com.vrv.vap.alarmdeal.business.asset.datasync.util.ExportExcelUtils;
 import com.vrv.vap.alarmdeal.business.asset.model.Asset;
 import com.vrv.vap.alarmdeal.business.asset.service.AssetService;
 import com.vrv.vap.alarmdeal.business.asset.util.ImportExcelUtil;
+import com.vrv.vap.alarmdeal.business.baseauth.dao.BaseAuthOverviewV2Dao;
 import com.vrv.vap.alarmdeal.business.baseauth.enums.BaseAuthEnum;
-import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthApp;
-import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthConfig;
-import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthOperation;
-import com.vrv.vap.alarmdeal.business.baseauth.model.BaseAuthPrintBurn;
+import com.vrv.vap.alarmdeal.business.baseauth.enums.OptEnum;
+import com.vrv.vap.alarmdeal.business.baseauth.model.*;
 import com.vrv.vap.alarmdeal.business.baseauth.service.*;
+import com.vrv.vap.alarmdeal.business.baseauth.util.BaseAuthUtil;
 import com.vrv.vap.alarmdeal.business.baseauth.util.PValidUtil;
-import com.vrv.vap.alarmdeal.business.baseauth.vo.BaseAuthAppVo;
-import com.vrv.vap.alarmdeal.business.baseauth.vo.BaseAuthInternetVo;
-import com.vrv.vap.alarmdeal.business.baseauth.vo.BaseAuthPrintBurnVo;
-import com.vrv.vap.alarmdeal.business.baseauth.vo.BaseAuthoOperationVo;
+import com.vrv.vap.alarmdeal.business.baseauth.vo.*;
 import com.vrv.vap.alarmdeal.business.baseauth.vo.export.*;
 import com.vrv.vap.alarmdeal.business.baseauth.vo.query.BaseAuthAppQueryVo;
 import com.vrv.vap.alarmdeal.business.baseauth.vo.query.BaseAuthInternetQueryVo;
@@ -35,6 +32,7 @@ import com.vrv.vap.jpa.web.ResultUtil;
 import com.vrv.vap.jpa.web.page.PageRes;
 import com.vrv.vap.jpa.web.page.QueryCondition;
 import com.vrv.vap.utils.dozer.MapperUtil;
+import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -50,6 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,6 +85,10 @@ public class BaseAuthServiceImpl implements BaseAuthService {
     private FileConfiguration fileConfiguration;
     @Autowired
     private BaseAuthConfigService baseAuthConfigService;
+    @Autowired
+    private BaseAuthOverviewV2Dao baseAuthOverviewV2Dao;
+    @Autowired
+    private MapperUtil mapper;
 
     @Override
     public Map<String, List<Map<String, Object>>> checkImportData(MultipartFile file, Integer code) {
@@ -378,6 +381,7 @@ public class BaseAuthServiceImpl implements BaseAuthService {
         for (Integer integer:saveList){
             BaseAuthEnum baseAuthEnumByCode = BaseAuthEnum.getBaseAuthEnumByCode(integer);
             Integer baseAuthType = baseAuthEnumByCode.getBaseAuthType();
+            Integer opt = baseAuthEnumByCode.getOpt();
             logger.info("授权数据变动：{}", baseAuthEnumByCode.getName());
             if (integer==1 ||integer==2){
                 List<QueryCondition> queryConditions=new ArrayList<>();
@@ -389,15 +393,20 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                     List<Asset> assets=getAssetByIps(strings);
                     if (assets.size()>0){
                         List<BaseAuthConfig> baseAuthConfigs=new ArrayList<>();
-                        for (Asset asset:assets){
-                            BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
-                            baseAuthConfig.setCreateTime(new Date());
-                            baseAuthConfig.setSrcObj(asset.getResponsibleCode());
-                            baseAuthConfig.setSrcObjLabel(asset.getResponsibleName());
-                            baseAuthConfig.setDstObj(asset.getIp());
-                            baseAuthConfig.setDstObjLabel(asset.getName());
-                            baseAuthConfig.setTypeId(baseAuthType);
-                            baseAuthConfigs.add(baseAuthConfig);
+                        for (BaseAuthPrintBurn baseAuthPrintBurn:all){
+                            List<Asset> assetList = assets.stream().filter(a -> a.getIp().equals(baseAuthPrintBurn.getIp())).collect(Collectors.toList());
+                            if (assetList.size()>0){
+                                Asset asset = assetList.get(0);
+                                BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
+                                baseAuthConfig.setCreateTime(baseAuthPrintBurn.getCreateTime());
+                                baseAuthConfig.setSrcObj(asset.getResponsibleCode());
+                                baseAuthConfig.setSrcObjLabel(asset.getResponsibleName());
+                                baseAuthConfig.setDstObj(asset.getIp());
+                                baseAuthConfig.setDstObjLabel(asset.getName());
+                                baseAuthConfig.setTypeId(baseAuthType);
+                                baseAuthConfig.setOpt(opt);
+                                baseAuthConfigs.add(baseAuthConfig);
+                            }
                         }
                         deleteBaseAuthConfigByType(baseAuthType);
                         baseAuthConfigService.save(baseAuthConfigs);
@@ -416,7 +425,7 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                         AppSysManager appSysManager = appSysManagerService.getOne(baseAuthApp.getAppId());
                         if (appSysManager!=null){
                             BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
-                            baseAuthConfig.setCreateTime(new Date());
+                            baseAuthConfig.setCreateTime(baseAuthApp.getCreateTime());
                             baseAuthConfig.setSrcObj(baseAuthApp.getIp());
                             if (asset!=null){
                                 baseAuthConfig.setSrcObjLabel(asset.getName());
@@ -424,6 +433,7 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                             baseAuthConfig.setDstObj(appSysManager.getAppNo());
                             baseAuthConfig.setDstObjLabel(appSysManager.getAppName());
                             baseAuthConfig.setTypeId(baseAuthType);
+                            baseAuthConfig.setOpt(opt);
                             baseAuthConfigs.add(baseAuthConfig);
                         }
                         deleteBaseAuthConfigByType(baseAuthType);
@@ -438,7 +448,7 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                         AppSysManager appSysManager = appSysManagerService.getOne(baseAuthApp.getAppId());
                         if (appSysManager!=null){
                             BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
-                            baseAuthConfig.setCreateTime(new Date());
+                            baseAuthConfig.setCreateTime(baseAuthApp.getCreateTime());
                             baseAuthConfig.setSrcObj(baseAuthApp.getIp());
                             if (asset!=null){
                                 baseAuthConfig.setSrcObjLabel(asset.getName());
@@ -446,6 +456,7 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                             baseAuthConfig.setDstObj(appSysManager.getAppNo());
                             baseAuthConfig.setDstObjLabel(appSysManager.getAppName());
                             baseAuthConfig.setTypeId(145);
+                            baseAuthConfig.setOpt(opt);
                             baseAuthConfigs.add(baseAuthConfig);
                         }
                         deleteBaseAuthConfigByType(145);
@@ -454,11 +465,39 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                 }
             }
             if (integer==4){
-            //ToDo 网络互联权限
+                List<BaseAuthInternet> baseAuthInternets = baseAuthInternetService.findAll();
+                if (baseAuthInternets.size()>0){
+                    List<BaseAuthConfig> baseAuthConfigs=new ArrayList<>();
+                    List<InternetInfoManage> internetInfoManageServiceAll = internetInfoManageService.findAll();
+                    for (BaseAuthInternet baseAuthInternet:baseAuthInternets){
+                        Asset asset=getAssetByIp(baseAuthInternet.getIp());
+                        List<InternetInfoManage> internetInfoManages = internetInfoManageServiceAll.stream().filter(p -> p.getId().equals(baseAuthInternet.getInternetId())).collect(Collectors.toList());
+                        if (internetInfoManages.size()>0){
+                            InternetInfoManage internetInfoManage = internetInfoManages.get(0);
+                            BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
+                            baseAuthConfig.setCreateTime(baseAuthInternet.getCreateTime());
+                            baseAuthConfig.setDstObj(internetInfoManage.getId().toString());
+                            baseAuthConfig.setDstObjLabel(internetInfoManage.getInternetName());
+                            baseAuthConfig.setSrcObj(baseAuthInternet.getIp());
+                            baseAuthConfig.setTypeId(baseAuthType);
+                            if (asset!=null){
+                                baseAuthConfig.setSrcObjLabel(asset.getName());
+                            }
+                            baseAuthConfig.setOpt(opt);
+                            baseAuthConfigs.add(baseAuthConfig);
+                        }
+                    }
+                    if (baseAuthConfigs.size()>0){
+                        deleteBaseAuthConfigByType(baseAuthType);
+                        baseAuthConfigService.save(baseAuthConfigs);
+                    }
+                }
+
             }
             if (integer==5){
                 List<BaseAuthOperation> all = baseAuthOperationService.findAll();
                 List<BaseAuthOperation> collect = all.stream().filter(a -> a.getType().equals(1)).collect(Collectors.toList());
+                List<BaseAuthOperation> assetCollect = all.stream().filter(a -> a.getType().equals(0)).collect(Collectors.toList());
                 if (collect.size()>0){
                     List<BaseAuthConfig> baseAuthConfigs=new ArrayList<>();
                     for (BaseAuthOperation baseAuthOperation:collect){
@@ -474,9 +513,32 @@ public class BaseAuthServiceImpl implements BaseAuthService {
                             baseAuthConfig.setDstObj(appSysManager.getAppNo());
                             baseAuthConfig.setDstObjLabel(appSysManager.getAppName());
                             baseAuthConfig.setTypeId(baseAuthType);
+                            baseAuthConfig.setOpt(opt);
                             baseAuthConfigs.add(baseAuthConfig);
                         }
                         deleteBaseAuthConfigByType(baseAuthType);
+                        baseAuthConfigService.save(baseAuthConfigs);
+                    }
+                }
+                if (assetCollect.size()>0){
+                    List<BaseAuthConfig> baseAuthConfigs=new ArrayList<>();
+                    for (BaseAuthOperation baseAuthOperation:assetCollect){
+                        Asset asset=getAssetByIp(baseAuthOperation.getIp());
+                        Asset assetByIp = getAssetByIp(baseAuthOperation.getDstIp());
+                        if (assetByIp!=null){
+                            BaseAuthConfig baseAuthConfig=new BaseAuthConfig();
+                            baseAuthConfig.setCreateTime(baseAuthOperation.getCreateTime());
+                            baseAuthConfig.setSrcObj(baseAuthOperation.getIp());
+                            if (asset!=null){
+                                baseAuthConfig.setSrcObjLabel(asset.getName());
+                            }
+                            baseAuthConfig.setDstObj(baseAuthOperation.getIp());
+                            baseAuthConfig.setDstObjLabel(assetByIp.getName());
+                            baseAuthConfig.setTypeId(147);
+                            baseAuthConfig.setOpt(opt);
+                            baseAuthConfigs.add(baseAuthConfig);
+                        }
+                        deleteBaseAuthConfigByType(147);
                         baseAuthConfigService.save(baseAuthConfigs);
                     }
                 }
@@ -484,6 +546,7 @@ public class BaseAuthServiceImpl implements BaseAuthService {
         }
 
     }
+
 
     private Asset getAssetByIp(String ip) {
         List<QueryCondition> queryConditions=new ArrayList<>();
@@ -519,7 +582,7 @@ public class BaseAuthServiceImpl implements BaseAuthService {
             fileName="网络互联权限审批信息";
         }
         if (code == 5) {
-            fileName="运维权限审批信息";
+            fileName="运维权限审批登记信息";
         }
         return fileName+com.vrv.vap.exportAndImport.excel.util.DateUtils.date2Str(new Date(), "yyyyMMddHHmmss");
     }
@@ -1033,5 +1096,177 @@ public class BaseAuthServiceImpl implements BaseAuthService {
         }
         return dataList;
     }
+    @Override
+    public Result<Map<String, Object>> getTotalStatisticsV2(String type) throws ParseException {
+        Map<String, Object> mapRes = new HashMap<>();
+        switch (type){
+            case  BaseAuthUtil.TYPE_ALL:  // 所有
+                return getAllTotalAndTrend();
+            case  BaseAuthUtil.TYPE_PRINT:  // 打印
+                return getPrintBrunTotalAndTrend(1,0);
+            case  BaseAuthUtil.TYPE_BURN: // e刻录
+                return getPrintBrunTotalAndTrend(2,0);
+            case  BaseAuthUtil.TYPE_INTER: //网路互联
+                return getTotalAndTrend("base_auth_internet");
+            case  BaseAuthUtil.TYPE_ACCESS: // 访问
+                return getTotalAndTrend("base_auth_app");
+            case  BaseAuthUtil.TYPE_MAINT: // 运维
+                return getTotalAndTrend("base_auth_operation");
+            default:
+                return ResultUtil.success(mapRes);
+        }
+    }
 
+    @Override
+    public Result<Map<String, Object>> getPrintStatistics() throws ParseException{
+        return getPrintBrunTotalAndTrend(1,1);
+    }
+
+    @Override
+    public Result<Map<String, Object>> getBurnStatistics() throws ParseException{
+        return getPrintBrunTotalAndTrend(2,1);
+    }
+
+    @Override
+    public Result<Map<String, Object>> getAccessHostStatistics() throws ParseException{
+        return getAppTotalAndTrend(0);
+
+    }
+
+    @Override
+    public Result<Map<String, Object>> getExternalAssetStatistics() throws ParseException{
+        return getAppTotalAndTrend(1);
+
+    }
+
+    @Override
+    public Result<List<CoordinateVO>> getMaintenFlagCountStatistics() throws ParseException{
+        return ResultUtil.successList(baseAuthOverviewV2Dao.getMaintenFlagCountStatistics());
+    }
+
+    @Override
+    public List<TrendResultVO> getMaintenFlagMonthStatistics() throws ParseException{
+        List<TrendResultVO> result = new ArrayStack();
+        // 一个月时间按天、ip分组统计结果
+        List<TrendExtendVO> list = baseAuthOverviewV2Dao.getMaintenFlagMonthStatistics();
+        if(CollectionUtils.isEmpty(list)){
+            return result;
+        }
+        // ip分组
+        Map<String,List<TrendExtendVO>> groupDatas = list.stream().collect(Collectors.groupingBy(TrendExtendVO::getFlag));
+        Set<String> ips = groupDatas.keySet();
+        TrendResultVO trendVO = null;
+        // 获取x轴数据
+        List<String> dataXs = BaseAuthUtil.getMonthDataX();
+        for(String ip : ips){
+            if(StringUtils.isEmpty(ip)){
+                continue;
+            }
+            trendVO = new TrendResultVO();
+            trendVO.setName(ip);
+            List<TrendExtendVO> datas = groupDatas.get(ip);
+            List<TrendVO> trends = mapper.mapList(datas,TrendVO.class);
+            List<CoordinateVO> resList = dataSupplementObj(trends,dataXs);
+            trendVO.setCoords(resList);
+            result.add(trendVO);
+        }
+        return result;
+    }
+
+    private Result<Map<String, Object>> getAppTotalAndTrend(int i) throws ParseException{
+        Map<String, Object> mapRes = new HashMap<>();
+        // 总数统计及差异统计
+        Map<String, Object> totalNum = new HashMap<>();
+        int total = baseAuthOverviewV2Dao.getAppTotal(true,i);
+        int lastTotal = baseAuthOverviewV2Dao.getAppTotal(false,i);
+        totalNum.put("total",total);
+        totalNum.put("diffCount",(total-lastTotal));
+        // 近一个月趋势统计
+        List<TrendVO> list = baseAuthOverviewV2Dao.getAppTrend(i);
+        List<String> dataXs =BaseAuthUtil.getMonthDataX();
+        List<CoordinateVO> trendDatas = dataSupplementObj(list,dataXs);
+        mapRes.put("count",totalNum);
+        mapRes.put("trend",trendDatas);
+        return ResultUtil.success(mapRes);
+    }
+
+    private Result<Map<String, Object>> getAllTotalAndTrend() throws ParseException{
+        Map<String, Object> mapRes = new HashMap<>();
+        // 总数统计及差异统计
+        Map<String, Object> totalNum = new HashMap<>();
+        int total = baseAuthOverviewV2Dao.getAllTotal(true);
+        int lastTotal = baseAuthOverviewV2Dao.getAllTotal(false);
+        totalNum.put("total",total);
+        totalNum.put("diffCount",(total-lastTotal));
+        // 近一个月趋势统计
+        List<TrendVO> list = baseAuthOverviewV2Dao.getAllTrend();
+        List<String> dataXs =BaseAuthUtil.getMonthDataX();
+        List<CoordinateVO> trendDatas = dataSupplementObj(list,dataXs);
+        mapRes.put("count",totalNum);
+        mapRes.put("trend",trendDatas);
+        return ResultUtil.success(mapRes);
+    }
+
+    private Result<Map<String, Object>> getTotalAndTrend(String table) throws ParseException {
+        Map<String, Object> mapRes = new HashMap<>();
+        // 总数统计及差异统计
+        Map<String, Object> totalNum = new HashMap<>();
+        int total = baseAuthOverviewV2Dao.getTotal(true,table);
+        int lastTotal = baseAuthOverviewV2Dao.getTotal(false,table);
+        totalNum.put("total",total);
+        totalNum.put("diffCount",(total-lastTotal));
+        // 近一个月趋势统计
+        List<TrendVO> list = baseAuthOverviewV2Dao.getTrend(table);
+        List<String> dataXs =BaseAuthUtil.getMonthDataX();
+        List<CoordinateVO> trendDatas = dataSupplementObj(list,dataXs);
+        mapRes.put("count",totalNum);
+        mapRes.put("trend",trendDatas);
+        return ResultUtil.success(mapRes);
+    }
+
+    private Result<Map<String, Object>> getPrintBrunTotalAndTrend(Integer type,Integer b) throws ParseException {
+        Map<String, Object> mapRes = new HashMap<>();
+        // 总数统计及差异统计
+        Map<String, Object> totalNum = new HashMap<>();
+        int total = baseAuthOverviewV2Dao.getPrintBrunTotal(type,b,true);
+        int lastTotal = baseAuthOverviewV2Dao.getPrintBrunTotal(type,b,false);
+        totalNum.put("total",total);
+        totalNum.put("diffCount",(total-lastTotal));
+        // 近一个月趋势统计
+        List<TrendVO> list = baseAuthOverviewV2Dao.getPrintBrunTrend(type,b);
+        List<String> dataXs =BaseAuthUtil.getMonthDataX();
+        List<CoordinateVO> trendDatas = dataSupplementObj(list,dataXs);
+        mapRes.put("count",totalNum);
+        mapRes.put("trend",trendDatas);
+        return ResultUtil.success(mapRes);
+    }
+    private  List<CoordinateVO>  dataSupplementObj(List<TrendVO> datas , List<String> dataXs) throws ParseException {
+        List<CoordinateVO> allDatas = new ArrayList<CoordinateVO>();
+        CoordinateVO data = null;
+        for(int i= 0;i < dataXs.size(); i++){
+            data = new CoordinateVO();
+            dataHandleObj(datas,data,dataXs.get(i));
+            allDatas.add(data);
+        }
+        return allDatas;
+    }
+
+    private void dataHandleObj(List<TrendVO> datas, CoordinateVO data, String name) {
+        int number =  getNumObj(datas,name);
+        data.setDataY(number+"");
+        data.setDataX(name);
+    }
+
+    private int getNumObj(List<TrendVO> datas, String name) {
+        if(CollectionUtils.isEmpty(datas)){
+            return 0;
+        }
+        for(TrendVO param : datas){
+            String dataName =param.getName();
+            if(name.equals(dataName)){
+                return param.getNumber();
+            }
+        }
+        return  0;
+    }
 }

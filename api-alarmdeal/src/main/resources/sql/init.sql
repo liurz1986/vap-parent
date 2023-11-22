@@ -3997,4 +3997,9 @@ CREATE TABLE IF NOT EXISTS `base_auth_print_burn` (
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
   );
-
+-- changeset tyj:20231121 labels:新增字段
+ALTER TABLE `app_sys_manager`
+  ADD COLUMN  `ip` varchar(255)  NULL,
+  ADD COLUMN  `person_name` varchar(255)  NULL,
+  ADD COLUMN  `person_code` varchar(255)  NULL,
+  ADD column  `app_type`  varchar(255)  NULL;

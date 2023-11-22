@@ -74,7 +74,8 @@ public class AppSysManagerDao {
         String countSql= " select  count(1) from app_sys_manager s where 1=1"+sqlWhere;
         Long count = jdbcTemplate.queryForObject(countSql, Long.class);
         // 分页查询
-        String sql ="SELECT s.id,s.app_no AS appNo,s.app_name AS  appName,s.department_name AS  departmentName,s.department_guid AS departmentGuid,s.domain_name AS domainName,s.secret_level AS secretLevel,s.secret_company AS secretCompany,s.service_id AS serviceId , s.app_url as appUrl ,s.operation_url as operationUrl from app_sys_manager as s  where 1=1 ";
+        String sql ="SELECT s.id,s.app_no AS appNo,s.app_name AS  appName,s.department_name AS  departmentName,s.department_guid AS departmentGuid,s.domain_name AS domainName,s.secret_level AS secretLevel,s.secret_company AS secretCompany,s.service_id AS serviceId , s.app_url as appUrl ,s.operation_url as operationUrl, " +
+                "s.person_name as personName , s.person_code as personCode , s.app_type as appType , s.ip as ip from app_sys_manager as s  where 1=1 ";
         sql=sql+sqlWhere+"  limit " +appSysManagerQueryVo.getStart_()+","+appSysManagerQueryVo.getCount_();
         List<AppSysManagerVo> list=jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<AppSysManagerVo>(AppSysManagerVo.class));
         // 分别获取账号、资源、角色数量
@@ -128,7 +129,7 @@ public class AppSysManagerDao {
         return 0;
     }
     public PageRes<AppSysManagerVo> getAppSysManagerImgPage(AppSysManagerQueryVo appSysManagerQueryVo) {
-        String sql="SELECT s.id,s.app_no AS appNo,s.app_name AS  appName,s.department_name AS  departmentName,s.department_guid AS departmentGuid,s.domain_name AS domainName,s.secret_level AS secretLevel,s.secret_company AS secretCompany,s.service_id AS serviceId ,a.steal_leak_value as stealLeakValue ,s.app_url as appUrl , s.operation_url as operationUrl" +
+        String sql="SELECT s.id,s.app_no AS appNo,s.app_name AS  appName,s.department_name AS  departmentName,s.department_guid AS departmentGuid,s.domain_name AS domainName,s.secret_level AS secretLevel,s.secret_company AS secretCompany,s.service_id AS serviceId ,a.steal_leak_value as stealLeakValue ,s.app_url as appUrl , s.operation_url as operationUrl,s.person_name as personName , s.person_code as personCode , s.app_type as appType " +
                 " from app_sys_manager s " +
                 " left join app_steal_leak_value a on a.app_id= s.id " +
                 " where 1=1 and  a.type=0";
@@ -188,7 +189,7 @@ public class AppSysManagerDao {
         return page;
     }
     public List<AppSysManagerVo> getAppSysManagerImgList(AppSysManagerQueryVo appSysManagerQueryVo) {
-        String sql="SELECT s.id,s.app_no AS appNo,s.app_name AS  appName,s.department_name AS  departmentName,s.department_guid AS departmentGuid,s.domain_name AS domainName,s.secret_level AS secretLevel,s.secret_company AS secretCompany,s.service_id AS serviceId ,a.steal_leak_value as stealLeakValue, s.app_url as appUrl , s.operation_url as operationUrl" +
+        String sql="SELECT s.id,s.app_no AS appNo,s.app_name AS  appName,s.department_name AS  departmentName,s.department_guid AS departmentGuid,s.domain_name AS domainName,s.secret_level AS secretLevel,s.secret_company AS secretCompany,s.service_id AS serviceId ,a.steal_leak_value as stealLeakValue, s.app_url as appUrl , s.operation_url as operationUrl,s.person_name as personName , s.person_code as personCode , s.app_type as appType " +
                 " from app_sys_manager s " +
                 " left join app_steal_leak_value a on a.app_id= s.id " +
                 " where 1=1 ";

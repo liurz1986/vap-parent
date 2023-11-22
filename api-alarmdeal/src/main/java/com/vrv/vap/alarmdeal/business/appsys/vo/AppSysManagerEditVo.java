@@ -61,5 +61,12 @@ public class AppSysManagerEditVo {
 
     private String appUrl;   //业务入口
     private String operationUrl;   //管理入口
-
+    @ApiModelProperty(value = "责任人")
+    private String personName;
+    @ApiModelProperty(value = "责任人code")
+    private String personCode;
+    @ApiModelProperty(value = "应用类型")
+    private String appType;
+    @ApiModelProperty(value = "ip")
+    private String ip;
 }

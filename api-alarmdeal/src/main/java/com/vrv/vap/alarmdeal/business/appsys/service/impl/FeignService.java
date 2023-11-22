@@ -79,5 +79,16 @@ public class FeignService {
         return personMap;
 
     }
+    public  Map<String,String> getPersonMapName(){
+        Map<String,String> personMap=new HashMap<>();
+        VData<List<BasePersonZjg>> vData=adminFeign.getAllPerson();
+        List<BasePersonZjg> basePersonZjgList=vData.getData();
+        for(BasePersonZjg basePersonZjg : basePersonZjgList){
+            if(!personMap.containsKey(basePersonZjg.getOrgName())){
+                personMap.put(basePersonZjg.getUserName(),basePersonZjg.getUserNo());
+            }
+        }
+        return personMap;
 
+    }
 }

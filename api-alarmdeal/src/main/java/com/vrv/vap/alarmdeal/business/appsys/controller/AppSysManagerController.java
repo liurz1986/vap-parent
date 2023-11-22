@@ -10,10 +10,12 @@ import com.vrv.vap.alarmdeal.business.appsys.model.AppResourceManage;
 import com.vrv.vap.alarmdeal.business.appsys.model.AppRoleManage;
 import com.vrv.vap.alarmdeal.business.appsys.model.AppSysManager;
 import com.vrv.vap.alarmdeal.business.appsys.service.*;
+import com.vrv.vap.alarmdeal.business.appsys.service.impl.FeignService;
 import com.vrv.vap.alarmdeal.business.appsys.util.EnumTransferUtil;
 import com.vrv.vap.alarmdeal.business.appsys.vo.*;
 import com.vrv.vap.alarmdeal.business.asset.dao.AssetDao;
 import com.vrv.vap.alarmdeal.business.asset.datasync.service.MessageService;
+import com.vrv.vap.alarmdeal.business.asset.service.AssetService;
 import com.vrv.vap.alarmdeal.business.asset.service.BaseDataRedisCacheService;
 import com.vrv.vap.alarmdeal.business.asset.util.ExportExcelUtils;
 import com.vrv.vap.alarmdeal.business.asset.vo.AssetSearchVO;
@@ -25,6 +27,7 @@ import com.vrv.vap.jpa.web.Result;
 import com.vrv.vap.jpa.web.ResultCodeEnum;
 import com.vrv.vap.jpa.web.ResultUtil;
 import com.vrv.vap.jpa.web.page.PageRes;
+import com.vrv.vap.jpa.web.page.QueryCondition;
 import com.vrv.vap.syslog.common.annotation.SysRequestLog;
 import com.vrv.vap.syslog.common.enums.ActionType;
 import com.vrv.vap.utils.dozer.MapperUtil;
@@ -82,6 +85,9 @@ public class AppSysManagerController  extends AbstractAppSysController<AppSysMan
 
     @Autowired
     private AssetDao assetDao;
+
+    @Autowired
+    private AssetService assetService;
     @Autowired
     private MessageService messageService;
     @Autowired
@@ -218,6 +224,12 @@ public class AppSysManagerController  extends AbstractAppSysController<AppSysMan
     @SysRequestLog(description="应用系统管理-编辑应用系统", actionType = ActionType.UPDATE,manually=false)
     public Result<AppSysManagerVo> editRoleManage(@RequestBody AppSysManagerEditVo appSysManagerEditVo){
         AppSysManager appSysManager=appSysManagerService.getOne(appSysManagerEditVo.getId());
+        List<QueryCondition> queryConditions=new ArrayList<>();
+        queryConditions.add(QueryCondition.eq("ip",appSysManagerEditVo.getIp()));
+        long count = assetService.count(queryConditions);
+        if (count==0){
+            return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(),"资产基础数据不存在该应用ip");
+        }
         String oldAppNo = appSysManager.getAppNo();
         mapperUtil.copy(appSysManagerEditVo,appSysManager);
         appSysManagerService.save(appSysManager);
@@ -448,7 +460,8 @@ public class AppSysManagerController  extends AbstractAppSysController<AppSysMan
         result.setData(map);
         return result;
     }
-
+    @Autowired
+    private FeignService feignService;
 
     @PostMapping(value="/saveList")
     @ApiOperation(value="应用系统管理导入数据入库",notes="")
@@ -473,12 +486,16 @@ public class AppSysManagerController  extends AbstractAppSysController<AppSysMan
         List<AppRoleManage> appRoleManages = new ArrayList<>();
         List<AppAccountManage> appAccountManages = new ArrayList<>();
         List<AppResourceManage> appResourceManages = new ArrayList<>();
+        Map<String, String> personMapName = feignService.getPersonMapName();
         // 构造数据
         for(Map<String,Object> map : appLists){
             String oldId=map.get("id").toString();
             map.remove("id");
             AppSysManager appSysManager=mapperUtil.map(map,AppSysManager.class);
             appSysManager.setCreateTime(new Date());
+            if (StringUtils.isNotBlank(appSysManager.getPersonName())){
+                appSysManager.setPersonCode(personMapName.get(appSysManager.getPersonName()));
+            }
             curMaxId++;
             appSysManager.setId(curMaxId);
             appSysManager.setDataSourceType(1);

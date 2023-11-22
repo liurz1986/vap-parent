@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.vrv.vap.alarmdeal.business.appsys.service.OrgService;
 import com.vrv.vap.alarmdeal.business.asset.util.RedisCacheUtil;
 import com.vrv.vap.alarmdeal.frameworks.contract.audit.BaseKoalOrg;
+import com.vrv.vap.alarmdeal.frameworks.contract.user.BasePersonZjg;
 import com.vrv.vap.alarmdeal.frameworks.exception.AlarmDealException;
 import com.vrv.vap.alarmdeal.frameworks.feign.AdminFeign;
 import com.vrv.vap.common.vo.VData;
@@ -57,7 +58,10 @@ public class OrgServiceImpl implements OrgService {
         orgs.add(baseKoalOrg);  // 加上根组织机构
         return orgs;
     }
-
+    public List<BasePersonZjg> getPerson(){
+        VData<List<BasePersonZjg>> allPerson = adminFegin.getAllPerson();
+        return allPerson.getData();
+    }
     private Object getData(String key){
         return redisCacheUtil.get(key);
     }

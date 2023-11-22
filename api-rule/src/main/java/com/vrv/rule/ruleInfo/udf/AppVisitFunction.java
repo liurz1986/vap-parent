@@ -131,7 +131,7 @@ public class AppVisitFunction extends ScalarFunction {
 
     public List<Map<String, Object>> getResultByResCode(String resCode, List<Map<String, Object>> firstVisitList) {
         List<Map<String, Object>> resultByResCode = firstVisitList.stream().filter(map -> {
-            String resultCode = map.get("http_res_code").toString();
+            String resultCode = map.getOrDefault("http_res_code", "0").toString();
             if (resCode.contains(resultCode)) {
                 return true;
             } else {

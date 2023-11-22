@@ -134,7 +134,7 @@ public class AlarmCommonDataServiceImpl implements AlarmCommonDataService {
             filterOperator.setFilterConfig(gson.toJson(filterConfigObject));
 
             List<OutFieldInfo> old = JSONArray.parseArray(filterOperator.getOutFieldInfos(), OutFieldInfo.class);
-            List<OutFieldInfo> newOutFieldInfo = updateOutFieldInfos(fields,old);
+            List<OutFieldInfo> newOutFieldInfo =  getOutputFields(tables,old); //updateOutFieldInfos(fields,old);
             filterOperator.setOutFieldInfos(gson.toJson(newOutFieldInfo));
             filterOperatorService.save(filterOperator);
         }
@@ -221,9 +221,11 @@ public class AlarmCommonDataServiceImpl implements AlarmCommonDataService {
                 }
                 filterConfigObject.setTables(tables);
                 filterOperator.setFilterConfig(gson.toJson(filterConfigObject));
-                List<OutFieldInfo> old = JSONArray.parseArray(filterOperator.getOutFieldInfos(), OutFieldInfo.class);
-                List<OutFieldInfo> newOutFieldInfo = updateOutFieldInfos(fields,old);
-                filterOperator.setOutFieldInfos(gson.toJson(newOutFieldInfo));
+                String outFieldInfos = filterOperator.getOutFieldInfos();
+                List<OutFieldInfo> old = JSONArray.parseArray(outFieldInfos, OutFieldInfo.class);
+                List<OutFieldInfo> outputFields = getOutputFields(tables,old);
+                filterOperator.setOutFieldInfos(gson.toJson(outputFields));
+                filterOperator.setUpdateTime(new Date());
                 filterOperatorService.save(filterOperator);
             }
             List<FilterSourceRes> result1 = result.stream().distinct().collect(toList());
@@ -231,6 +233,37 @@ public class AlarmCommonDataServiceImpl implements AlarmCommonDataService {
         }
         return resultMap;
     }
+
+
+    /**
+     * 获得对应得输出字段值
+     * @param tables
+     * @return
+     */
+    private List<OutFieldInfo> getOutputFields(Tables[][] tables,List<OutFieldInfo> outFieldInfos){
+        List<OutFieldInfo> result = new ArrayList<>();
+        //获得tables数组的最后一个元素
+        // 遍历得到数据节点信息
+        Tables lastTable = tables[tables.length-1][tables[tables.length-1].length-1];
+        List<Column> columnList = lastTable.getColumn();
+        Integer max = 0;
+        for (Column column:columnList) {
+            OutFieldInfo outFieldInfo = new OutFieldInfo();
+            outFieldInfo.setFieldName(column.getName());
+            outFieldInfo.setFieldLabel(column.getLabel());
+            outFieldInfo.setFieldType(column.getDataType());
+            Integer order = column.getOrder();
+            outFieldInfo.setOrder(order);
+            max = order>max?order:max;
+            result.add(outFieldInfo);
+        }
+        OutFieldInfo last = outFieldInfos.get(outFieldInfos.size()-1);
+        last.setOrder(max+1);
+        result.add(last);
+        Collections.sort(result,Comparator.comparing(OutFieldInfo::getOrder));
+        return result;
+    }
+
 
     @Override
     public List<String> changeRiskList(ChangeRiskReq req) {
@@ -431,21 +464,6 @@ public class AlarmCommonDataServiceImpl implements AlarmCommonDataService {
             return String.valueOf(dataSource.getId());
         }
         return null;
-    }
-
-    public List<OutFieldInfo> updateOutFieldInfos(List<EventColumn> fields,List<OutFieldInfo> outFieldInfos){
-        List<OutFieldInfo> result = new ArrayList<>();
-        for(int i=0;i<fields.size();i++){
-            OutFieldInfo outFieldInfo = new OutFieldInfo();
-            outFieldInfo.setFieldName(fields.get(i).getName());
-            outFieldInfo.setFieldLabel(fields.get(i).getLabel());
-            outFieldInfo.setFieldType(fields.get(i).getType());
-            outFieldInfo.setOrder(i);
-        }
-        OutFieldInfo last = outFieldInfos.get(outFieldInfos.size()-1);
-        result.add(last);
-        Collections.sort(result,Comparator.comparing(OutFieldInfo::getOrder));
-        return result;
     }
 
     public List<Column> updateField(List<EventColumn> fields){

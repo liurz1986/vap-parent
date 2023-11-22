@@ -220,6 +220,9 @@ public class AlarmBaseDataServiceImpl implements AlarmBaseDataService {
      */
     @Override
     public BaseSecurityDomain queryDomianById(String id) {
+        if(StringUtils.isEmpty(id)){
+            return null;
+        }
         List<BaseSecurityDomain> baseSecurityDomains = null;
         if(CommomLocalCache.containsKey("Alarm-BaseSecurityDomain")){
             baseSecurityDomains = CommomLocalCache.get("Alarm-BaseSecurityDomain");

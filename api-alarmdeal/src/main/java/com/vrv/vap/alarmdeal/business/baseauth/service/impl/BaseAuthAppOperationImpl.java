@@ -203,6 +203,12 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
         PageRes<BaseAuthoOperationVo> pageRes=new PageRes<>();
         List<BaseAuthoOperationVo> baseAuthoOperationVos=new ArrayList<>();
         List<QueryCondition> queryConditions=new ArrayList<>();
+        if (StringUtils.isBlank(baseAuthInternetQueryVo.getBy_())){
+            baseAuthInternetQueryVo.setBy_("DESC");
+        }
+        if (StringUtils.isBlank(baseAuthInternetQueryVo.getOrder_())){
+            baseAuthInternetQueryVo.setOrder_("createTime");
+        }
         if (StringUtils.isNotBlank(baseAuthInternetQueryVo.getIp())){
             queryConditions.add(QueryCondition.like("dstIp",baseAuthInternetQueryVo.getIp()));
         }

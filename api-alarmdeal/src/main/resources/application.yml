@@ -37,6 +37,7 @@ spring:
         enable_lazy_load_on_trans : true
   main:
     show-banner: false
+    allow-bean-definition-overriding: true
   data:
     elasticsearch:
       cluster-name: ${ES_CLUSTER_NAME:elasticsearch-cluster}

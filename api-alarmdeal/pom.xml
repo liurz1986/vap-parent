@@ -249,39 +249,7 @@
             <version>3.4.2</version>
         </dependency>
     </dependencies>
-    <profiles>
-        <profile>
-            <id>default</id>
-            <!-- 默认是不带内置数据的，没有初始化内置数据 -->
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <package.environment>default</package.environment>
-            </properties>
-        </profile>
-        <profile>
-            <id>soc</id>
-            <properties>
-                <package.environment>soc</package.environment>
-            </properties>
-        </profile>
-        <profile>
-            <id>audit</id>
-            <properties>
-                <package.environment>audit</package.environment>
-            </properties>
-        </profile>
-        <profile>
-            <id>sonar</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <sonar.host.url>http://192.168.118.236:9000/</sonar.host.url>
-            </properties>
-        </profile>
-    </profiles>
+
 
     <!-- 添加spring-boot的maven插件 -->
     <distributionManagement>
@@ -298,6 +266,40 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--构建过程中,是否打印详细信息-->
+                    <verbose>true</verbose>
+                    <!--日期格式-->
+                    <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
+                    <!--是否生成"git.properties"文件;默认值:false;-->
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <!--指定"git.properties"文件的存放路径-->
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                    <!-- 获取指定的信息，下面获取git.build.time,git.build.version,git.commit.id.abbrev,git.commit.id.full -->
+                    <includeOnlyProperties>
+                        <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.build.user.(email|name)$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
+                        <includeOnlyProperty>git.commit.time</includeOnlyProperty>
+                        <includeOnlyProperty>git.branch</includeOnlyProperty>
+                    </includeOnlyProperties>
+                    <commitIdGenerationMode>full</commitIdGenerationMode>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -316,6 +318,7 @@
                                     <directory>src/main/resources</directory>
                                     <includes>
                                         <include>application.yml</include>
+                                        <include>application-*.yml</include>
                                     </includes>
                                     <filtering>false</filtering>
                                 </resource>
@@ -332,6 +335,9 @@
                 <configuration>
                     <excludes>
                         <exclude>application.yml</exclude>
+                        <exclude>bootstrap-dev.yml</exclude>
+                        <exclude>bootstrap-cluster.yml</exclude>
+                        <exclude>bootstrap-*.yml</exclude>
                     </excludes>
                 </configuration>
             </plugin>

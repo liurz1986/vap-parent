@@ -161,7 +161,7 @@ public class BaseAuthPrintBurnController {
             map.put("code",baseAuthEnum.getCode());
             mapList.add(map);
         }
-       return ResultUtil.successList(mapList);
+       return ResultUtil.success(mapList);
     }
     @PostMapping(value="/appPage")
     @SysRequestLog(description="应用系统审批信息分页查询", actionType = ActionType.SELECT,manually=false)
@@ -212,7 +212,7 @@ public class BaseAuthPrintBurnController {
             return baseAuthInternetService.addAuthInt(baseAuthInternet);
         }catch (Exception e){
             logger.error("网络互联审批信息保存异常:{}",e);
-            return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "网络互联审批信息保存保存异常");
+            return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "网络互联审批信息保存异常");
         }
     }
     @PostMapping(value="delAuthInt")
@@ -260,7 +260,7 @@ public class BaseAuthPrintBurnController {
             return baseAuthOperationService.addAuthOperation(baseAuthOperation);
         }catch (Exception e){
             logger.error("运维审批信息保存异常:{}",e);
-            return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "网络互联审批信息保存保存异常");
+            return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "网络互联审批信息保存异常");
         }
     }
     @PostMapping(value="updateAuthOperation")

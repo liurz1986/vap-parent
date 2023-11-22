@@ -22,4 +22,6 @@ public interface BaseAuthOverviewService {
    public Result<List<CoordinateVO>> getMaintenFlagCountStatistics();
 
    public List<TrendResultVO> getMaintenFlagMonthStatistics() throws ParseException;
+
+
 }

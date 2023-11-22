@@ -106,7 +106,7 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
             }
         }else {
             List<QueryCondition> queryConditionList=new ArrayList<>();
-            queryConditionList.add(QueryCondition.eq("domainName",baseAuthOperation.getDstIp()));
+            queryConditionList.add(QueryCondition.eq("ip",baseAuthOperation.getDstIp()));
             List<AppSysManager> appSysManagers = appSysManagerService.findAll(queryConditionList);
             baseAuthoOperationVo.setAssetType("应用系统");
             baseAuthoOperationVo.setTreeCode("app-server");
@@ -170,7 +170,7 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
             }
         }else {
             List<QueryCondition> queryConditionList=new ArrayList<>();
-            queryConditionList.add(QueryCondition.eq("domainName",baseAuthOperation.getDstIp()));
+            queryConditionList.add(QueryCondition.eq("ip",baseAuthOperation.getDstIp()));
             List<AppSysManager> appSysManagers = appSysManagerService.findAll(queryConditionList);
             baseAuthoOperationVo.setAssetType("应用系统");
             baseAuthoOperationVo.setTreeCode("app-server");
@@ -234,6 +234,9 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
                             AssetTypeGroup assetOneType = getAssetOneType(one, assetTypeGroups);
                             if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getName())){
                                 baseAuthoOperationVo.setAssetType(assetOneType.getName());
+                                if (!assetOneType.getName().equals("安全保密产品")){
+                                    baseAuthoOperationVo.setOperationUrl(asset.getIp());
+                                }
                             }
                             if (assetOneType!=null&&StringUtils.isNotBlank(assetOneType.getTreeCode())){
                                 baseAuthoOperationVo.setTreeCode(assetOneType.getTreeCode());
@@ -242,13 +245,18 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
                     }
                 }else {
                     List<QueryCondition> queryConditionList=new ArrayList<>();
-                    queryConditionList.add(QueryCondition.eq("domainName",baseAuthOperation.getDstIp()));
+                    queryConditionList.add(QueryCondition.eq("ip",baseAuthOperation.getDstIp()));
                     List<AppSysManager> appSysManagers = appSysManagerService.findAll(queryConditionList);
                     baseAuthoOperationVo.setAssetType("应用系统");
                     baseAuthoOperationVo.setTreeCode("app-server");
                     if (appSysManagers.size()>0){
                         baseAuthoOperationVo.setOperationUrl(appSysManagers.get(0).getOperationUrl());
                         baseAuthoOperationVo.setOrgName(appSysManagers.get(0).getDepartmentName());
+                        baseAuthoOperationVo.setResponsibleName(appSysManagers.get(0).getPersonName());
+                        Asset asset=getAssetByIp(baseAuthOperation.getDstIp());
+                        if (asset!=null){
+                            baseAuthoOperationVo.setMac(asset.getMac());
+                        }
                     }
                 }
                 baseAuthoOperationVos.add(baseAuthoOperationVo);
@@ -257,6 +265,16 @@ public class BaseAuthAppOperationImpl extends BaseServiceImpl<BaseAuthOperation,
 
         pageRes.setList(baseAuthoOperationVos);
         return pageRes;
+    }
+
+    private Asset getAssetByIp(String dstIp) {
+        List<QueryCondition> queryConditionList=new ArrayList<>();
+        queryConditionList.add(QueryCondition.eq("ip",dstIp));
+        List<Asset> assetServiceAll = assetService.findAll(queryConditionList);
+        if (assetServiceAll.size()>0){
+            return assetServiceAll.get(0);
+        }
+        return null;
     }
 
     private AssetTypeGroup getAssetOneType(AssetType one, List<AssetTypeGroup> assetTypeGroups) {

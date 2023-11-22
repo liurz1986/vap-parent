@@ -76,7 +76,15 @@ public class AppSysManager {
     private String appUrl;   //业务入口
     @Column(name="operation_url")
     private String operationUrl;   //管理入口
+    @Column(name = "person_name")
+    private String personName;//
 
+    @Column(name = "person_code")
+    private String personCode;
+    @Column(name = "app_type")
+    private String appType;
+    @Column(name = "ip")
+    private String ip;
 
 
 

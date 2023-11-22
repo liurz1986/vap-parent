@@ -16,11 +16,11 @@ import java.util.List;
  */
 public enum BaseAuthEnum {
 
-    PRINT(1,"打印权限审批信息",143),
-    BURN(2,"刻录权限审批信息",144),
-    ACCESS(3,"应用访问权限审批信息",14),
-    MAINT(4,"网络互联权限审批信息",146),
-    INTER(5,"运维权限审批信息",141);
+    PRINT(1,"打印权限审批信息",143,1),
+    BURN(2,"刻录权限审批信息",144,2),
+    ACCESS(3,"应用访问权限审批信息",14,3),
+    MAINT(4,"网络互联权限审批信息",146,5),
+    INTER(5,"运维权限审批登记信息",141,4);
 
 
     public static Integer getCodeByName(String name){
@@ -65,6 +65,15 @@ public enum BaseAuthEnum {
     private String name;
 
     public Integer baseAuthType;
+    public Integer opt;
+
+    public Integer getOpt() {
+        return opt;
+    }
+
+    public void setOpt(Integer opt) {
+        this.opt = opt;
+    }
 
     public int getCode() {
         return code;
@@ -90,9 +99,10 @@ public enum BaseAuthEnum {
         this.baseAuthType = baseAuthType;
     }
 
-    BaseAuthEnum(int code, String name, Integer baseAuthType) {
+    BaseAuthEnum(int code, String name, Integer baseAuthType,Integer opt) {
         this.code = code;
         this.name = name;
         this.baseAuthType = baseAuthType;
+        this.opt = opt;
     }
 }

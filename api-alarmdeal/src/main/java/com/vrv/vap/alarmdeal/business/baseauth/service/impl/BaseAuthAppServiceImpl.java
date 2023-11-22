@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -176,31 +177,20 @@ public class BaseAuthAppServiceImpl extends BaseServiceImpl<BaseAuthApp, Integer
         if (!PValidUtil.isIPValid(baseAuthAppVo.getInsideIp())){
             return ResultUtil.error(ResultCodeEnum.UNKNOW_FAILED.getCode(), "内部授权访问ip格式异常");
         }
-        List<QueryCondition> queryConditionsApp=new ArrayList<>();
-        queryConditionsApp.add(QueryCondition.eq("id",baseAuthAppVo.getAppId()));
-        List<AppSysManager> appSysManagers = appSysManagerService.findAll(queryConditionsApp);
-        List<QueryCondition> queryConditions=new ArrayList<>();
-        queryConditions.add(QueryCondition.eq("appId",baseAuthAppVo.getId()));
-        List<BaseAuthApp> all = findAll(queryConditions);
-        if (all.size()>0){
-            for (BaseAuthApp baseAuthApp:all){
-                delete(baseAuthApp.getId());
-            }
-        }
-        List<QueryCondition> queryConditions1=new ArrayList<>();
-        queryConditions1.add(QueryCondition.eq("appId",baseAuthAppVo.getAppId()));
-        List<BaseAuthApp> all1 = findAll(queryConditions1);
-        if (all1.size()>0){
-            for (BaseAuthApp baseAuthApp:all1){
-                delete(baseAuthApp.getId());
-            }
-        }
+        //删除老数据
+        deleteOldData(baseAuthAppVo);
         List<BaseAuthApp> baseAuthAppList=new ArrayList<>();
         if (StringUtils.isNotBlank(baseAuthAppVo.getOutIp())){
             String[] split = baseAuthAppVo.getOutIp().split(",");
             for (String s:split){
+                BaseAuthApp byIp=getByIp(s,baseAuthAppVo.getAppId(),1);
                 BaseAuthApp baseAuthApp=new BaseAuthApp();
-                baseAuthApp.setCreateTime(new Date());
+                if (byIp!=null){
+                    baseAuthApp.setId(byIp.getId());
+                    baseAuthApp.setCreateTime(byIp.getCreateTime());
+                }else {
+                    baseAuthApp.setCreateTime(new Date());
+                }
                 baseAuthApp.setIp(s);
                 baseAuthApp.setAppId(baseAuthAppVo.getAppId());
                 baseAuthApp.setType(1);
@@ -210,8 +200,14 @@ public class BaseAuthAppServiceImpl extends BaseServiceImpl<BaseAuthApp, Integer
         if (StringUtils.isNotBlank(baseAuthAppVo.getInsideIp())){
             String[] split = baseAuthAppVo.getInsideIp().split(",");
             for (String s:split){
+                BaseAuthApp byIp=getByIp(s,baseAuthAppVo.getAppId(),0);
                 BaseAuthApp baseAuthApp=new BaseAuthApp();
-                baseAuthApp.setCreateTime(new Date());
+                if (byIp!=null){
+                    baseAuthApp.setId(byIp.getId());
+                    baseAuthApp.setCreateTime(byIp.getCreateTime());
+                }else {
+                    baseAuthApp.setCreateTime(new Date());
+                }
                 baseAuthApp.setIp(s);
                 baseAuthApp.setAppId(baseAuthAppVo.getAppId());
                 baseAuthApp.setType(0);
@@ -219,6 +215,9 @@ public class BaseAuthAppServiceImpl extends BaseServiceImpl<BaseAuthApp, Integer
             }
             save(baseAuthAppList);
         }
+        List<QueryCondition> queryConditionsApp=new ArrayList<>();
+        queryConditionsApp.add(QueryCondition.eq("id",baseAuthAppVo.getAppId()));
+        List<AppSysManager> appSysManagers = appSysManagerService.findAll(queryConditionsApp);
         baseAuthAppVo.setAppName(appSysManagers.get(0).getAppName());
         try {
             QueueUtil.putAuth(3);
@@ -228,15 +227,51 @@ public class BaseAuthAppServiceImpl extends BaseServiceImpl<BaseAuthApp, Integer
         return ResultUtil.success(baseAuthAppVo);
     }
 
+    private BaseAuthApp getByIp(String s, Integer appId, int i) {
+        List<QueryCondition> queryConditions=new ArrayList<>();
+        queryConditions.add(QueryCondition.eq("appId",appId));
+        queryConditions.add(QueryCondition.eq("type",i));
+        queryConditions.add(QueryCondition.eq("ip",s));
+        List<BaseAuthApp> all = findAll(queryConditions);
+        if (all.size()>0){
+            return  all.get(0);
+        }
+        return null;
+    }
+
+
+    private void deleteOldData(BaseAuthAppVo baseAuthAppVo) {
+        List<BaseAuthApp> authApps=new ArrayList<>();
+        if (StringUtils.isNotBlank(baseAuthAppVo.getInsideIp())){
+            String[] split = baseAuthAppVo.getInsideIp().split(",");
+            List<QueryCondition> queryConditions1=new ArrayList<>();
+            queryConditions1.add(QueryCondition.eq("appId",baseAuthAppVo.getAppId()));
+            queryConditions1.add(QueryCondition.not(QueryCondition.in("ip",Arrays.asList(split))));
+            queryConditions1.add(QueryCondition.eq("type",0));
+            List<BaseAuthApp> all = findAll(queryConditions1);
+            authApps.addAll(all);
+        }
+        if (StringUtils.isNotBlank(baseAuthAppVo.getOutIp())){
+            String[] split = baseAuthAppVo.getOutIp().split(",");
+            List<QueryCondition> queryConditions1=new ArrayList<>();
+            queryConditions1.add(QueryCondition.eq("appId",baseAuthAppVo.getAppId()));
+            queryConditions1.add(QueryCondition.not(QueryCondition.in("ip",Arrays.asList(split))));
+            queryConditions1.add(QueryCondition.eq("type",1));
+            List<BaseAuthApp> all = findAll(queryConditions1);
+            authApps.addAll(all);
+        }
+        if (authApps.size()>0){
+            deleteInBatch(authApps);
+        }
+    }
+
     @Override
     public Result<String> delAuthApp(BaseAuthAppVo baseAuthAppVo) {
         List<QueryCondition> queryConditions=new ArrayList<>();
         queryConditions.add(QueryCondition.eq("appId",baseAuthAppVo.getId()));
         List<BaseAuthApp> all = findAll(queryConditions);
         if (all.size()>0){
-            for (BaseAuthApp baseAuthApp:all){
-                delete(baseAuthApp.getId());
-            }
+            deleteInBatch(all);
         }
         try {
             QueueUtil.putAuth(3);

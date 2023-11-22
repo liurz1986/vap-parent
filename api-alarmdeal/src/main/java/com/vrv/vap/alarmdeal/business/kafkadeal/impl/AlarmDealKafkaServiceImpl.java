@@ -27,6 +27,7 @@ import com.vrv.vap.alarmdeal.business.kafkadeal.AlarmDealKafkaService;
 import com.vrv.vap.alarmdeal.frameworks.util.RedissonSingleUtil;
 import com.vrv.vap.es.service.ElasticSearchMapManage;
 import com.vrv.vap.jpa.common.DateUtil;
+import com.vrv.vap.jpa.common.UUIDUtils;
 import com.vrv.vap.jpa.web.page.QueryCondition;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -138,8 +139,12 @@ public class AlarmDealKafkaServiceImpl implements AlarmDealKafkaService {
             Map<String, Object> map = gson.fromJson(content, Map.class);
             //创建索引
 //            Boolean index = elasticSearchMapManage.createIndex(indexName, map);
-            //保存数据
-            elasticSearchMapManage.save(indexName, map, map.get("resultGuid"));
+            //TODO 这个地方采用多线程俩保存数据（数据量过大的情况下会有有问题）
+            try{
+                elasticSearchMapManage.save(indexName, map, map.getOrDefault("resultGuid",UUIDUtils.get32UUID()));
+            }catch (Exception e){
+                logger.error("报错信息：{},索引信息：{},map信息：{}",e,indexName,new Gson().toJson(map));
+            }
         }
     }
 

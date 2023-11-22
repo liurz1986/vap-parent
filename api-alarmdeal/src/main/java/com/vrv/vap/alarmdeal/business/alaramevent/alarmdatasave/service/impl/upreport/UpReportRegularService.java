@@ -51,7 +51,6 @@ public class UpReportRegularService implements IUpReportEventService {
 
     @Override
     public void upEventToKafka(UpEventDTO eventDTO) {
-        logger.info("###########上报监管事件开始#################");
         try {
             //1 构造数据
             AbstractUpEvent upEvent = constructUpEvent(eventDTO);
@@ -60,7 +59,6 @@ public class UpReportRegularService implements IUpReportEventService {
         } catch (Exception e) {
             logger.error("##############上报监管事件发生了异常，异常原因为{}",e);
         }
-        logger.info("#################上报监管事件结束###################");
     }
 
     @Override

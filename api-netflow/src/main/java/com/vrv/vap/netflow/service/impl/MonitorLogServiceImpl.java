@@ -291,8 +291,14 @@ public class MonitorLogServiceImpl implements MonitorLogService {
             BeanUtils.copyProperties(networkMonitorHistory, auditItemHistory, "id");
 
             List<String> ignoreList = new ArrayList<>();
-            Map<String, List<Object>> fields = CompareFiledUtil.compareFields(auditItem, auditItemHistory, ignoreList);
+            ignoreList.add("networkMonitorStatus");
+            ignoreList.add("reportTime");
+            ignoreList.add("regType");
+            ignoreList.add("status");
+            ignoreList.add("networkMonitorStatus");
 
+            Map<String, List<Object>> fields = CompareFiledUtil.compareFields(auditItem, auditItemHistory, ignoreList);
+            log.error("不相同的字段："+gson.toJson(fields));
             //表示多次提交的结果相同
             if (fields == null || fields.isEmpty()) {
 

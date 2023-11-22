@@ -180,12 +180,13 @@ public class MonitorV1Controller {
         logger.info(String.format("注册接口调用参数：%s", JSON.toJSONString(regInfo)));
         Integer regResult = monitorLogService.register(regInfo);
         MonitorReturnVO result = null;
-        if (regResult > 0) {
+        if (regResult == 0) {
             result = MonitorReturnVO.builder().type(MonitorTypeEnum.TYPE_SUCCESS.getType()).message(MonitorTypeEnum.TYPE_SUCCESS.getDesc()).build();
         } else if (regResult == -1) {
-            result = MonitorReturnVO.builder().type(MonitorTypeEnum.TYPE_FAILED.getType()).message(MonitorTypeEnum.TYPE_UNREGISTERED.getDesc()).build();
+            result = MonitorReturnVO.builder().type(MonitorTypeEnum.TYPE_UNREGISTERED.getType()).message(MonitorTypeEnum.TYPE_UNREGISTERED.getDesc()).build();
         } else {
-            result = MonitorReturnVO.builder().type(MonitorTypeEnum.TYPE_FAILED.getType()).message(MonitorTypeEnum.TYPE_FAILED.getDesc()).build();
+            // 1
+            result = MonitorReturnVO.builder().type(MonitorTypeEnum.TYPE_REG_FAILED.getType()).message(MonitorTypeEnum.TYPE_REG_FAILED.getDesc()).build();
         }
         return result;
     }

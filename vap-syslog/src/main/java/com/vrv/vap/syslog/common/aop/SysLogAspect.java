@@ -78,12 +78,12 @@ public class SysLogAspect implements InitializingBean {
         // 获取不到user信息，不记录日志
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if(attributes == null) {
-            logger.info("非Servlet容器ServletRequestAttributes为空，不记录日志");
+            logger.warn("非Servlet容器ServletRequestAttributes为空，不记录日志");
             return  true;
         }
         HttpServletRequest request = attributes.getRequest();
         if(request == null) {
-            logger.info("非Servlet容器,request为空，不记录日志");
+            logger.warn("非Servlet容器,request为空，不记录日志");
             return  true;
         }
         // 后台使用feign接口调用带有注解的SysRequestLog的方法，则后台有可能获取不到user对象。 或者使用restTemplate的方式。 需要在header中携带user

@@ -27,8 +27,9 @@ public class SyslogSenderUtils {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendSyslogManually获取ApplicationContextUtil获取对象为空，syslogSender值为空");
+        } else {
+            syslogSender.sendSysLog(systemLog);
         }
-        syslogSender.sendSysLog(systemLog);
     }
 
     /**
@@ -39,24 +40,27 @@ public class SyslogSenderUtils {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendSelectSyslog获取ApplicationContextUtil获取对象为空，syslogSender值为空");
+        } else {
+            syslogSender.sendSysLog(ActionType.SELECT, null, null, SyslogConstant.SUCCESS);
         }
-        syslogSender.sendSysLog(ActionType.SELECT, null, null, SyslogConstant.SUCCESS);
     }
 
     /**
      * 查询时，带转义字段
-     * @param newData 查询对象
-     * @param title 查询标题
+     *
+     * @param newData           查询对象
+     * @param title             查询标题
      * @param transferredFields 转义字段
      */
     public static void sendSelectSyslogAndTransferredField(Object newData, String title, Map<String, Object> transferredFields) {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendSelectSyslogAndTransferredField获取ApplicationContextUtil获取对象为空，syslogSender值为空");
+        } else {
+            String context = CompareObjectUtil.objectDescription(newData, title, transferredFields);
+            String operationObject = CompareObjectUtil.getOperationObject(newData);
+            syslogSender.sendSysLog(ActionType.SELECT, context, operationObject, SyslogConstant.SUCCESS);
         }
-        String context = CompareObjectUtil.objectDescription(newData, title, transferredFields);
-        String operationObject = CompareObjectUtil.getOperationObject(newData);
-        syslogSender.sendSysLog(ActionType.SELECT, context, operationObject, SyslogConstant.SUCCESS);
     }
 
 
@@ -70,11 +74,11 @@ public class SyslogSenderUtils {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendAddSyslog获取ApplicationContextUtil获取对象为空，syslogSender值为空");
-            return;
+        } else {
+            String context = CompareObjectUtil.objectDescription(saveData, title);
+            String operationObject = CompareObjectUtil.getOperationObject(saveData);
+            syslogSender.sendSysLog(ActionType.ADD, context, operationObject, SyslogConstant.SUCCESS);
         }
-        String context = CompareObjectUtil.objectDescription(saveData, title);
-        String operationObject = CompareObjectUtil.getOperationObject(saveData);
-        syslogSender.sendSysLog(ActionType.ADD, context, operationObject, SyslogConstant.SUCCESS);
     }
 
     /**
@@ -89,11 +93,11 @@ public class SyslogSenderUtils {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendAddSyslogAndTransferredField获取ApplicationContextUtil获取对象为空，syslogSender值为空");
-            return;
+        } else {
+            String context = CompareObjectUtil.objectDescription(newData, title, transferredFields);
+            String operationObject = CompareObjectUtil.getOperationObject(newData);
+            syslogSender.sendSysLog(ActionType.ADD, context, operationObject, SyslogConstant.SUCCESS);
         }
-        String context = CompareObjectUtil.objectDescription(newData, title, transferredFields);
-        String operationObject = CompareObjectUtil.getOperationObject(newData);
-        syslogSender.sendSysLog(ActionType.ADD, context, operationObject, SyslogConstant.SUCCESS);
     }
 
     /**
@@ -107,11 +111,11 @@ public class SyslogSenderUtils {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendUpdateSyslog获取ApplicationContextUtil获取对象为空，syslogSender值为空");
-            return;
+        } else {
+            String context = CompareObjectUtil.compareObject(oldData, newData, title);
+            String operationObject = CompareObjectUtil.getOperationObject(newData);
+            syslogSender.sendSysLog(ActionType.UPDATE, context, operationObject, SyslogConstant.SUCCESS);
         }
-        String context = CompareObjectUtil.compareObject(oldData, newData, title);
-        String operationObject = CompareObjectUtil.getOperationObject(newData);
-        syslogSender.sendSysLog(ActionType.UPDATE, context, operationObject, SyslogConstant.SUCCESS);
     }
 
     /**
@@ -127,11 +131,11 @@ public class SyslogSenderUtils {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendUpdateAndTransferredField获取ApplicationContextUtil获取对象为空，syslogSender值为空");
-            return;
+        } else {
+            String context = CompareObjectUtil.compareObject(oldData, newData, title, transferredFields);
+            String operationObject = CompareObjectUtil.getOperationObject(newData);
+            syslogSender.sendSysLog(ActionType.UPDATE, context, operationObject, SyslogConstant.SUCCESS);
         }
-        String context = CompareObjectUtil.compareObject(oldData, newData, title, transferredFields);
-        String operationObject = CompareObjectUtil.getOperationObject(newData);
-        syslogSender.sendSysLog(ActionType.UPDATE, context, operationObject, SyslogConstant.SUCCESS);
     }
 
 
@@ -145,11 +149,11 @@ public class SyslogSenderUtils {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendDeleteSyslog获取ApplicationContextUtil获取对象为空，syslogSender值为空");
-            return;
+        } else {
+            String context = CompareObjectUtil.objectDescription(deleteData, title);
+            String operationObject = CompareObjectUtil.getOperationObject(deleteData);
+            syslogSender.sendSysLog(ActionType.DELETE, context, operationObject, SyslogConstant.SUCCESS);
         }
-        String context = CompareObjectUtil.objectDescription(deleteData, title);
-        String operationObject = CompareObjectUtil.getOperationObject(deleteData);
-        syslogSender.sendSysLog(ActionType.DELETE, context, operationObject, SyslogConstant.SUCCESS);
     }
 
     /**
@@ -162,36 +166,36 @@ public class SyslogSenderUtils {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendDeleteAndTransferredField获取ApplicationContextUtil获取对象为空，syslogSender值为空");
-            return;
+        } else {
+            String context = CompareObjectUtil.objectDescription(deleteData, title, transferredFields);
+            String operationObject = CompareObjectUtil.getOperationObject(deleteData);
+            syslogSender.sendSysLog(ActionType.DELETE, context, operationObject, SyslogConstant.SUCCESS);
         }
-        String context = CompareObjectUtil.objectDescription(deleteData, title, transferredFields);
-        String operationObject = CompareObjectUtil.getOperationObject(deleteData);
-        syslogSender.sendSysLog(ActionType.DELETE, context, operationObject, SyslogConstant.SUCCESS);
     }
 
     /**
      * 导入时，发送日志
      * 通过AOP切面获取描述信息，进行插入
      */
-    public static void sendExportSyslog(){
+    public static void sendExportSyslog() {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendExportSyslog获取ApplicationContextUtil获取对象为空，syslogSender值为空");
-            return;
+        } else {
+            syslogSender.sendSysLog(ActionType.EXPORT, null, null, SyslogConstant.SUCCESS);
         }
-        syslogSender.sendSysLog(ActionType.EXPORT, null, null, SyslogConstant.SUCCESS);
     }
 
     /**
      * 下载时，发送日志
      * 通过AOP切面获取描述信息，进行插入
      */
-    public static void sendDownLosdSyslog(){
+    public static void sendDownLosdSyslog() {
         SyslogSender syslogSender = ApplicationContextUtil.getBean(SyslogSender.class);
         if (syslogSender == null) {
             logger.error("sendDownLosdSyslog获取ApplicationContextUtil获取对象为空，syslogSender值为空");
-            return;
+        } else {
+            syslogSender.sendSysLog(ActionType.DOWNLOAD, null, null, SyslogConstant.SUCCESS);
         }
-        syslogSender.sendSysLog(ActionType.DOWNLOAD, null, null, SyslogConstant.SUCCESS);
     }
 }

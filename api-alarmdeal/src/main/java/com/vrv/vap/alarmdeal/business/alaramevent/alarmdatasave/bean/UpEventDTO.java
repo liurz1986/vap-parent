@@ -36,6 +36,13 @@ public class UpEventDTO {
      * 告警事件对象
      */
     private AlarmEventAttribute doc;
+
+
+    /**
+     * 告警事件对象集合
+     */
+    private List<AlarmEventAttribute> docs;
+
     /**
      * 上报bean对象的名曾
      */

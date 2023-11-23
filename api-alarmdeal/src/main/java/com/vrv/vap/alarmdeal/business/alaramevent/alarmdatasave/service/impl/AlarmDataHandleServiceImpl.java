@@ -697,9 +697,6 @@ public class AlarmDataHandleServiceImpl implements AlarmDataHandleService {
                     //1,上报监管事件
                     UpEventDTO eventDTO = new UpEventDTO();
                     eventDTO.setDoc(item);
-                    eventDTO.setUpReportBeanName(IUpReportEventService.UpReportRegular_BEAN_NAME);
-                    reportCommonService.upReportEvent(eventDTO);
-
                     logger.warn("------------上报事件处置-----------------");
                     //2，上报事件处置
                     eventDTO.setDisposeStatus(DisponseConstant.WAIT_DISPONSE);
@@ -710,9 +707,18 @@ public class AlarmDataHandleServiceImpl implements AlarmDataHandleService {
                 }
 
             });
+            UpEventDTO eventDTO = new UpEventDTO();
+            eventDTO.setDocs(docs);
+            eventDTO.setUpReportBeanName(IUpReportEventService.UpReportRegular_BEAN_NAME);
+            reportCommonService.upReportEvent(eventDTO);
+
+
             logger.info("AlarmDataSaveJob handleAlarmData pushSuperviseData success size ={}", docs.size());
         }
     }
+
+
+
 
 
 }

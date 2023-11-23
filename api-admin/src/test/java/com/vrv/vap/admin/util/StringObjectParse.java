@@ -1,6 +1,7 @@
 package com.vrv.vap.admin.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.vrv.vap.admin.model.DbBackupStrategy;
 import org.junit.Test;
 
 /**
@@ -75,5 +76,23 @@ public class StringObjectParse {
         JSONObject jsonObject = JSONObject.parseObject(xx);
         Object code = jsonObject.get("code");
         System.out.println(code);
+    }
+
+    @Test
+    public void print(){
+        DbBackupStrategy dbBackupStrategy = new DbBackupStrategy();
+        dbBackupStrategy.setBackupTime("11:32:33");
+        dbBackupStrategy.setBackPeriod(4);
+        String[] time = dbBackupStrategy.getBackupTime().split(":");
+        if (time[1].startsWith("0")) {
+            time[1] = time[1].substring(1);
+        }
+        if (time[0].startsWith("0")) {
+            time[0] = time[0].substring(1);
+        }
+
+        String zz = String.format("0 %s %s */%s * ?", time[1], time[0], dbBackupStrategy.getBackPeriod());
+        System.out.println(zz);
+
     }
 }

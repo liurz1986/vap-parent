@@ -58,7 +58,13 @@ public abstract class AbstractSyslogProcessor<C extends SystemLog> implements Sy
     @Override
     public C processing(ProceedingJoinPoint joinPoint, String resResult) {
         // TODO 获取AOP的属性并生成Syslog对象
+        if (logger.isDebugEnabled()) {
+            logger.debug("processing调整打印日志...");
+        }
         C c = generate(joinPoint, resResult);
+        if (logger.isDebugEnabled()) {
+            logger.debug("processing调整打印日志生成, {}...", c);
+        }
         // TODO 是否发送，由注解决定：手动是人工发送，那么就不需要自动的通过AOP切面在发送一次。
         //  c.getManually()== true 代表自动发送。 自动发送到flume，并做日志保存。 由自定义注解@SysRequestLog 的 manually= true决定。默认是true
         if (c != null && Boolean.FALSE.equals(c.getManually())) {
@@ -74,28 +80,40 @@ public abstract class AbstractSyslogProcessor<C extends SystemLog> implements Sy
      * @return 返回操作日志对象
      */
     private C generate(ProceedingJoinPoint joinPoint, String resResult) {
-        String methodName = joinPoint.getSignature().getName();
-        String beanName = joinPoint.getSignature().getDeclaringTypeName();
-        String operationObject = getOperationObject(joinPoint);
-        // 获取切面上的【方法】
-        Method targetMethod = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-        // 获取方法上的括号中的【参数名称】
-        String[] parameterNames = parameterNameDiscoverer.getParameterNames(targetMethod);
-        // 获取方法上的括号中的【对象的值】
-        Object[] args = joinPoint.getArgs();
-        Parameter[] parameters = targetMethod.getParameters();
-        // TODO 反射方法参数中对应的对象，对象中的所有属性为查询字段。 保存的是额外的名称、描述、值
-        List<ExtendFiledDTO> extendFiledList = parameterFiledList(parameters, parameterNames, args);
-        String description = getMethodDescription(joinPoint);
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        Object user = UserUtil.getUser();
-        //  TODO 构建审计日志对象， 并赋值操作
-        SysRequestLog sysRequestLog = targetMethod.getDeclaredAnnotation(SysRequestLog.class);
-        int type = ActionTypeEnums.actionTypeEnumsEscape(sysRequestLog.actionType().getName());
-        boolean manually = sysRequestLog.manually();
-        C syslog = createSyslog(request, request.getRequestURI(), methodName, beanName, user, extendFiledList, description, type,
-                manually, operationObject, resResult);
+        if (logger.isDebugEnabled()) {
+            logger.debug("generate调整打印日志,构建syslog对象开始...");
+        }
+        C syslog = null;
+        try {
+            String methodName = joinPoint.getSignature().getName();
+            String beanName = joinPoint.getSignature().getDeclaringTypeName();
+            String operationObject = getOperationObject(joinPoint);
+            // 获取切面上的【方法】
+            Method targetMethod = ((MethodSignature) joinPoint.getSignature()).getMethod();
+            ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+            // 获取方法上的括号中的【参数名称】
+            String[] parameterNames = parameterNameDiscoverer.getParameterNames(targetMethod);
+            // 获取方法上的括号中的【对象的值】
+            Object[] args = joinPoint.getArgs();
+            Parameter[] parameters = targetMethod.getParameters();
+            // TODO 反射方法参数中对应的对象，对象中的所有属性为查询字段。 保存的是额外的名称、描述、值
+            List<ExtendFiledDTO> extendFiledList = parameterFiledList(parameters, parameterNames, args);
+            String description = getMethodDescription(joinPoint);
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            Object user = UserUtil.getUser();
+            //  TODO 构建审计日志对象， 并赋值操作
+            SysRequestLog sysRequestLog = targetMethod.getDeclaredAnnotation(SysRequestLog.class);
+            int type = ActionTypeEnums.actionTypeEnumsEscape(sysRequestLog.actionType().getName());
+            // 获取自定义注解中的自动发送还是手动发送的boolean类型标识
+            boolean manually = sysRequestLog.manually();
+            syslog = createSyslog(request, request.getRequestURI(), methodName, beanName, user, extendFiledList, description, type,
+                    manually, operationObject, resResult);
+        } catch (Exception e) {
+            logger.error("syslog参数构析异常!!!", e);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("generate调整打印日志,构建syslog对象结束...");
+        }
         return syslog;
     }
 

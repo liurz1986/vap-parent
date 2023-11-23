@@ -21,6 +21,12 @@ KAFKA_USERNAME: admin
 KAFKA_PWD: ENC\(foWKilukAXACm7b2\/wh\/ltkGqHlED9Fb\)
 
 
+# jasypt,  PBEWITHHMACSHA512ANDAES_256
+ENC_SALT: salt
+ENC_ALGORITHM: PBEWithMD5AndDES
+ENC_IV_CLASS: org.jasypt.iv.RandomIvGenerator
+ENC_SALT_CLASS: org.jasypt.salt.RandomSaltGenerator
+ENC_ITERATIONS: 1000
 
 
 

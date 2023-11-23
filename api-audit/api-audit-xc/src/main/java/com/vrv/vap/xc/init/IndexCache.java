@@ -1,14 +1,13 @@
 package com.vrv.vap.xc.init;
 
 import com.alibaba.fastjson.JSONObject;
+import com.vrv.vap.toolkit.tools.PathTools;
+import com.vrv.vap.toolkit.tools.TimeTools;
 import com.vrv.vap.xc.client.ElasticSearchManager;
 import com.vrv.vap.xc.config.IndexConfig;
 import com.vrv.vap.xc.tools.EsCurdTools;
 import com.vrv.vap.xc.tools.QueryTools;
 import com.vrv.vap.xc.tools.QueryTools.QueryWrapper;
-import com.vrv.vap.toolkit.tools.PathTools;
-import com.vrv.vap.toolkit.tools.TimeTools;
-import com.vrv.vap.xc.tools.ReadObjectUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -223,7 +222,7 @@ public final class IndexCache {
     private static File getCacheFile(String type) {
         String filename = "index.cache" + type;
         String basePath = PathTools.getBaseDir();
-        log.info("cache file path : " + basePath + "/" + filename);
+        log.info("缓存cache file path : " + basePath + "/" + filename);
         return new File(basePath + "/" + filename);
     }
 

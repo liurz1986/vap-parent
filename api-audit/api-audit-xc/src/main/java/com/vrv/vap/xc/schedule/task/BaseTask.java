@@ -32,25 +32,21 @@ public abstract class BaseTask implements Job {
         Date startTime = StringUtils.isNotEmpty(TASKS.get(jobClassName)) ? TimeTools.parseDate2(TASKS.get(jobClassName)) : nowTime;
         if (startTime.before(nowTime)) {
             String val = TASKS.remove(jobClassName);
-            log.info(new StringBuffer().append("before task fail force remove job:").append(jobClassName).append(" start at:").append(val)
-                    .append(" remove at:").append(TimeTools.format(TimeTools.getNow())));
+            log.info(new StringBuffer().append("before task fail force remove job:").append(jobClassName).append(" ,start at:").append(val)
+                    .append(" ,remove at:").append(TimeTools.format(TimeTools.getNow())));
         }
         if (!TASKS.containsKey(jobClassName)) {
-            log.info("start " + jobClassName);
-
+            log.info("开始start " + jobClassName);
             TASKS.put(jobClassName, TimeTools.format2(TimeTools.getNow()));
             if (jobDataMap.size() != 0) {
                 this.run(jobClassName, jobDataMap);
             } else {
                 this.run(jobClassName);
             }
-
             String val = TASKS.remove(jobClassName);
-
-            log.info("remove job:" + jobClassName + " start at:" + val + " remove at:" + TimeTools.format(TimeTools.getNow()));
+            log.info("移除remove job:" + jobClassName + " start at:" + val + " remove at:" + TimeTools.format(TimeTools.getNow()));
         } else {
             log.info("job " + jobClassName + " already running,start at:" + TASKS.get(jobClassName));
-
         }
     }
 

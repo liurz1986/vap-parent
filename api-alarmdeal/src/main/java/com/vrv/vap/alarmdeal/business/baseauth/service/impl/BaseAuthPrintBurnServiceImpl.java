@@ -181,11 +181,13 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
             BaseAuthPrintBurn baseAuthPrintBurn = new BaseAuthPrintBurn();
             if (all.size()>0){
                 baseAuthPrintBurn.setId(all.get(0).getId());
+                baseAuthPrintBurn.setCreateTime(all.get(0).getCreateTime());
+            }else {
+                baseAuthPrintBurn.setCreateTime(new Date());
             }
             baseAuthPrintBurn.setIp(ip);
             baseAuthPrintBurn.setDecide(baseAuthPrintBurnQueryVo.getDecide());
             baseAuthPrintBurn.setType(baseAuthPrintBurnQueryVo.getType());
-            baseAuthPrintBurn.setCreateTime(new Date());
             baseAuthPrintBurns.add(baseAuthPrintBurn);
         }
         save(baseAuthPrintBurns);
@@ -222,7 +224,7 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
         String treeCode = assetTypeGroup.getTreeCode();
         if (treeCode.equals(APP_TYPE_CODE)) {
             List<AppSysManager> appSysManagers = appSysManagerService.findAll();
-            List<String> strings = appSysManagers.stream().map(a -> a.getDomainName()).collect(Collectors.toList());
+            List<String> strings = appSysManagers.stream().map(a -> a.getIp()).collect(Collectors.toList());
             return ResultUtil.successList(strings);
         } else {
             List<QueryCondition> conditions = new ArrayList<>();

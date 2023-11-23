@@ -4,21 +4,16 @@ import com.vrv.vap.xc.VapXcApplication;
 import com.vrv.vap.xc.mapper.core.custom.TaskMapper;
 import com.vrv.vap.xc.model.JobModel;
 import com.vrv.vap.xc.model.TaskModel;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -38,25 +33,12 @@ public class TaskLoader {
     public static final String ID_KEY = "id";
 
     private volatile int globalId = 0;
-    private String LINE_TASK_CLASS = "com.vrv.vap.xc.schedule.task.BaseLineTask";
-    private String JOB_PRE = "baseLineTask-";
-
-    /**
-     * 为兼容旧工程下的定时任务类路径而定义的映射列表
-     */
-    private static final Map<String, String> JOB_CLASS_PATH_MAP = new HashMap<>();
-
-    static {
-        JOB_CLASS_PATH_MAP.put("com.vrv.vap.schedular.schedule.task.DataDumpTask", "com.vrv.vap.xc.schedule.task.DataDumpTask");
-        JOB_CLASS_PATH_MAP.put("com.vrv.vap.schedular.schedule.task.DatasourceReadTask", "com.vrv.vap.xc.schedule.task.DatasourceReadTask");
-        JOB_CLASS_PATH_MAP.put("com.vrv.vap.schedular.schedule.task.DataSendKafkaTask", "com.vrv.vap.xc.schedule.task.DataSendKafkaTask");
-    }
 
     public TaskLoader() {
     }
 
     public void start() {
-        this.registJob();
+        this.registerJob();
         this.run();
     }
 
@@ -76,30 +58,20 @@ public class TaskLoader {
     /**
      * 注册任务信息
      */
-    private void registJob() {
+    private void registerJob() {
         try {
-            /*
-            Properties props = new Properties();
-            props.put("org.quartz.scheduler.instanceName", "static");
-            props.put("org.quartz.threadPool.threadCount", "10");
-            StdSchedulerFactory stdSchedulerFactory = new StdSchedulerFactory();
-            stdSchedulerFactory.initialize(props);
-
-            scheduler = stdSchedulerFactory.getScheduler();
-*/
             LOGGER.info("开始加载java定时任务");
             TaskMapper dao = VapXcApplication.getApplicationContext().getBean(TaskMapper.class);
             for (TaskModel taskModel : dao.queryTasks()) {
                 if (!"1".equals(taskModel.getShouldRun())) {
                     continue;
                 }
-
                 Class<? extends Job> clazz = this.getJobClass(taskModel);
-
+                LOGGER.warn("自定义表schedule_tasks_config中taskModel值：" + taskModel);
+                LOGGER.warn("反射类型clazz：" + clazz);
                 if (null == clazz) {
                     continue;
                 }
-
                 JobDetailImpl job = new JobDetailImpl();
                 job.setKey(JobKey.jobKey(clazz.getName(), "java"));
                 job.setName(clazz.getName());
@@ -112,37 +84,13 @@ public class TaskLoader {
                 trigger.setKey(TriggerKey.triggerKey(clazz.getName()));
                 trigger.setName(clazz.getName());
                 trigger.setCronExpression(taskModel.getCronTime());
-
+                LOGGER.warn("register任务：" + taskModel.getTaskName() + "，cron表达式：" + taskModel.getCronTime());
                 globalId++;
-
                 scheduler.scheduleJob(job, trigger);
             }
-
-
         } catch (SchedulerException | ParseException e) {
-            LOGGER.error("", e);
+            LOGGER.error("自动任务异常！", e);
         }
-/*
-        try{
-            LOGGER.info("开始加载基线定时任务");
-            //注册基线任务
-            BaseLineService lineService = VapXcApplication.getApplicationContext().getBean(BaseLineService.class);
-            List<BaseLine> lines = lineService.findAll();
-            for(BaseLine line : lines){
-                if(LineConstants.LINE_STATUS.ENABLE.equals(line.getStatus())){
-                    JobModel jobModel = new JobModel();
-                    jobModel.setJobName(JOB_PRE + line.getId());
-                    jobModel.setCronTime(line.getCron());
-                    jobModel.setJobClazz(LINE_TASK_CLASS);
-                    Map<String, Object> param = new HashMap<String, Object>();
-                    param.put("id", line.getId());
-                    jobModel.setParams(param);
-                    TaskLoader.addJob(jobModel,param);
-                }
-            }
-        }catch (Exception e){
-            LOGGER.error(e.getMessage(),e);
-        }*/
     }
 
 
@@ -161,23 +109,24 @@ public class TaskLoader {
      * 获取定时任务的实现类
      */
     @SuppressWarnings("unchecked")
-    private Class<? extends Job> getJobClass(TaskModel bean) {
-        if ("0".equals(bean.getShouldRun())) {
-            //LOGGER.info("not load " + bean.getDescription());
+    private Class<? extends Job> getJobClass(TaskModel taskModel) {
+        if ("0".equals(taskModel.getShouldRun())) {
+            LOGGER.info("not load定时任务,直接返回! " + taskModel);
             return null;
-        } else {
-            //LOGGER.info("load " + bean.getTaskName() + " -> " + bean.getCronTime());
         }
-
+        if (StringUtils.isEmpty(taskModel.getClasspath())) {
+            LOGGER.info("定时任务的实现类为空，直接返回! " + taskModel);
+            return null;
+        }
         try {
-            return (Class<? extends Job>) Class.forName(JOB_CLASS_PATH_MAP.getOrDefault(bean.getClasspath(), bean.getClasspath()));
+            return (Class<? extends Job>) Class.forName(taskModel.getClasspath());
         } catch (ClassNotFoundException e) {
             LOGGER.error("", e);
         }
         return null;
     }
 
-    public static void addJob(JobModel jobModel, Map<String, Object> param){
+    public static void addJob(JobModel jobModel, Map<String, Object> param) {
         if (!jobModel.isOpen()) {
             return;
         }
@@ -185,16 +134,14 @@ public class TaskLoader {
             JobDetailImpl job = new JobDetailImpl();
             job.setKey(JobKey.jobKey(jobModel.getJobName()));
             job.setName(jobModel.getJobName());
-            job.setJobClass((Class<? extends Job>)Class.forName(jobModel.getJobClazz()));
+            job.setJobClass((Class<? extends Job>) Class.forName(jobModel.getJobClazz()));
             JobDataMap jobDataMap = new JobDataMap();
             if (null != param) {
                 for (Map.Entry<String, Object> entry : param.entrySet()) {
                     jobDataMap.put(entry.getKey(), entry.getValue());
                 }
             }
-
             job.setJobDataMap(jobDataMap);
-
             CronTriggerImpl trigger = new CronTriggerImpl();
             trigger.setKey(TriggerKey.triggerKey(jobModel.getJobName()));
             trigger.setName(jobModel.getJobName());
@@ -205,7 +152,7 @@ public class TaskLoader {
         }
     }
 
-    public static void removeJob(JobModel jobModel){
+    public static void removeJob(JobModel jobModel) {
         try {
             String jobName = jobModel.getJobName();
             // 先判断是否存在
@@ -220,7 +167,7 @@ public class TaskLoader {
         }
     }
 
-    public static boolean isExists(JobModel jobModel){
+    public static boolean isExists(JobModel jobModel) {
         boolean result = false;
         try {
             String jobName = jobModel.getJobName();

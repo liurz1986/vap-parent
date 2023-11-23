@@ -7,13 +7,8 @@ import com.google.gson.GsonBuilder;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-
 import com.vrv.vap.toolkit.config.PathConfig;
-import com.vrv.vap.toolkit.tools.CommonTools;
-import com.vrv.vap.toolkit.tools.HttpTools;
-import com.vrv.vap.toolkit.tools.RemoteSSHTools;
-import com.vrv.vap.toolkit.tools.TimeTools;
-import com.vrv.vap.toolkit.tools.ZipTools;
+import com.vrv.vap.toolkit.tools.*;
 import com.vrv.vap.toolkit.tools.jsch.FileProgressMonitor;
 import com.vrv.vap.toolkit.vo.EsResult;
 import com.vrv.vap.toolkit.vo.Result;
@@ -36,6 +31,9 @@ import com.vrv.vap.xc.tools.QueryTools;
 import com.vrv.vap.xc.vo.DataDumpStrategyQuery;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -57,31 +55,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import javax.annotation.PostConstruct;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 
 /**
  * es公共服务实现
@@ -565,9 +549,15 @@ public class CommonServiceImpl implements CommonService {
         return VoBuilder.success();
     }
 
+    /**
+     * es的索引备份操作
+     *
+     * @param paramModel
+     * @return
+     */
     @Override
     public Result dataBackup(Map<String, Object> paramModel) {
-        log.info("es数据备份开始");
+        log.warn("es数据备份开始");
         // 默认备份30天前的数据
         int dataBackupBeforeDays = (Integer) paramModel.get("dataBackupBeforeDays");
         // 默认磁盘使用率超过80，不执行备份
@@ -581,12 +571,10 @@ public class CommonServiceImpl implements CommonService {
         }
         // 分页条数
         int size = 500;
-
         // 获取本机磁盘使用情况
         double diskUsedPercent = this.getDiskUsedPercent();
-
         if (diskUsedPercent >= diskUsedPercentThreshold) {
-            log.info("当前磁盘空间已使用：" + diskUsedPercent + ", 超过阈值" + diskUsedPercentThreshold + "，暂不进行数据备份");
+            log.warn("当前磁盘空间已使用：" + diskUsedPercent + ", 超过阈值" + diskUsedPercentThreshold + "，暂不进行数据备份");
         } else {
             if (indexList != null && indexList.size() > 0) {
                 QueryTools.QueryWrapper wrapper = QueryTools.build();
@@ -596,7 +584,7 @@ public class CommonServiceImpl implements CommonService {
                     this.dataBackup4Csv(index, wrapper, dataBackupBeforeDays, size);
                 }
             }
-            log.info("es数据备份结束");
+            log.warn("es数据备份结束");
         }
 
         return VoBuilder.success();
@@ -609,6 +597,7 @@ public class CommonServiceImpl implements CommonService {
     public Result dataBackupAndCLean(Map<String, Object> paramModel) {
         QueryTools.QueryWrapper wrapper = QueryTools.build();
         String gzBaseDir = backUpBaseDir;
+        log.warn(String.format("backUpBaseDir: %s, 开始时间：%s", backUpBaseDir, DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss")));
         RemoteSSHTools sshTools = null;
         try {
             sshTools = getRemoteSSHTools();
@@ -631,98 +620,98 @@ public class CommonServiceImpl implements CommonService {
         record.setMyCount(1000);
         List<PreparedCleanIndex> allIndex = new ArrayList<>();
         List<PreparedCleanIndex> allCleanIndex = new ArrayList<>();
-
+        // data_dump_strategy表中获取数据清理策略
         List<DataDumpStrategy> dumpStrategies = businessClient.selectStrategyListByPage(record).getList();
-        for (DataDumpStrategy r : dumpStrategies) {
-            String indices = r.getDataId();
+        log.warn("dumpStrategies size:" + dumpStrategies.size());
+        for (DataDumpStrategy dataDumpStrategy : dumpStrategies) {
+            // indices 为 netflow-http-*
+            String indices = dataDumpStrategy.getDataId();
             if (StringUtils.isEmpty(indices)) {
                 continue;
             }
-            String tailUrl = "_alias";
-            tailUrl = indices + "*/" + tailUrl;
+            String tailUrl = indices + "*/" + "_alias";
             List<PreparedCleanIndex> cleanIndices = new ArrayList<>();
-            log.info("数据清理备份,url=!!!!!!!!!!!!!!!!!!!!!! " + tailUrl);
+            log.warn("simpleGetQueryHttp【GET请求】，别名请求url-----> " + tailUrl);
             //Optional<JSONObject> opt = wrapper.lowLevelResponseValue("", "_alias");
             Optional<JSONObject> opt = EsCurdTools.simpleGetQueryHttp(tailUrl);
-            log.debug("数据清理备份!!!!!!!!!!!!!!!!!!!!!!" + opt);
-            if (!opt.isPresent()) {
-                continue;
-            }
-            if (opt.isPresent()) {
-                opt.get().entrySet().forEach(e -> {
-                    String index = e.getKey();
-//                    Matcher matcher = patternMonth.matcher(index);
-                    if (index.startsWith("searchguard") || index.startsWith(".")) {
-                        return;
-                    }
 
-                    Matcher matcher = patternDay.matcher(index);
-                    PreparedCleanIndex cleanIndex = null;
+            log.warn(String.format("根据别名获取所有索引 %s", ReflectionToStringBuilder.toString(opt, ToStringStyle.MULTI_LINE_STYLE)));
+            Set<Map.Entry<String, Object>> entries = opt.get().entrySet();
+            log.warn(String.format("索引 %s", ReflectionToStringBuilder.toString(entries, ToStringStyle.MULTI_LINE_STYLE)));
+            entries.forEach(e -> {
+                String index = e.getKey();
+                Object value = e.getValue();
+                if (index.startsWith("searchguard") || index.startsWith(".")) {
+                    return;
+                }
+                log.warn("数据elasticSearch index: " + index);
+                Matcher matcher = patternDay.matcher(index);
+                PreparedCleanIndex cleanIndex = null;
+                if (matcher.find()) {
+                    String day = matcher.group();
+                    String indexPrefix = index.replace(day, "");
+                    log.warn(String.format("别名按天，数据elasticSearch index: %s, indexPrefix: %s, day: %s", index, indexPrefix, day));
+                    Date date = TimeTools.parseDate(day.replaceAll("\\.", ""), "yyyyMMdd");
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+                    log.warn(String.format("按天： %s", DateFormatUtils.format(calendar.getTime().getTime(), "yyyy-MM-dd HH:mm:ss")));
+                    cleanIndex = new PreparedCleanIndex(indexPrefix, index, date, day, false);
+                    cleanIndex.setStrategy(dataDumpStrategy);
+                } else {
+                    matcher = patternMonth.matcher(index);
                     if (matcher.find()) {
-                        String day = matcher.group();
-                        String indexPrefix = index.replace(day, "");
-                        Date date = TimeTools.parseDate(day.replaceAll("\\.", ""), "yyyyMMdd");
+                        String month = matcher.group();
+                        String indexPrefix = index.replace(month, "");
+                        log.warn(String.format("别名按月，数据elasticSearch index: %s, indexPrefix: %s, month: %s", index, indexPrefix, month));
+                        Date date = TimeTools.parseDate(month.replaceAll("\\.", ""), "yyyyMM");
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(date);
-                        cleanIndex = new PreparedCleanIndex(indexPrefix, index, date, day, false);
-                        cleanIndex.setStrategy(r);
-                        //cleanIndices.add(cleanIndex);
+                        calendar.add(Calendar.MONTH, 1);
+                        calendar.set(Calendar.DAY_OF_MONTH, 0);
+                        log.warn(String.format("按月： %s", DateFormatUtils.format(calendar.getTime().getTime(), "yyyy-MM-dd HH:mm:ss")));
+                        cleanIndex = new PreparedCleanIndex(indexPrefix, index, calendar.getTime(), month, true);
+                        cleanIndex.setStrategy(dataDumpStrategy);
                     } else {
-                        matcher = patternMonth.matcher(index);
+                        //新加年份索引的判断逻辑
+                        matcher = patternYear.matcher(index);
                         if (matcher.find()) {
-                            String month = matcher.group();
-                            String indexPrefix = index.replace(month, "");
-
-                            Date date = TimeTools.parseDate(month.replaceAll("\\.", ""), "yyyyMM");
+                            String year = matcher.group();
+                            String indexPrefix = index.replace(year, "");
+                            log.warn(String.format("按年，数据elasticSearch index: %s, indexPrefix: %s, year: %s", index, indexPrefix, year));
+                            Date date = TimeTools.parseDate(year.replaceAll("\\.", ""), "yyyy");
                             Calendar calendar = Calendar.getInstance();
                             calendar.setTime(date);
-                            calendar.add(Calendar.MONTH, 1);
-                            calendar.set(Calendar.DAY_OF_MONTH, 0);
-                            cleanIndex = new PreparedCleanIndex(indexPrefix, index, calendar.getTime(), month, true);
-                            cleanIndex.setStrategy(r);
-                            //cleanIndices.add(cleanIndex);
-                        } else {
-                            //新加年份索引的判断逻辑
-                            matcher = patternYear.matcher(index);
-                            if (matcher.find()) {
-                                String year = matcher.group();
-                                String indexPrefix = index.replace(year, "");
-
-                                Date date = TimeTools.parseDate(year.replaceAll("\\.", ""), "yyyy");
-                                Calendar calendar = Calendar.getInstance();
-                                calendar.setTime(date);
-                                calendar.add(Calendar.YEAR, 1);
-                                calendar.set(Calendar.DAY_OF_YEAR, 0);
-                                cleanIndex = new PreparedCleanIndex(indexPrefix, index, calendar.getTime(), year, false);
-                                cleanIndex.setStrategy(r);
-                                //cleanIndices.add(cleanIndex);
-                            }
-
-
+                            calendar.add(Calendar.YEAR, 1);
+                            calendar.set(Calendar.DAY_OF_YEAR, 0);
+                            log.warn(String.format("匹配别名按年： %s", DateFormatUtils.format(calendar.getTime().getTime(), "yyyy-MM-dd HH:mm:ss")));
+                            cleanIndex = new PreparedCleanIndex(indexPrefix, index, calendar.getTime(), year, false);
+                            cleanIndex.setStrategy(dataDumpStrategy);
                         }
                     }
-                    if (cleanIndex != null) {
-                        //对索引前缀二次校验, 避免相同前缀的索引(如net-*, net-dns-*)导致备份了不相干的数据
-                        if (indices.substring(0, indices.length() - 1).equals(cleanIndex.getIndexPrefi())) {
-                            cleanIndices.add(cleanIndex);
-                        }
+                }
+                if (cleanIndex != null) {
+                    log.warn(String.format("数据清理备份结果请求打印日志[%s]", ReflectionToStringBuilder.toString(cleanIndex, ToStringStyle.MULTI_LINE_STYLE)));
+                    //对索引前缀二次校验, 避免相同前缀的索引(如net-*, net-dns-*)导致备份了不相干的数据
+                    if (indices.substring(0, indices.length() - 1).equals(cleanIndex.getIndexPrefi())) {
+                        cleanIndices.add(cleanIndex);
                     }
+                }
+            });
+            allIndex.addAll(cleanIndices);
 
-                });
-                allIndex.addAll(cleanIndices);
-            }
-
-            //判断保留天数
-            final Date remainDate = TimeTools.getNowBeforeByDay(r.getSaveTime());
+            // TODO 从界面上获取的数据保留时间（天数），计算当前时间前多少天的数据需要清理。
+            final Date remainDate = TimeTools.getNowBeforeByDay(dataDumpStrategy.getSaveTime());
+            log.warn(String.format("开始时间:%s, 结束时间:%s, 保存天数：%s", DateFormatUtils.format(remainDate, "yyyy-MM-dd HH:mm:ss"), DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss"), String.valueOf(dataDumpStrategy.getSaveTime())));
+            // TODO 比较要清理最早的时间。如果发现有比更早的时间，则是需要清理。如果是按年建立的索引，就是当前年的12月31日，如果比开始时间小，，则加入到队列中，并进行clean操作。不备份也不删除。
             List<PreparedCleanIndex> cleanIndexList = cleanIndices.stream().filter(f -> f.getIndexDate().compareTo(remainDate) < 0).collect(Collectors.toList());
-            log.info("数据清理备份:待清理的所有索引!!!!!!!!!!!!!!!!!!!!!!" + cleanIndexList.size());
-            log.info("数据清理备份:待清理的所有索引!!!!!!!!!!!!!!!!!!!!!!" + cleanIndexList);
+            log.warn("数据清理备份:待清理的所有索引!!!!!!!!!!!!!!!!!!!!!!" + cleanIndexList.size());
+            log.warn(String.format("数据清理备份:待清理的所有索引!!! %s", ReflectionToStringBuilder.toString(cleanIndexList, ToStringStyle.MULTI_LINE_STYLE)));
             if (cleanIndexList.isEmpty()) {
                 continue;
             }
-            eachBackAndClean(backUpBaseDir, gzBaseDir, lowLevelClient, r, cleanIndexList, sshTools);
+            // TODO 清理并进行备份操作
+            eachBackAndClean(backUpBaseDir, gzBaseDir, lowLevelClient, dataDumpStrategy, cleanIndexList, sshTools);
             allCleanIndex.addAll(cleanIndexList);
-
         }
 
         //阈值
@@ -737,7 +726,7 @@ public class CommonServiceImpl implements CommonService {
             } catch (InterruptedException e) {
             }
         }
-        log.info("数据清理备份:结束!!!!!!!!!!!!!!!!!!!!!!");
+        log.warn("数据清理备份:结束!!!!!!!!!!!!!!!!!!!!!!");
         sshTools.close();
         return VoBuilder.success();
     }
@@ -759,6 +748,17 @@ public class CommonServiceImpl implements CommonService {
         return false;
     }
 
+    /**
+     * 创建备份操作，通过ELASTICSEARCH的方式进行备份 https://zhuanlan.zhihu.com/p/654858137
+     *
+     * @param backUpBaseDir
+     * @param gzBaseDir
+     * @param lowLevelClient
+     * @param r
+     * @param cleanIndexList
+     * @param sshTools
+     * @return
+     */
     protected boolean eachBackAndClean(String backUpBaseDir, String gzBaseDir, RestClient lowLevelClient, DataDumpStrategy r, List<PreparedCleanIndex> cleanIndexList, RemoteSSHTools sshTools) {
         String currentDate = TimeTools.formatTimeStamp(TimeTools.getNow());
         String indicesBackup = cleanIndexList.stream().map(PreparedCleanIndex::getIndexName).collect(Collectors.joining(","));
@@ -772,7 +772,7 @@ public class CommonServiceImpl implements CommonService {
 //                Response put = lowLevelClient.performRequest("put", "/_snapshot/" + r.getId(), Collections.emptyMap(), entity0);
                 Response put = lowLevelClient.performRequest(request);
                 Object o = JSON.parseObject(put.getEntity().getContent(), Map.class);
-                log.info("数据清理备份:创建仓库!!!!!!!!!!!!!!!!!!!!!!" + o);
+                log.warn("数据清理备份:创建仓库!!!!!!!!!!!!!!!!!!!!!!" + o);
             } catch (IOException e) {
                 log.error("", e);
             }
@@ -796,7 +796,7 @@ public class CommonServiceImpl implements CommonService {
                 String command = String.format("tar -zcvPf %s %s/*", dstFile, backUpBaseDir + "/" + r.getId());
 
                 String res = sshTools.execute(command);
-                log.info("数据清理备份:执行压缩结果:!!!!!!!!!!!!!!!!!!!!!!" + res.substring(0, 5) + "...");
+                log.warn("数据清理备份:执行压缩结果:!!!!!!!!!!!!!!!!!!!!!!" + res.substring(0, 5) + "...");
                 log.debug("数据清理备份:执行压缩结果:!!!!!!!!!!!!!!!!!!!!!!" + res);
 
                 TimeUnit.SECONDS.sleep(5);
@@ -825,27 +825,27 @@ public class CommonServiceImpl implements CommonService {
 
                 command = String.format("rm -rf %s/*", backUpBaseDir + "/" + r.getId());
                 res = sshTools.execute(command);
-                log.info("数据清理备份:压缩后执行删除:!!!!!!!!!!!!!!!!!!!!!!" + res);
+                log.warn("数据清理备份:压缩后执行删除:!!!!!!!!!!!!!!!!!!!!!!" + res);
 
                 if (r.getType() == 3) {
                     //转存
                     FileProgressMonitor downloadMonitor = new FileProgressMonitor();
                     InputStream downloadSftpFile = sshTools.downloadSftpFile(dstFile, downloadMonitor);
-    //                while(!downloadMonitor.isEnd()){
-    //                    //隔1秒获取下文件下载状态
-    //                    TimeUnit.SECONDS.sleep(1);
-    //                }
+                    //                while(!downloadMonitor.isEnd()){
+                    //                    //隔1秒获取下文件下载状态
+                    //                    TimeUnit.SECONDS.sleep(1);
+                    //                }
                     RemoteSSHTools transferRemoteSSHTools = getTransferRemoteSSHTools();
                     Map<String, Map<String, String>> cleanHostMap = dataCleanDao.getConfMapById("data_transfer_dst_audit");
                     String dstDir = cleanHostMap.get("data_transfer_dst_audit").get("val");
 
                     FileProgressMonitor uploadMonitor = new FileProgressMonitor();
                     transferRemoteSSHTools.uploadSftpFile(downloadSftpFile, dstDir, fileName, uploadMonitor);
-    //                while(!downloadMonitor.isEnd()){
-    //                    //隔1秒获取下文件上传状态
-    //                    TimeUnit.SECONDS.sleep(1);
-    //                }
-                    log.info("数据清理备份:文件转存结束!!!!!!!!!!!!!!!!!!!!!!");
+                    //                while(!downloadMonitor.isEnd()){
+                    //                    //隔1秒获取下文件上传状态
+                    //                    TimeUnit.SECONDS.sleep(1);
+                    //                }
+                    log.warn("数据清理备份:文件转存结束!!!!!!!!!!!!!!!!!!!!!!");
                 }
             } catch (Exception e1) {
                 log.error("", e1);
@@ -961,14 +961,14 @@ public class CommonServiceImpl implements CommonService {
         Result re = new Result();
         QueryTools.QueryWrapper wrapper = QueryTools.build();
         RestClient lowLevelClient = wrapper.getClient().getLowLevelClient();
-        String tailUrl = "/_template/"+template.getName();
+        String tailUrl = "/_template/" + template.getName();
         Request request = new Request("put", tailUrl);
         HttpEntity entity = new NStringEntity(template.toTemplateJson(), ContentType.APPLICATION_JSON);
         request.setEntity(entity);
-        try{
+        try {
             lowLevelClient.performRequest(request);
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         return re;
     }
@@ -978,13 +978,13 @@ public class CommonServiceImpl implements CommonService {
         QueryTools.QueryWrapper wrapper = QueryTools.build();
         RestClient lowLevelClient = wrapper.getClient().getLowLevelClient();
         Request request = new Request(HttpHead.METHOD_NAME, "_template/" + templateName);
-        try{
+        try {
             Response response = lowLevelClient.performRequest(request);
             if (200 == response.getStatusLine().getStatusCode()) {
                 return true;
             }
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         return false;
     }
@@ -1054,10 +1054,12 @@ public class CommonServiceImpl implements CommonService {
         for (File file : disks) {
             totalSpace += file.getTotalSpace();
             totalUsedSpace += file.getTotalSpace() - file.getUsableSpace();
-            log.info(file.getPath());
-            log.info("空闲未使用 = " + file.getFreeSpace() / 1024 / 1024 + "M" + "    ");// 空闲空间
-            log.info("已经使用 = " + (file.getTotalSpace() - file.getUsableSpace()) / 1024 / 1024 + "M" + "    ");// 可用空间
-            log.info("容量 = " + file.getTotalSpace() / 1024 / 1024 + "M" + "    ");// 总空间
+            if (log.isDebugEnabled()) {
+                log.debug(file.getPath());
+                log.debug("空闲未使用 = " + file.getFreeSpace() / 1024 / 1024 + "M" + "    ");
+                log.debug("已经使用 = " + (file.getTotalSpace() - file.getUsableSpace()) / 1024 / 1024 + "M" + "    ");
+                log.debug("容量 = " + file.getTotalSpace() / 1024 / 1024 + "M" + "    ");
+            }
         }
         log.info("总容量" + totalSpace);
         log.info("总已使用" + totalUsedSpace);
@@ -1136,21 +1138,21 @@ public class CommonServiceImpl implements CommonService {
             e.printStackTrace();
         } finally {
             try {
-                if(writer != null){
+                if (writer != null) {
                     writer.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
             try {
-                if(fs != null){
+                if (fs != null) {
                     fs.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
             try {
-                if(ow != null){
+                if (ow != null) {
                     ow.close();
                 }
             } catch (IOException e) {
@@ -1168,13 +1170,13 @@ public class CommonServiceImpl implements CommonService {
             file.delete();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }finally {
-            try{
-                if(os != null){
+        } finally {
+            try {
+                if (os != null) {
                     os.close();
                 }
-            }catch (Exception e){
-                log.error(e.getMessage(),e);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
         }
 
@@ -1261,14 +1263,14 @@ public class CommonServiceImpl implements CommonService {
             e.printStackTrace();
         } finally {
             try {
-                if(writer != null){
+                if (writer != null) {
                     writer.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
             try {
-                if(fs != null){
+                if (fs != null) {
                     fs.close();
                 }
             } catch (IOException e) {

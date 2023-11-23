@@ -51,7 +51,8 @@ public class DataDumpServiceImpl implements DataDumpService {
         Page<DataDumpStrategy> page = new Page<>(record.getCurrentPage(), record.getMyCount());
         QueryWrapper<DataDumpStrategy> queryWrapper = new QueryWrapper<>();
         QueryWrapperUtil.convertQuery(queryWrapper, record);
-        return VoBuilder.vl(dataDumpStrategyMapper.selectPage(page, queryWrapper));
+        VList<DataDumpStrategy> vl = VoBuilder.vl(dataDumpStrategyMapper.selectPage(page, queryWrapper));
+        return vl;
     }
 
     @Override

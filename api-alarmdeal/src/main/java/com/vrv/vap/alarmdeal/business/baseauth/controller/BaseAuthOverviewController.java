@@ -23,7 +23,7 @@ import java.util.Map;
  * @author liurz
  */
 @RestController
-@RequestMapping(value="/baseAuthOverview")
+@RequestMapping(value="/baseAuthOverview-delete")
 @ApiOperation(value= "审批信息概览")
 public class BaseAuthOverviewController {
     private static Logger logger = LoggerFactory.getLogger(BaseAuthOverviewController.class);

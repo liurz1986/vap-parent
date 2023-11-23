@@ -25,6 +25,7 @@ import com.vrv.vap.alarmdeal.business.asset.service.impl.AssetServiceImpl;
 import com.vrv.vap.alarmdeal.business.asset.util.ImportExcelUtil;
 import com.vrv.vap.alarmdeal.business.asset.vo.AssetExportVO;
 import com.vrv.vap.alarmdeal.business.asset.vo.AssetVO;
+import com.vrv.vap.alarmdeal.business.baseauth.util.PValidUtil;
 import com.vrv.vap.alarmdeal.frameworks.config.FileConfiguration;
 import com.vrv.vap.alarmdeal.frameworks.contract.user.BaseSecurityDomain;
 import com.vrv.vap.alarmdeal.frameworks.exception.AlarmDealException;
@@ -43,6 +44,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,9 +92,14 @@ public class AppSysManagerServiceImpl extends AbstractBaseServiceImpl<AppSysMana
 
     @Autowired
     private FileConfiguration fileConfiguration;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private Map<String, String> deptMap = new HashMap<>();
 
+    private Map<String, String> personName = new HashMap<>();
+
+    private List<String> ips = new ArrayList<>();
     private static String APP_ID = "appId";
 
     private List<BaseDictAll> classifiedLevels = null;
@@ -138,14 +145,14 @@ public class AppSysManagerServiceImpl extends AbstractBaseServiceImpl<AppSysMana
         PageRes<AppSysManagerVo> pageRes = appSysManagerDao.getAppSysManagerImgPage(appSysManagerQueryVo);
         List<AppSysManagerVo> list = pageRes.getList();
         for (AppSysManagerVo appSysManagerVo : list) {
-            List<QueryCondition> queryConditions = new ArrayList<>();
-            queryConditions.add(QueryCondition.eq("appId", appSysManagerVo.getId()));
-            List<AppAccountManage> all = appAccountManageService.findAll(queryConditions);
-            if (all.size() > 0) {
-                List<String> strings = all.stream().map(a -> a.getName()).collect(Collectors.toList());
-                String join = StringUtils.join(strings, ",");
-                appSysManagerVo.setPersonName(join);
-            }
+//            List<QueryCondition> queryConditions = new ArrayList<>();
+//            queryConditions.add(QueryCondition.eq("appId", appSysManagerVo.getId()));
+//            List<AppAccountManage> all = appAccountManageService.findAll(queryConditions);
+//            if (all.size() > 0) {
+//                List<String> strings = all.stream().map(a -> a.getName()).collect(Collectors.toList());
+//                String join = StringUtils.join(strings, ",");
+//                appSysManagerVo.setPersonName(join);
+//            }
             //事件数
             Integer num = 0;
             if (StringUtils.isNotBlank(appSysManagerVo.getServiceId())) {
@@ -231,14 +238,14 @@ public class AppSysManagerServiceImpl extends AbstractBaseServiceImpl<AppSysMana
         List<AppSysManagerVo> appSysManagerImgList = appSysManagerDao.getAppSysManagerImgList(appSysManagerQueryVo);
         List<AppSysManagerExportVo> assetExportVOS = new ArrayList<>();
         for (AppSysManagerVo appSysManagerVo : appSysManagerImgList) {
-            List<QueryCondition> queryConditions = new ArrayList<>();
-            queryConditions.add(QueryCondition.eq("appId", appSysManagerVo.getId()));
-            List<AppAccountManage> all = appAccountManageService.findAll(queryConditions);
-            if (all.size() > 0) {
-                List<String> strings = all.stream().map(a -> a.getName()).collect(Collectors.toList());
-                String join = StringUtils.join(strings, ",");
-                appSysManagerVo.setPersonName(join);
-            }
+//            List<QueryCondition> queryConditions = new ArrayList<>();
+//            queryConditions.add(QueryCondition.eq("appId", appSysManagerVo.getId()));
+//            List<AppAccountManage> all = appAccountManageService.findAll(queryConditions);
+//            if (all.size() > 0) {
+//                List<String> strings = all.stream().map(a -> a.getName()).collect(Collectors.toList());
+//                String join = StringUtils.join(strings, ",");
+//                appSysManagerVo.setPersonName(join);
+//            }
             //事件数
             Integer num = 0;
             if (StringUtils.isNotBlank(appSysManagerVo.getServiceId())) {
@@ -466,8 +473,14 @@ public class AppSysManagerServiceImpl extends AbstractBaseServiceImpl<AppSysMana
         classifiedLevels = classifiedLevelService.getAppAll();
         apps = this.findAll();
         deptMap = feignService.getDeptMap();
-    }
+        personName=feignService.getPersonMapName();
+        ips=getAssetAllIps();
 
+    }
+    private List<String> getAssetAllIps() {
+        String sql = "select ip from asset where IP is not null;";
+        return jdbcTemplate.queryForList(sql, String.class);
+    }
     /**
      * 解析数据
      * 1.应用系统信息sheet页中数据
@@ -747,6 +760,21 @@ public class AppSysManagerServiceImpl extends AbstractBaseServiceImpl<AppSysMana
                     return returnEroorResult("域名:" + value + "不能为空");
                 }
                 break;
+            case "ip":
+                if (StringUtils.isBlank(value)) {
+                    return returnEroorResult("应用:" + value + "不能为空");
+                }
+                break;
+            case "personName":
+                if (StringUtils.isBlank(value)) {
+                    return returnEroorResult("责任人:" + value + "不能为空");
+                }
+                break;
+            case "appType":
+                if (StringUtils.isBlank(value)) {
+                    return returnEroorResult("应用类型:" + value + "不能为空");
+                }
+                break;
             default:
                 break;
         }
@@ -793,6 +821,19 @@ public class AppSysManagerServiceImpl extends AbstractBaseServiceImpl<AppSysMana
             case "domainName":
                 if (StringUtils.isNotBlank(value) && !urlFormatValidate(value)) {
                     return returnEroorResult("域名:" + value + "格式错误");
+                }
+                break;
+            case "personName":
+                if (!personName.containsKey(value)) {
+                    return returnEroorResult("责任人:" + value + "格式错误");
+                }
+                break;
+            case "ip":
+                if (StringUtils.isNotBlank(value) && !PValidUtil.isIPValid(value)) {
+                    return returnEroorResult("ip:" + value + "格式错误");
+                }
+                if (StringUtils.isNotBlank(value) &&!ips.contains(value)) {
+                    return returnEroorResult("基础数据不存在该ip:" + value );
                 }
                 break;
             default:

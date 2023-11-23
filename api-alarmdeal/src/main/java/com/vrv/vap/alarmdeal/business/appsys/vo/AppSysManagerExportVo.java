@@ -63,4 +63,7 @@ public class AppSysManagerExportVo {
     @ApiModelProperty(value = "泄密")
     @ExportExcelField(title = "窃泄密值", order = 6)
     private Integer stealLeakValue;
+    @ExportExcelField(title = "应用类型", order = 9)
+    @ApiModelProperty(value = "应用类型")
+    private String appType;
 }

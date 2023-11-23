@@ -2,6 +2,7 @@ package com.vrv.vap.alarmdeal;
 
 
 
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableJpaRepositories({"com.vrv.vap"})
 @EnableDiscoveryClient
 @EntityScan("com.vrv.vap")
+@EnableEncryptableProperties
 public class ApiAlarmdealApplication {
 
 	private static Logger logger = LoggerFactory.getLogger(ApiAlarmdealApplication.class);

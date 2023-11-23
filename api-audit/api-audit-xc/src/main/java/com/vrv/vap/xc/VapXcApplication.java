@@ -33,9 +33,6 @@ public class VapXcApplication extends SpringBootServletInitializer implements Ap
 
     private static final Log log = LogFactory.getLog(VapXcApplication.class);
 
-    /**
-     * spring 上下文
-     */
     private static ApplicationContext appCtx;
 
     public static void main(String[] args) {
@@ -44,11 +41,6 @@ public class VapXcApplication extends SpringBootServletInitializer implements Ap
         //初始化已经迁移到com.vrv.vap.server.command.InitializedInitCommand,后续再把ApplicationContext迁移出去
     }
 
-    /**
-     * 获取spring上下文
-     *
-     * @return
-     */
     public static ApplicationContext getApplicationContext() {
         return appCtx;
     }

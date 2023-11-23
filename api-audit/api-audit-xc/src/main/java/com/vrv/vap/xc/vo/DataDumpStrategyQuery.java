@@ -7,6 +7,7 @@ import com.vrv.vap.toolkit.plugin.QueryWapperEnum;
 import com.vrv.vap.toolkit.vo.Query;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Date;
  * @author CodeGenerator
  * @since 2021-05-26
  */
-@ApiModel(value="DataDumpStrategy对象", description="数据备份策略")
+@ApiModel(value = "DataDumpStrategy对象", description = "数据备份策略")
 public class DataDumpStrategyQuery extends Query {
 
     @TableId(value = "id", type = IdType.AUTO)
@@ -44,7 +45,8 @@ public class DataDumpStrategyQuery extends Query {
     private Integer dumpMode;
 
     @ApiModelProperty(value = "状态，1-启用，0-关闭")
-    private Integer state;
+    @QueryWapper(queryWapperEnum = QueryWapperEnum.EQ)
+    private Integer state ;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
@@ -62,6 +64,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setId(Integer id) {
         this.id = id;
     }
+
     public Integer getDataType() {
         return dataType;
     }
@@ -69,6 +72,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setDataType(Integer dataType) {
         this.dataType = dataType;
     }
+
     public String getDataId() {
         return dataId;
     }
@@ -76,6 +80,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setDataId(String dataId) {
         this.dataId = dataId;
     }
+
     public String getDataDesc() {
         return dataDesc;
     }
@@ -83,6 +88,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setDataDesc(String dataDesc) {
         this.dataDesc = dataDesc;
     }
+
     public Integer getSaveTime() {
         return saveTime;
     }
@@ -90,6 +96,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setSaveTime(Integer saveTime) {
         this.saveTime = saveTime;
     }
+
     public Integer getType() {
         return type;
     }
@@ -97,6 +104,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setType(Integer type) {
         this.type = type;
     }
+
     public Integer getDumpMode() {
         return dumpMode;
     }
@@ -104,6 +112,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setDumpMode(Integer dumpMode) {
         this.dumpMode = dumpMode;
     }
+
     public Integer getState() {
         return state;
     }
@@ -111,6 +120,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setState(Integer state) {
         this.state = state;
     }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -118,6 +128,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -125,6 +136,7 @@ public class DataDumpStrategyQuery extends Query {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
+
     public String getRemark() {
         return remark;
     }
@@ -136,17 +148,17 @@ public class DataDumpStrategyQuery extends Query {
     @Override
     public String toString() {
         return "DataDumpStrategy{" +
-            "id=" + id +
-            ", dataType=" + dataType +
-            ", dataId=" + dataId +
-            ", dataDesc=" + dataDesc +
-            ", saveTime=" + saveTime +
-            ", type=" + type +
-            ", dumpMode=" + dumpMode +
-            ", state=" + state +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            ", remark=" + remark +
-        "}";
+                "id=" + id +
+                ", dataType=" + dataType +
+                ", dataId=" + dataId +
+                ", dataDesc=" + dataDesc +
+                ", saveTime=" + saveTime +
+                ", type=" + type +
+                ", dumpMode=" + dumpMode +
+                ", state=" + state +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", remark=" + remark +
+                "}";
     }
 }

@@ -620,6 +620,7 @@ public class CommonServiceImpl implements CommonService {
         record.setMyCount(1000);
         List<PreparedCleanIndex> allIndex = new ArrayList<>();
         List<PreparedCleanIndex> allCleanIndex = new ArrayList<>();
+        // data_dump_strategy表中获取数据清理策略
         List<DataDumpStrategy> dumpStrategies = businessClient.selectStrategyListByPage(record).getList();
         log.warn("dumpStrategies size:" + dumpStrategies.size());
         for (DataDumpStrategy dataDumpStrategy : dumpStrategies) {
@@ -635,7 +636,9 @@ public class CommonServiceImpl implements CommonService {
             Optional<JSONObject> opt = EsCurdTools.simpleGetQueryHttp(tailUrl);
 
             log.warn(String.format("根据别名获取所有索引 %s", ReflectionToStringBuilder.toString(opt, ToStringStyle.MULTI_LINE_STYLE)));
-            opt.get().entrySet().forEach(e -> {
+            Set<Map.Entry<String, Object>> entries = opt.get().entrySet();
+            log.warn(String.format("索引 %s", ReflectionToStringBuilder.toString(entries, ToStringStyle.MULTI_LINE_STYLE)));
+            entries.forEach(e -> {
                 String index = e.getKey();
                 Object value = e.getValue();
                 if (index.startsWith("searchguard") || index.startsWith(".")) {
@@ -651,9 +654,9 @@ public class CommonServiceImpl implements CommonService {
                     Date date = TimeTools.parseDate(day.replaceAll("\\.", ""), "yyyyMMdd");
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(date);
+                    log.warn(String.format("按天： %s", DateFormatUtils.format(calendar.getTime().getTime(), "yyyy-MM-dd HH:mm:ss")));
                     cleanIndex = new PreparedCleanIndex(indexPrefix, index, date, day, false);
                     cleanIndex.setStrategy(dataDumpStrategy);
-                    //cleanIndices.add(cleanIndex);
                 } else {
                     matcher = patternMonth.matcher(index);
                     if (matcher.find()) {
@@ -665,24 +668,24 @@ public class CommonServiceImpl implements CommonService {
                         calendar.setTime(date);
                         calendar.add(Calendar.MONTH, 1);
                         calendar.set(Calendar.DAY_OF_MONTH, 0);
+                        log.warn(String.format("按月： %s", DateFormatUtils.format(calendar.getTime().getTime(), "yyyy-MM-dd HH:mm:ss")));
                         cleanIndex = new PreparedCleanIndex(indexPrefix, index, calendar.getTime(), month, true);
                         cleanIndex.setStrategy(dataDumpStrategy);
-                        //cleanIndices.add(cleanIndex);
                     } else {
                         //新加年份索引的判断逻辑
                         matcher = patternYear.matcher(index);
                         if (matcher.find()) {
                             String year = matcher.group();
                             String indexPrefix = index.replace(year, "");
-                            log.warn(String.format("别名按年，数据elasticSearch index: %s, indexPrefix: %s, year: %s", index, indexPrefix, year));
+                            log.warn(String.format("按年，数据elasticSearch index: %s, indexPrefix: %s, year: %s", index, indexPrefix, year));
                             Date date = TimeTools.parseDate(year.replaceAll("\\.", ""), "yyyy");
                             Calendar calendar = Calendar.getInstance();
                             calendar.setTime(date);
                             calendar.add(Calendar.YEAR, 1);
                             calendar.set(Calendar.DAY_OF_YEAR, 0);
+                            log.warn(String.format("匹配别名按年： %s", DateFormatUtils.format(calendar.getTime().getTime(), "yyyy-MM-dd HH:mm:ss")));
                             cleanIndex = new PreparedCleanIndex(indexPrefix, index, calendar.getTime(), year, false);
                             cleanIndex.setStrategy(dataDumpStrategy);
-                            //cleanIndices.add(cleanIndex);
                         }
                     }
                 }
@@ -696,9 +699,10 @@ public class CommonServiceImpl implements CommonService {
             });
             allIndex.addAll(cleanIndices);
 
-            // TODO 从界面上获取的数据保留时间（天数），计算当前时间前多少天的数据需要清理
+            // TODO 从界面上获取的数据保留时间（天数），计算当前时间前多少天的数据需要清理。
             final Date remainDate = TimeTools.getNowBeforeByDay(dataDumpStrategy.getSaveTime());
             log.warn(String.format("开始时间:%s, 结束时间:%s, 保存天数：%s", DateFormatUtils.format(remainDate, "yyyy-MM-dd HH:mm:ss"), DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss"), String.valueOf(dataDumpStrategy.getSaveTime())));
+            // TODO 比较要清理最早的时间。如果发现有比更早的时间，则是需要清理。如果是按年建立的索引，就是当前年的12月31日，如果比开始时间小，，则加入到队列中，并进行clean操作。不备份也不删除。
             List<PreparedCleanIndex> cleanIndexList = cleanIndices.stream().filter(f -> f.getIndexDate().compareTo(remainDate) < 0).collect(Collectors.toList());
             log.warn("数据清理备份:待清理的所有索引!!!!!!!!!!!!!!!!!!!!!!" + cleanIndexList.size());
             log.warn(String.format("数据清理备份:待清理的所有索引!!! %s", ReflectionToStringBuilder.toString(cleanIndexList, ToStringStyle.MULTI_LINE_STYLE)));

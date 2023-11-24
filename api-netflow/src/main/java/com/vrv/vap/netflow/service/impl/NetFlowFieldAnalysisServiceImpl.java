@@ -155,12 +155,18 @@ public class NetFlowFieldAnalysisServiceImpl implements InitializingBean, NetFlo
                         for (String header : headerArr) {
                             if (header.toUpperCase().indexOf("SESSION") >= 0) {
                                 String[] head = header.split("=");
-                                if (head.length > 0) {
+                                if (head.length >=2 ) {
                                     sessionId = head[1].replaceAll("\r", "").replaceAll("\n", "");
                                 }
                             }
                         }
                     }
+                }
+            }
+            // TODO 新增session_id字段的解析数据
+            if(StringUtils.isEmpty(sessionId)) {
+                if (targetMap.containsKey("sess_id")) {
+                    sessionId = String.valueOf(targetMap.get("sess_id"));
                 }
             }
             targetMap.put("session_id", sessionId);

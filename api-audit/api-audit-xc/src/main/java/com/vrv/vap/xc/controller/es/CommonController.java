@@ -59,7 +59,7 @@ public class CommonController {
     @PostMapping("/common/data/backup_clean")
     @ApiOperation("es数据备份(快照)-清理")
     public Result dataBackupAndCLean(@RequestBody Map<String, Object> paramModel) {
-        return commonService.dataBackupAndCLean(paramModel);
+        return commonService.dataBackupAndClean(paramModel);
     }
 
     @PostMapping("/common/data/roll_back")

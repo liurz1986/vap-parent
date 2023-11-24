@@ -35,7 +35,7 @@ public class DataDumpTask extends BaseTask {
         }
         Map<String, Object> param = new HashMap<>();
         param.put("diskUsedPercentThreshold", esDiskUsedThreshold);
-        commonService.dataBackupAndCLean(param);
+        commonService.dataBackupAndClean(param);
         logger.warn(String.format("Elasticsearch结束执行数据备份清理转储, jobName: %s, 时间：%s", jobName,
                 DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss")));
     }

@@ -4,7 +4,6 @@ import com.vrv.vap.toolkit.vo.Result;
 import com.vrv.vap.xc.model.EsTemplate;
 import com.vrv.vap.xc.pojo.DataDumpLog;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -25,7 +24,7 @@ public interface CommonService {
 
     Result dataBackup(Map<String, Object> paramModel);
 
-    Result dataBackupAndCLean(Map<String, Object> paramModel);
+    Result dataBackupAndClean(Map<String, Object> paramModel);
 
     Result datarollBack(DataDumpLog paramModel);
 

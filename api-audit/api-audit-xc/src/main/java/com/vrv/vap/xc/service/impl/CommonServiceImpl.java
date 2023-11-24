@@ -594,7 +594,7 @@ public class CommonServiceImpl implements CommonService {
     private String backUpBaseDir;
 
     @Override
-    public Result dataBackupAndCLean(Map<String, Object> paramModel) {
+    public Result dataBackupAndClean(Map<String, Object> paramModel) {
         QueryTools.QueryWrapper wrapper = QueryTools.build();
         String gzBaseDir = backUpBaseDir;
         log.warn(String.format("backUpBaseDir: %s, 开始时间：%s", backUpBaseDir, DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss")));
@@ -640,7 +640,7 @@ public class CommonServiceImpl implements CommonService {
             log.warn(String.format("索引 %s", ReflectionToStringBuilder.toString(entries, ToStringStyle.MULTI_LINE_STYLE)));
             entries.forEach(e -> {
                 String index = e.getKey();
-                Object value = e.getValue();
+                JSONObject value = (JSONObject)e.getValue();
                 if (index.startsWith("searchguard") || index.startsWith(".")) {
                     return;
                 }

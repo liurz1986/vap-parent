@@ -6,6 +6,9 @@ package com.vrv.vap.netflow.common.enums;
  * @date 2023/8/17 11:01
  */
 public enum NetFlowDataTypeEnum {
+    /**
+     * 网络日志枚举类型
+     */
     NET_CONNECT_LOG(1,"网络通连日志"),
     APPLICATION_AUDIT_LOG(2,"应用行为审计日志"),
     STATUS_INFO_LOG(3,"状态信息"),

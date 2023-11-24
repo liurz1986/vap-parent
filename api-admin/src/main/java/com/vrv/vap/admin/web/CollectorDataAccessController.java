@@ -27,8 +27,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,10 +94,6 @@ public class CollectorDataAccessController extends ApiController {
     @PostMapping
     @SysRequestLog(description = "查询数据接入列表",actionType = ActionType.SELECT)
     public VList queryDataAccess(@RequestBody CollectorDataAccessQuery query) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("查询数据接入列表打印日志[%s]",
-                    ReflectionToStringBuilder.toString(query, ToStringStyle.MULTI_LINE_STYLE)));
-        }
         SyslogSenderUtils.sendSelectSyslog();
         Example example = this.pageQuery(query,CollectorDataAccess.class);
 //        Example.Criteria criteria = example.createCriteria();

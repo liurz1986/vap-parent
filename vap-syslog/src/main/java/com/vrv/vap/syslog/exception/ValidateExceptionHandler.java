@@ -88,6 +88,15 @@ public class ValidateExceptionHandler {
         return new VData(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), ex.getMessage());
     }
 
+    /**
+     * AOP syslog全局异常
+     */
+    @ExceptionHandler(value = VapSyslogException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public VData handleSyslogException(HttpServletRequest request, VapSyslogException ex) {
+        return new VData(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), ex.getMessage());
+    }
 
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

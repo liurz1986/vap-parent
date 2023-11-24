@@ -15,6 +15,8 @@ import com.vrv.vap.base.BaseServiceImpl;
 import com.vrv.vap.common.vo.Result;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -101,13 +103,17 @@ public class CollectorDataAccessServiceImpl extends BaseServiceImpl<CollectorDat
         if (CollectionUtils.isEmpty(accessList)) {
             return accessVOList;
         }
+        logger.info("参数accessList值{}", ReflectionToStringBuilder.toString(accessList, ToStringStyle.MULTI_LINE_STYLE));
         accessList.stream().forEach(item -> {
             CollectorDataAccessVO accessVO = new CollectorDataAccessVO();
             BeanUtils.copyProperties(item,accessVO);
             Integer collectionId = item.getCollectionId();
             if (collectionId != null) {
                 CollectorRuleCollection ruleCollection = ruleCollectionService.findById(collectionId);
-                accessVO.setCollectionName(ruleCollection.getName());
+                accessVO.setCollectionName(Optional.ofNullable(ruleCollection)
+                        .map(CollectorRuleCollection::getName)
+                        .orElseThrow(() -> new RuntimeException("规则集不存在:" + collectionId))
+                );
                 // 是否最新
                 String newVersion = ruleCollection.getVersion();
                 String oldVersion = item.getVersion();

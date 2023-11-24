@@ -2,7 +2,7 @@ package com.vrv.vap.syslog.common.aop;
 
 import com.vrv.vap.syslog.common.constant.SyslogConstant;
 import com.vrv.vap.syslog.common.utils.SyslogContextHolder;
-import com.vrv.vap.syslog.exception.VapRuntimeException;
+import com.vrv.vap.syslog.exception.VapSyslogException;
 import com.vrv.vap.syslog.model.SystemLog;
 import com.vrv.vap.syslog.service.SyslogProcessor;
 import jdk.nashorn.internal.ir.annotations.Ignore;
@@ -68,7 +68,7 @@ public class SysLogAspect implements InitializingBean {
         } catch (Throwable throwable) {
             logger.error("后台接口调用异常，发送syslog的查询结果为查询失败!!", throwable);
             syslogProcessor.processing(joinPoint, SyslogConstant.FAILED);
-            throw new VapRuntimeException("服务器内部异常，请联系管理员!!", throwable);
+            throw new VapSyslogException("服务器内部异常，请联系管理员!!", throwable);
         } finally {
             SyslogContextHolder.clearSyslog();
         }

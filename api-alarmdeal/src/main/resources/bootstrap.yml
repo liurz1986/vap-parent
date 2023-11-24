@@ -3,5 +3,3 @@ spring:
     name:  api-alarmdeal
   profiles:
     active: dev
-  main:
-    allow-bean-definition-overriding: true

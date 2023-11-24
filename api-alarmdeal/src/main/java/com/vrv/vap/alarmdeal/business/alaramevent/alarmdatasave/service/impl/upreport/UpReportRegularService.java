@@ -66,20 +66,26 @@ public class UpReportRegularService implements IUpReportEventService {
 
     @Override
     public AbstractUpEvent constructUpEvent(UpEventDTO eventDTO) {
-
-
-        AlarmEventAttribute item = eventDTO.getDoc();
-        //1,构造上报监管事件数据
-        Alert alert = constractDataRegular(item);
+        List<String> logs = getLogs(eventDTO);
+        List<AlarmEventAttribute> docs = eventDTO.getDocs();
+        Map<String, List<String>> logsGroup = groupIdByLogs(logs, docs);
         RegularEvent regularEvent = new RegularEvent();
-        AlertInfo alertInfo = new AlertInfo();
-        alertInfo.setAlert(alert);
-
-        //补全原始日志数据
-        completeUpLogData(alertInfo, item);
-        regularEvent.setAlert_info(alertInfo);
+        List<AlertInfo> alert_infos = new ArrayList<>();
+        for (AlarmEventAttribute item : docs) {
+            Alert alert = constractDataRegular(item);
+            AlertInfo alertInfo = new AlertInfo();
+            alertInfo.setAlert(alert);
+            String eventId = item.getEventId();
+            List<String> eventLogs = logsGroup.getOrDefault(eventId,new ArrayList<>());
+            alertInfo.setLogs(eventLogs);
+            alert_infos.add(alertInfo);
+        }
+        regularEvent.setAlert_info(alert_infos);
         return regularEvent;
     }
+
+
+
 
 
     /**
@@ -109,7 +115,7 @@ public class UpReportRegularService implements IUpReportEventService {
      * @param logs
      * @param docs
      */
-    private List<Map<String, Object>> groupIdByLogs(List<String> logs, List<AlarmEventAttribute> docs) {
+    public Map<String, List<String>> groupIdByLogs(List<String> logs, List<AlarmEventAttribute> docs) {
         Gson gson = new Gson();
         List<Map<String, Object>> maps = transLogStrToObj(logs);
         //maps当中单个元素包含guid字段，docs单个元素包含logs当中包含guids集合，将maps当中日志查询归属到对应的AlarmEventAttribute当中
@@ -120,7 +126,7 @@ public class UpReportRegularService implements IUpReportEventService {
             for (AlarmEventAttribute doc : docs) {
                 List<LogIdVO> logIds = doc.getLogs();
                 for (LogIdVO logIdVO : logIds) {
-                    List<String> logGuids = logIdVO.getLogGuids();
+                    List<String> logGuids = logIdVO.getIds();
                     if (logGuids.contains(guid)) {
                         List<String> stringList = result.get(doc.getEventId());
                         if (stringList == null) { //新的元素
@@ -133,7 +139,7 @@ public class UpReportRegularService implements IUpReportEventService {
                 }
             }
         }
-        return maps;
+        return result;
     }
 
     /**
@@ -244,23 +250,7 @@ public class UpReportRegularService implements IUpReportEventService {
      * @param alertInfo
      * @param doc       告警事件数据
      */
-    private void completeUpLogData(AlertInfo alertInfo, AlarmEventAttribute doc) {
-        List<String> logs = new ArrayList<>();
-        List<LogIdVO> logIdVOS = doc.getLogs();
-        for (LogIdVO logIdVO : logIdVOS) {
-            List<QueryCondition_ES> conditions = new CopyOnWriteArrayList<>();
-            List<String> ids = logIdVO.getIds();
-            conditions.add(QueryCondition_ES.in("guid", ids));
-            QueryBuilder queryBuilder = ElasticSearchUtil.toQueryBuilder(conditions);
-            SearchResponse response = elasticSearchRestClient.getDocs(new String[]{logIdVO.getIndexName() + "*"}, queryBuilder, null, null, 0, ids.size());
-            SearchHits hits = response.getHits();
-            for (SearchHit hit : hits) {
-                logs.add(hit.getSourceAsString());
-                break;
-            }
-        }
-        alertInfo.setLogs(logs);
-    }
+
 
 
 }

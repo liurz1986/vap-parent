@@ -692,27 +692,16 @@ public class AlarmDataHandleServiceImpl implements AlarmDataHandleService {
     @Override
     public void pushSuperviseData(List<AlarmEventAttribute> docs) {
         if (CollectionUtils.isNotEmpty(docs)) {
-            docs.parallelStream().forEach(item -> {
-                try {
-                    //1,上报监管事件
-                    UpEventDTO eventDTO = new UpEventDTO();
-                    eventDTO.setDoc(item);
-                    logger.warn("------------上报事件处置-----------------");
-                    //2，上报事件处置
-                    eventDTO.setDisposeStatus(DisponseConstant.WAIT_DISPONSE);
-                    eventDTO.setUpReportBeanName(IUpReportEventService.UpReportDispose_BEAN_NAME);
-                    reportCommonService.upReportEvent(eventDTO);
-                } catch (Exception ex) {
-                    logger.error("AlarmDataSaveJob handleAlarmData pushSuperviseData upToDisposeEventData  error", ex);
-                }
 
-            });
             UpEventDTO eventDTO = new UpEventDTO();
             eventDTO.setDocs(docs);
-            eventDTO.setUpReportBeanName(IUpReportEventService.UpReportRegular_BEAN_NAME);
+
+            eventDTO.setDisposeStatus(DisponseConstant.WAIT_DISPONSE);
+            eventDTO.setUpReportBeanName(IUpReportEventService.UpReportDispose_BEAN_NAME);
             reportCommonService.upReportEvent(eventDTO);
 
-
+            eventDTO.setUpReportBeanName(IUpReportEventService.UpReportRegular_BEAN_NAME);
+            reportCommonService.upReportEvent(eventDTO);
             logger.info("AlarmDataSaveJob handleAlarmData pushSuperviseData success size ={}", docs.size());
         }
     }

@@ -70,20 +70,25 @@ public class UpReportDisposeService implements IUpReportEventService {
 
     @Override
     public AbstractUpEvent constructUpEvent(UpEventDTO eventDTO) {
-        //1,构造数据
-        AlarmEventAttribute doc = upReportCommonService.getAlarmEventAttribute(eventDTO);
-        if (doc == null) {
-            //返回空就是不会发送，事件id有问题，查询不到数据
-            logger.error("##############eventId无法关联对应的告警数据，无法上报##################");
-            return null;
-        }
+
+        List<AlarmEventAttribute> docs = eventDTO.getDocs();
         DisposeEvent disposeEvent = new DisposeEvent();
-        //构造一：es
-        DataDispose dataDispose = constractUpDisposeEs(doc);
-        //构造二：公共
-        constractUpDisposeCommon(disposeEvent, dataDispose, eventDTO);
-        //构造三：表单
-        constractUpDisposeForm(eventDTO, dataDispose);
+        List<AbstractUpData> data = new ArrayList<>();
+        for (AlarmEventAttribute doc:docs){
+            if (doc == null) {
+                //返回空就是不会发送，事件id有问题，查询不到数据
+                logger.warn("##############eventId无法关联对应的告警数据，无法上报##################");
+                return null;
+            }
+            //构造一：es
+            DataDispose dataDispose = constractUpDisposeEs(doc);
+            //构造二：公共
+            constractUpDisposeCommon(disposeEvent, dataDispose, eventDTO);
+            //构造三：表单
+            constractUpDisposeForm(eventDTO, dataDispose);
+            data.add(dataDispose);
+        }
+        disposeEvent.setData(data);
         return disposeEvent;
     }
 

@@ -35,7 +35,6 @@ public class AlarmThread implements Runnable{
            // 上传数据
            alarmDataHandleService.pushAlarmData(resultList);
            // 上报数据（监管事件+事件处置）
-           alarmDataHandleService.pushSuperviseData(resultList);
            resultList.clear();
        }catch (Exception e){
            logger.error("消费日志报错，报错信息：{}",e);

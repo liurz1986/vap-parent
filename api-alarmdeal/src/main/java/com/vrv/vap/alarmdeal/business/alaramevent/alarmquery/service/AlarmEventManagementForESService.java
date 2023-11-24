@@ -21,7 +21,7 @@ import java.util.Map;
  * @author liangguolu
  * @date 2021年12月23日 9:23
  */
-public interface AlarmEventManagementForESService {
+public interface AlarmEventManagementForESService  {
     /**
      * 功能描述
      *

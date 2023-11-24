@@ -26,10 +26,10 @@ public class Asset {
     private Long ipnum;
 
     @Column(name = "Type_Guid")
-    private String typeGuid;
+    private String assetType;
 
     @Column(name = "Type_Sno_Guid")
-    private String typeSnoGuid;
+    private String assetTypeSnoGuid;
 
     @Column(name = "Version_info")
     private String versionInfo;
@@ -373,29 +373,29 @@ public class Asset {
     /**
      * @return Type_Guid
      */
-    public String getTypeGuid() {
-        return typeGuid;
+    public String getAssetType() {
+        return assetType;
     }
 
     /**
-     * @param typeGuid
+     * @param assetType
      */
-    public void setTypeGuid(String typeGuid) {
-        this.typeGuid = typeGuid;
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 
     /**
      * @return Type_Sno_Guid
      */
-    public String getTypeSnoGuid() {
-        return typeSnoGuid;
+    public String getAssetTypeSnoGuid() {
+        return assetTypeSnoGuid;
     }
 
     /**
-     * @param typeSnoGuid
+     * @param assetTypeSnoGuid
      */
-    public void setTypeSnoGuid(String typeSnoGuid) {
-        this.typeSnoGuid = typeSnoGuid;
+    public void setAssetTypeSnoGuid(String assetTypeSnoGuid) {
+        this.assetTypeSnoGuid = assetTypeSnoGuid;
     }
 
     /**

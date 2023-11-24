@@ -346,7 +346,9 @@ public class NetFlowFieldAnalysisServiceImpl implements InitializingBean, NetFlo
             //所属安全域
             log.put("src_std_dev_safety_marign", DEFAULT_UNKNOWN_VALUE);
             log.put("src_std_dev_safety_marign_name", DEFAULT_UNKNOWN_VALUE);
+            // 源设备标识
             log.put("src_std_terminal_type", "-1");
+            // 目的设备标识
             log.put("dst_std_terminal_type", "-1");
             //设备类型-二级名称
             log.put("dst_std_dev_type", DEFAULT_UNKNOWN_VALUE);
@@ -362,6 +364,7 @@ public class NetFlowFieldAnalysisServiceImpl implements InitializingBean, NetFlo
             log.put("dst_std_dev_safety_marign_name", DEFAULT_UNKNOWN_VALUE);
             String srcIp = (String) log.get("sip");
             if (StringUtils.isNotEmpty(srcIp)) {
+                // terminalType做了单独处理
                 AssetVo asset = netflowBaseDataService.fixAssetIpCache(StringUtils.strip(srcIp));
                 if (asset != null) {
                     //设备类型
@@ -375,12 +378,12 @@ public class NetFlowFieldAnalysisServiceImpl implements InitializingBean, NetFlo
                     //设备密级
                     log.put("src_std_dev_level", asset.getEquipmentIntensive());
                     //MAC
-                    // typeGuid
+                    // 源设备标识typeGuid
                     log.put("src_std_terminal_type", asset.getTerminalType());
                     //所属安全域
                     log.put("src_std_dev_safety_marign", asset.getSecurityguid());
-                    BaseSecurityDomain baseSecurityDomainInfo =
-                            netflowBaseDataService.fixSecCodeCache(asset.getSecurityguid());
+                    // TODO fixed bug! redis中的id是0,1,  而不是guid
+                    BaseSecurityDomain baseSecurityDomainInfo = netflowBaseDataService.fixSecCodeCache(asset.getSecurityguid());
                     if (baseSecurityDomainInfo != null) {
                         log.put("src_std_dev_safety_marign_name", baseSecurityDomainInfo.getDomainName());
                     }

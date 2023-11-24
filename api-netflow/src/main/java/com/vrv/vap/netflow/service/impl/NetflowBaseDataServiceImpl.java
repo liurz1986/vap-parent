@@ -33,7 +33,15 @@ public class NetflowBaseDataServiceImpl implements InitializingBean, NetflowBase
     private StringRedisTemplate redisTemplate;
     // 组织机构
     private static final Map<String, Object> orgMap = new HashMap<>();
-    // 安全域
+    /**
+     * 安全域
+     * 在redis中的格式
+     * 15) "4"
+     * 16) "{\"code\":\"cb99e054-ea3b-45c3-a43c-e1989bac5b03\",\"domainName\":\"\xe5\xba\x94\xe7\x94\xa8\xe6\x9c\x8d\xe5\x8a\xa1\xe5\x9f\x9f\",\"id\":4,\"parentCode\":\"bc19b8c2-034e-4e8f-8480-2eb7ffb518bd\",\"secretLevel\":4,\"sort\":3,\"subCode\":\"001003\"}"
+     * <p>
+     * 127.0.0.1:6379> hget  _BASEINFO:BASE_SECURITY_DOMAIN:ID 4
+     * "{\"code\":\"cb99e054-ea3b-45c3-a43c-e1989bac5b03\",\"domainName\":\"\xe5\xba\x94\xe7\x94\xa8\xe6\x9c\x8d\xe5\x8a\xa1\xe5\x9f\x9f\",\"id\":4,\"parentCode\":\"bc19b8c2-034e-4e8f-8480-2eb7ffb518bd\",\"secretLevel\":4,\"sort\":3,\"subCode\":\"001003\"}"
+     */
     private static final Map<String, Object> secMap = new HashMap<>();
     // 人员
     private static final Map<String, Object> personMap = new HashMap<>();
@@ -123,7 +131,9 @@ public class NetflowBaseDataServiceImpl implements InitializingBean, NetflowBase
         secMap.clear();
         String secIpJson = redisTemplate.opsForValue().get(CACHE_SEC_RANGE_VO_KEY);
         secMap.put(CACHE_SEC_RANGE_VO_KEY, StringUtils.isNotEmpty(secIpJson) ? secIpJson : "");
+
         Map secIdJson = redisTemplate.opsForHash().entries(CACHE_SEC_ID_KEY);
+        // TODO fixed bug: redis中的数据类型是hash，但是这里使用的是string，导致数据类型转换异常
         secMap.put(CACHE_SEC_ID_KEY, secIdJson != null ? secIdJson : new HashMap<>());
     }
 
@@ -181,6 +191,10 @@ public class NetflowBaseDataServiceImpl implements InitializingBean, NetflowBase
         return assetIpMap;
     }
 
+    /**
+     * @param ip
+     * @return
+     */
     @Override
     public AssetVo fixAssetIpCache(String ip) {
         if (StringUtils.isEmpty(ip)) {
@@ -192,7 +206,7 @@ public class NetflowBaseDataServiceImpl implements InitializingBean, NetflowBase
             AssetVo assetVo = JSON.parseObject(jsonObject, AssetVo.class);
             if (assetVo != null) {
                 if (StringUtils.isEmpty(assetVo.getTerminalType())) {
-                    String typeGuid = assetVo.getTypeGuid();
+                    String typeGuid = assetVo.getAssetType();
                     if ("82416cd327b74519a78667f2245693a9".equals(typeGuid) ||
                             "60f36b0370db4464a8b17e0d3347bdc9".equals(typeGuid) ||
                             "99e94620ed644647b53936df79d26684".equals(typeGuid) ||
@@ -324,20 +338,32 @@ public class NetflowBaseDataServiceImpl implements InitializingBean, NetflowBase
         return null;
     }
 
+    /**
+     * 在redis中的格式，key是id，value是json字符串
+     * 15) "4"
+     * 16) "{\"code\":\"cb99e054-ea3b-45c3-a43c-e1989bac5b03\",\"domainName\":\"\xe5\xba\x94\xe7\x94\xa8\xe6\x9c\x8d\xe5\x8a\xa1\xe5\x9f\x9f\",\"id\":4,\"parentCode\":\"bc19b8c2-034e-4e8f-8480-2eb7ffb518bd\",\"secretLevel\":4,\"sort\":3,\"subCode\":\"001003\"}"
+     * <p>
+     * 127.0.0.1:6379> hget  _BASEINFO:BASE_SECURITY_DOMAIN:ID 4
+     * "{\"code\":\"cb99e054-ea3b-45c3-a43c-e1989bac5b03\",\"domainName\":\"\xe5\xba\x94\xe7\x94\xa8\xe6\x9c\x8d\xe5\x8a\xa1\xe5\x9f\x9f\",\"id\":4,\"parentCode\":\"bc19b8c2-034e-4e8f-8480-2eb7ffb518bd\",\"secretLevel\":4,\"sort\":3,\"subCode\":\"001003\"}"
+     *
+     * @param code 安全域的guid
+     * @return BaseSecurityDomain
+     */
     @Override
-    public BaseSecurityDomain fixSecCodeCache(String id) {
-        if (StringUtils.isEmpty(id)) {
+    public BaseSecurityDomain fixSecCodeCache(String code) {
+        if (StringUtils.isEmpty(code)) {
             return null;
         }
-        Map secIdMap = (Map) secMap.get(CACHE_SEC_ID_KEY);
-        if (secIdMap.containsKey(id)) {
-            String jsonObject = (String) secIdMap.get(id);
-            BaseSecurityDomain baseSecurityDomain = JSON.parseObject(jsonObject, BaseSecurityDomain.class);
-            if (baseSecurityDomain != null) {
-                return baseSecurityDomain;
+        BaseSecurityDomain baseSecurityDomain = null;
+        LinkedHashMap<String, String> secIdMap = (LinkedHashMap<String, String>) secMap.get(CACHE_SEC_ID_KEY);
+        // secIdMap中的key是code，value是json字符串
+        for (String json : secIdMap.values()) {
+            baseSecurityDomain = JSON.parseObject(json, BaseSecurityDomain.class);
+            if (baseSecurityDomain.getCode().equals(code)) {
+                break;
             }
         }
-        return null;
+        return baseSecurityDomain;
     }
 
     @Override

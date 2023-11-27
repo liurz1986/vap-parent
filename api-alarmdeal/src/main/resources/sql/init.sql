@@ -4004,7 +4004,7 @@ ALTER TABLE `app_sys_manager`
   ADD COLUMN  `person_code` varchar(255)  NULL,
   ADD column  `app_type`  varchar(255)  NULL;
 
--- changeset tyj:20231127 labels:新增事件对象转换表
+--changeset tyj:20231127-apiAlarmdeal  labels:4.23.0
 CREATE TABLE IF NOT EXISTS `event_column_dict` (
                                    `id` int(11) NOT NULL AUTO_INCREMENT,
                                    `name` varchar(255) DEFAULT NULL,

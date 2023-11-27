@@ -16,7 +16,6 @@
     <description>api-audit 模块 ${project.version}</description>
 
     <properties>
-        <parent.version>${parent.version}</parent.version>
         <release.dir>../release/package</release.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -181,7 +180,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>vap-parent</artifactId>
-                <version>${parent.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>

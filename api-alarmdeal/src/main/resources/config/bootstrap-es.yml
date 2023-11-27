@@ -18,7 +18,7 @@ spring:
         server-addr: ${SERVER_ADDR}
         namespace: ${NAMESPACE}
         enabled: true
-SERVER_ADDR: ${NACOS_HOST:192.168.120.106}:${NACOS_PORT:8848}
+SERVER_ADDR: ${NACOS_HOST:192.168.120.153}:${NACOS_PORT:8848}
 NAMESPACE: ${NACOS_NAMESPACE:a338c762-d2a7-4a2f-86f0-022c171c0928}
 mybatis:
   type-handlers-package: com.vrv.vap.domain.type.handler

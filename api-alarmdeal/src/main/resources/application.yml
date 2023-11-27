@@ -14,7 +14,7 @@ spring:
   datasource:
     username: ${MYSQL_USER:root}
     password: ${MYSQL_PASSWORD:mysql}
-    url: jdbc:mysql://${MYSQL_HOST:192.168.120.106}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+    url: jdbc:mysql://${MYSQL_HOST:192.168.120.153}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
     filters: stat
     maxActive: 20
     initialSize: 1
@@ -41,7 +41,7 @@ spring:
   data:
     elasticsearch:
       cluster-name: ${ES_CLUSTER_NAME:elasticsearch-cluster}
-      cluster-client-nodes: ${ES_CLUSTER_HOST:192.168.120.106}:${ES_CLUSTER_PORT:9200}
+      cluster-client-nodes: ${ES_CLUSTER_HOST:192.168.120.153}:${ES_CLUSTER_PORT:9200}
       http:
         username: ${ES_CLUSTER_UNAME:admin}
         password: ${ES_CLUSTER_PWD:vrv@12345}
@@ -51,7 +51,7 @@ spring:
     store-type: redis
   redis:
     database: 0
-    host: ${REDIS_HOST:192.168.120.106}
+    host: ${REDIS_HOST:192.168.120.153}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PWD:vrv@1234}
     pool:
@@ -61,14 +61,14 @@ spring:
       min-idle: 0 # 连接池中的最小空闲连接
     timeout: 10000  # 连接超时时间（毫秒）
   kafka:
-    bootstrap-servers: ${KAFKA_URL:192.168.120.106}:9092
+    bootstrap-servers: ${KAFKA_URL:192.168.120.153}:9092
     consumer:
       properties:
         sasl.mechanism: PLAIN
         security.protocol: SASL_PLAINTEXT
         sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="${KAFKA_PWD:admin-2019}";
       enable-auto-commit: false
-      group-id: alarmdeal-consumer-group-1
+      group-id: alarmdeal-consumer-group-test-2
       auto-commit-interval: 100
       auto-offset-reset: latest
       max-poll-records: 1000
@@ -133,7 +133,7 @@ flink:
   flink_home_path: /opt/test/flink/
   flink_jar_path: /opt/test/cloud/api-rule.jar
   remote_flag: false
-  remote_ip: 192.168.120.106
+  remote_ip: 192.168.120.153
   remote_user: root
   slots: 100
   solt_allot: 20
@@ -155,10 +155,10 @@ vap:
     capacity: 200000   
     sink-type: database
     databases:
-      - url: jdbc:mysql://${MYSQL_HOST:192.168.120.106}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+      - url: jdbc:mysql://${MYSQL_HOST:192.168.120.153}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
         username: ${MYSQL_USER:root}
         password: ${MYSQL_PASSWORD:mysql}
-      - url: jdbc:mysql://${MYSQL_HOST:192.168.120.106}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
+      - url: jdbc:mysql://${MYSQL_HOST:192.168.120.153}:${MYSQL_PORT:3306}/ajb_vap?useUnicode=true&useSSL=false&characterEncoding=UTF-8
         username: ${MYSQL_USER:root}
         password: ${MYSQL_PASSWORD:mysql}
     driver: ${DATABASE_DRIVER:com.mysql.jdbc.Driver}

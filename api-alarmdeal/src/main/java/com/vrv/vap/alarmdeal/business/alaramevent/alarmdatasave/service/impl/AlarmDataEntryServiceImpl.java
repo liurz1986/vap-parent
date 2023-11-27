@@ -135,26 +135,15 @@ public class AlarmDataEntryServiceImpl implements AlarmDataEntryService {
     public void handleLogData(AlarmEventAttribute doc, WarnResultLogTmpVO warnResultLogTmpVO) {
         Map<String, String[]> logMap = warnResultLogTmpVO.getIdRoom();
         List<LogIdVO> logs = new LinkedList<>();
-        logMap.forEach((indexName, logIds) -> {
-            List<EventTable> list = null;
-            if (CollectionUtils.isEmpty(list)) {
-                list = eventTabelService.getSourceData(indexName);
-                eventTableMap.put(indexName, list);
-            }
-            LogIdVO vo = new LogIdVO();
-            if (list.size()>0) {
-                EventTable eventTable = list.get(0);
-                vo.setIndexName(eventTable.getIndexName());
-                vo.setEventTableName(eventTable.getName());
-            } else {
-                vo.setIndexName(indexName);
-                vo.setEventTableName(indexName);
-            }
-            if(logIds != null){
-                vo.setIds(new LinkedList<>(Arrays.asList(logIds)));
-            }
-            logs.add(vo);
-        });
+        for (Map.Entry<String, String[]> entry : logMap.entrySet()){
+            LogIdVO logIdVO = new LogIdVO();
+            String key = entry.getKey();
+            String[] ids = entry.getValue();
+            logIdVO.setIndexName(key);
+            logIdVO.setEventTableName(key);
+            logIdVO.setIds(Arrays.asList(ids));
+            logs.add(logIdVO);
+        }
         doc.setLogs(logs);
     }
 

@@ -125,7 +125,7 @@ public class HaveNotQueryLogJob implements CommandLineRunner {
     private boolean getTimeResult() {
         Date endTime = new Date();
         long timeSpan = (endTime.getTime() - startTime.getTime()) / 1000 / 60;
-        if (timeSpan > 5) {
+        if (timeSpan > 3) {
             startTime = new Date();
             return true;
         } else {

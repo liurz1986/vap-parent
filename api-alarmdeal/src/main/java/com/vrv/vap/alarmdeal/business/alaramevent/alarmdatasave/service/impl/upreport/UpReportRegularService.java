@@ -2,6 +2,7 @@ package com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.service.impl.up
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.bean.NumericBooleanSerializer;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.bean.StaffInfoSupervise;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmdatasave.bean.UnitInfo;
@@ -24,10 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -46,21 +44,19 @@ public class UpReportRegularService implements IUpReportEventService {
     /**
      * 空值也不会忽略
      */
-    private static Gson gsonNotIgnoreNull = new GsonBuilder().serializeNulls().registerTypeAdapter(String.class,new StringNullAdapter()).setDateFormat("yyyy-MM-dd HH:mm:ss").registerTypeAdapter(Boolean.class, new NumericBooleanSerializer())
+    private static Gson gsonNotIgnoreNull = new GsonBuilder().serializeNulls().registerTypeAdapter(String.class, new StringNullAdapter()).setDateFormat("yyyy-MM-dd HH:mm:ss").registerTypeAdapter(Boolean.class, new NumericBooleanSerializer())
             .create();
 
     @Override
     public void upEventToKafka(UpEventDTO eventDTO) {
-        logger.info("###########上报监管事件开始#################");
         try {
             //1 构造数据
             AbstractUpEvent upEvent = constructUpEvent(eventDTO);
             //2 发送数据
             kafkaTemplate.send(getTopicName(), gsonNotIgnoreNull.toJson(upEvent));
         } catch (Exception e) {
-            logger.error("##############上报监管事件发生了异常，异常原因为{}",e);
+            logger.error("##############上报监管事件发生了异常，异常原因为{}", e);
         }
-        logger.info("#################上报监管事件结束###################");
     }
 
     @Override
@@ -70,16 +66,137 @@ public class UpReportRegularService implements IUpReportEventService {
 
     @Override
     public AbstractUpEvent constructUpEvent(UpEventDTO eventDTO) {
-        AlarmEventAttribute item = eventDTO.getDoc();
-        //1,构造上报监管事件数据
-        Alert alert = constractDataRegular(item);
+        List<String> logs = getLogs(eventDTO);
+        List<AlarmEventAttribute> docs = eventDTO.getDocs();
+        Map<String, List<String>> logsGroup = groupIdByLogs(logs, docs);
         RegularEvent regularEvent = new RegularEvent();
-        AlertInfo alertInfo = new AlertInfo();
-        alertInfo.setAlert(alert);
-        //补全原始日志数据
-        completeUpLogData(alertInfo, item);
-        regularEvent.setAlert_info(alertInfo);
+        List<AlertInfo> alert_infos = new ArrayList<>();
+        for (AlarmEventAttribute item : docs) {
+            Alert alert = constractDataRegular(item);
+            AlertInfo alertInfo = new AlertInfo();
+            alertInfo.setAlert(alert);
+            String eventId = item.getEventId();
+            List<String> eventLogs = logsGroup.getOrDefault(eventId,new ArrayList<>());
+            alertInfo.setLogs(eventLogs);
+            alert_infos.add(alertInfo);
+        }
+        regularEvent.setAlert_info(alert_infos);
         return regularEvent;
+    }
+
+
+
+
+
+    /**
+     * 拿到该批次所有的日志数据
+     *
+     * @param eventDTO
+     * @return
+     */
+    private List<String> getLogs(UpEventDTO eventDTO) {
+        List<String> logs = new ArrayList<>();
+        List<String> guids = getGuids(eventDTO);
+        List<QueryCondition_ES> conditions = new ArrayList<>();
+        conditions.add(QueryCondition_ES.in("guid", guids));
+        QueryBuilder queryBuilder = ElasticSearchUtil.toQueryBuilder(conditions);
+        String indexName = getIndexName(eventDTO);
+        SearchResponse response = elasticSearchRestClient.getDocs(new String[]{indexName + "*"}, queryBuilder, null, null, 0, guids.size());
+        SearchHits hits = response.getHits();
+        for (SearchHit hit : hits) {
+            logs.add(hit.getSourceAsString());
+        }
+        return logs;
+    }
+
+    /**
+     * 对相关内容进行分组
+     *
+     * @param logs
+     * @param docs
+     */
+    public Map<String, List<String>> groupIdByLogs(List<String> logs, List<AlarmEventAttribute> docs) {
+        Gson gson = new Gson();
+        List<Map<String, Object>> maps = transLogStrToObj(logs);
+        //maps当中单个元素包含guid字段，docs单个元素包含logs当中包含guids集合，将maps当中日志查询归属到对应的AlarmEventAttribute当中
+        Map<String, List<String>> result = new HashMap<>();
+        for (int i = 0; i < maps.size(); i++) {
+            Map<String, Object> map = maps.get(i);
+            String guid = (String) map.get("guid");
+            for (AlarmEventAttribute doc : docs) {
+                List<LogIdVO> logIds = doc.getLogs();
+                for (LogIdVO logIdVO : logIds) {
+                    List<String> logGuids = logIdVO.getIds();
+                    if (logGuids.contains(guid)) {
+                        List<String> stringList = result.get(doc.getEventId());
+                        if (stringList == null) { //新的元素
+                            stringList = new ArrayList<>();
+                        }
+                        stringList.add(gson.toJson(map));
+                        result.put(doc.getEventId(), stringList);
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 将日志信息转换成为日志对象信息
+     *
+     * @param logs
+     * @return
+     */
+    private static List<Map<String, Object>> transLogStrToObj(List<String> logs) {
+        Gson gson = new Gson();
+        List<Map<String, Object>> lists = new ArrayList<>();
+        for (String log : logs) {
+            Map<String, Object> map = gson.fromJson(log, Map.class);
+            lists.add(map);
+        }
+        return lists;
+    }
+
+
+    /**
+     * 获得索引名称
+     *
+     * @return
+     */
+    private String getIndexName(UpEventDTO eventDTO) {
+        String indexName = "";
+        List<AlarmEventAttribute> docs = eventDTO.getDocs();
+        if (docs.size() > 0) {
+            AlarmEventAttribute alarmEventAttribute = docs.get(0);
+            List<LogIdVO> logs = alarmEventAttribute.getLogs();
+            if (logs != null && logs.size() > 0) {
+                LogIdVO logIdVO = logs.get(0);
+                indexName = logIdVO.getIndexName();
+            }
+        }
+        return indexName;
+    }
+
+    /**
+     * 获得本批次所有数据源的guids
+     *
+     * @param eventDTO
+     * @return
+     */
+    private List<String> getGuids(UpEventDTO eventDTO) {
+        List<String> guids = new ArrayList<>();
+        List<AlarmEventAttribute> docs = eventDTO.getDocs();
+        if (docs != null && docs.size() > 0) {
+            for (AlarmEventAttribute alarmEventAttribute : docs) {
+                List<LogIdVO> logs = alarmEventAttribute.getLogs();
+                for (LogIdVO logIdVO : logs) {
+                    guids.addAll(logIdVO.getIds());
+                }
+            }
+
+        }
+        return guids;
     }
 
     /**
@@ -111,7 +228,7 @@ public class UpReportRegularService implements IUpReportEventService {
         }
         if (dataRegular.getFile_list() != null) {
             dataRegular.setFile_count(dataRegular.getFile_list().size());
-        }else{
+        } else {
             dataRegular.setFile_list(new ArrayList<>());
         }
         List<AbstractUpData> data = new ArrayList<>();
@@ -133,23 +250,6 @@ public class UpReportRegularService implements IUpReportEventService {
      * @param alertInfo
      * @param doc       告警事件数据
      */
-    private void completeUpLogData(AlertInfo alertInfo, AlarmEventAttribute doc) {
-        List<String> logs = new ArrayList<>();
-        List<LogIdVO> logIdVOS = doc.getLogs();
-        for (LogIdVO logIdVO : logIdVOS) {
-            List<QueryCondition_ES> conditions = new CopyOnWriteArrayList<>();
-            List<String> ids = logIdVO.getIds();
-            conditions.add(QueryCondition_ES.in("guid", ids));
-            QueryBuilder queryBuilder = ElasticSearchUtil.toQueryBuilder(conditions);
-            SearchResponse response = elasticSearchRestClient.getDocs(new String[]{logIdVO.getIndexName() + "*"}, queryBuilder, null, null, 0, ids.size());
-            SearchHits hits = response.getHits();
-            for (SearchHit hit : hits) {
-                logs.add(hit.getSourceAsString());
-                break;
-            }
-        }
-        alertInfo.setLogs(logs);
-    }
 
 
 

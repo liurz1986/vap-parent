@@ -157,6 +157,7 @@ public class UpReportCommonServiceImpl implements IUpReportCommonService {
      *
      * @param eventDTO 事件传输对象
      */
+    @Override
     public void upReportEvent(UpEventDTO eventDTO) {
         //1 获取上报bean对象的名称
         String upReportBeanName = eventDTO.getUpReportBeanName();

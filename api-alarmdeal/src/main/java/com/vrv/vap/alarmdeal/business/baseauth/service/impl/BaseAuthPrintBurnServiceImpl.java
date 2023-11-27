@@ -89,6 +89,12 @@ public class BaseAuthPrintBurnServiceImpl extends BaseServiceImpl<BaseAuthPrintB
                 queryConditions.add(QueryCondition.isNull("ip"));
             }
         }
+        if (StringUtils.isBlank(baseAuthPrintBurnQueryVo.getBy_())){
+            baseAuthPrintBurnQueryVo.setBy_("DESC");
+        }
+        if (StringUtils.isBlank(baseAuthPrintBurnQueryVo.getOrder_())){
+            baseAuthPrintBurnQueryVo.setOrder_("createTime");
+        }
         Page<BaseAuthPrintBurn> all = this.findAll(queryConditions, baseAuthPrintBurnQueryVo.getPageable());
         PageRes<BaseAuthPrintBurn> res = PageRes.toRes(all);
         List<BaseAuthPrintBurn> list = res.getList();

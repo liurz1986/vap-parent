@@ -14,9 +14,7 @@ import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.enums.EvenTypeEnum;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.service.*;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.util.AlarmDealUtil;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.util.PageReqESUtil;
-import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.vo.EventTaVo;
-import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.vo.GuidNameVO;
-import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.vo.IdTitleValue;
+import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.vo.*;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.vo.alarm.AlarmEventAttributeVO;
 import com.vrv.vap.alarmdeal.business.alaramevent.alarmquery.vo.alarm.AppAlarmEventAttributeVO;
 import com.vrv.vap.alarmdeal.business.analysis.model.AuthorizationControl;
@@ -30,6 +28,7 @@ import com.vrv.vap.alarmdeal.business.appsys.service.AppSysManagerService;
 import com.vrv.vap.alarmdeal.business.asset.enums.AssetTrypeGroupEnum;
 import com.vrv.vap.alarmdeal.business.asset.model.Asset;
 import com.vrv.vap.alarmdeal.business.asset.service.AssetService;
+import com.vrv.vap.alarmdeal.business.asset.vo.AssetCsvVO;
 import com.vrv.vap.alarmdeal.business.asset.vo.AssetVO;
 import com.vrv.vap.alarmdeal.business.threat.bean.request.ThreatReq;
 import com.vrv.vap.alarmdeal.frameworks.config.FileConfiguration;
@@ -67,10 +66,12 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInter
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -80,6 +81,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -932,9 +935,87 @@ public class AlarmEventManagementServiceImpl implements AlarmEventManagementServ
                 System.out.println(all.get(0));
                 //组装数据
                 assembleData(all.get(0),eventTaVos,topicName);
+                //字典转换
+                try {
+                    dictConver(eventTaVos);
+                } catch (Exception e) {
+                    logger.info("事件对象字典转换异常");
+                    throw new RuntimeException(e);
+                }
             }
         }
         return eventTaVos;
+    }
+
+    private void dictConver(List<EventTaVo> eventTaVos) {
+        String sqlT="SELECT *  FROM event_dict";
+        List<EventDictVO> eventDictVOS = jdbcTemplate.query(sqlT, new BeanPropertyRowMapper<EventDictVO>(EventDictVO.class));
+        String sql="SELECT * FROM event_column_dict";
+        List<EventColumnDictVO> eventColumnDictVOS = jdbcTemplate.query(sql, new BeanPropertyRowMapper<EventColumnDictVO>(EventColumnDictVO.class));
+        if (eventTaVos.size()>0){
+            for (EventTaVo eventTaVo:eventTaVos){
+                if (eventTaVo.getFieldValue().startsWith("[")){
+                    if (eventTaVo.getFieldValue().contains("{")){
+                        List<Map<String, String>> maps = parseStringToListOfMaps(eventTaVo.getFieldValue());
+                        for (Map<String, String> map:maps){
+                            Set<Map.Entry<String, String>> entries = map.entrySet();
+                            for (Map.Entry<String, String> m:entries){
+                                String value=getFieldValueByCode(m.getKey(),m.getValue(),eventDictVOS,eventColumnDictVOS);
+                                if (com.vrv.vap.common.utils.StringUtils.isNotBlank(value)){
+                                    map.put(m.getKey(),value);
+                                }
+                            }
+                        }
+                        eventTaVo.setFieldValue(maps.toString());
+                    }else {
+                        String replace = eventTaVo.getFieldValue().replace("[", "").replace("]", "");
+                        String[] split = replace.split(",");
+                        List<String> stringList=new ArrayList<>();
+                        for (String s:split){
+                            String value=getFieldValueByCode(eventTaVo.getFieldName(),s.trim(),eventDictVOS,eventColumnDictVOS);
+                            if (StringUtils.isNotBlank(value)){
+                                stringList.add(value);
+                            }
+                        }
+                        if (stringList.size()>0){
+                            eventTaVo.setFieldValue(stringList.toString());
+                        }
+                    }
+                }else {
+                    String value=getFieldValueByCode(eventTaVo.getFieldName(),eventTaVo.getFieldValue(),eventDictVOS,eventColumnDictVOS);
+                    if (com.vrv.vap.common.utils.StringUtils.isNotBlank(value)){
+                        eventTaVo.setFieldValue(value);
+                    }
+                }
+            }
+        }
+    }
+    private String getFieldValueByCode(String fieldName, String fieldValue, List<EventDictVO> eventDictVOS, List<EventColumnDictVO> eventColumnDictVOS) {
+        List<EventColumnDictVO> eventColumnDictVOList = eventColumnDictVOS.stream().filter(m -> m.getName().equals(fieldName)).collect(Collectors.toList());
+        if (eventColumnDictVOList.size()>0){
+            Integer integer = eventColumnDictVOList.get(0).getDict_type();
+            List<EventDictVO> eventDictVOList = eventDictVOS.stream().filter(m -> m.getType().equals(integer) && m.getCode().equals(fieldValue)).collect(Collectors.toList());
+            if (eventDictVOList.size()>0){
+                return eventDictVOList.get(0).getCode_value();
+            }
+        }
+        return null;
+    }
+
+    public static List<Map<String, String>> parseStringToListOfMaps(String input) {
+        List<Map<String, String>> list = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\{([^}]+)\\}");
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            Map<String, String> map = new HashMap<>();
+            String[] keyValuePairs = matcher.group(1).split(",");
+            for (String keyValuePair : keyValuePairs) {
+                String[] keyValue = keyValuePair.split("=");
+                map.put(keyValue[0].trim(), keyValue[1].trim());
+            }
+            list.add(map);
+        }
+        return list;
     }
     @Autowired
     private EventTabelService eventTabelService;

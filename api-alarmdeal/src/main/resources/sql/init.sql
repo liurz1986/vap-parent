@@ -4003,3 +4003,19 @@ ALTER TABLE `app_sys_manager`
   ADD COLUMN  `person_name` varchar(255)  NULL,
   ADD COLUMN  `person_code` varchar(255)  NULL,
   ADD column  `app_type`  varchar(255)  NULL;
+
+--changeset tyj:20231127-apiAlarmdeal  labels:4.23.0
+CREATE TABLE IF NOT EXISTS `event_column_dict` (
+                                   `id` int(11) NOT NULL AUTO_INCREMENT,
+                                   `name` varchar(255) DEFAULT NULL,
+                                   `dict_type` int(11) DEFAULT NULL COMMENT '对应事件字典类型id',
+                                   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `event_dict` (
+                            `id` int(11) NOT NULL AUTO_INCREMENT,
+                            `type` int(1) DEFAULT NULL COMMENT '1密级 2网络层协议 3传输层学医 4会话层协议 5应用层协议',
+                            `code` varchar(255) DEFAULT NULL,
+                            `code_value` varchar(255) DEFAULT NULL,
+                            PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8;

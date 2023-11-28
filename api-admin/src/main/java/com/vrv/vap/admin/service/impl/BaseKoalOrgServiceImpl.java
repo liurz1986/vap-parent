@@ -531,30 +531,30 @@ public class BaseKoalOrgServiceImpl extends BaseServiceImpl<BaseKoalOrg> impleme
                 BaseKoalOrg baseKoalOrg = this.generateSubCode(baseKoalOrgImport);
                 orgList.add(baseKoalOrg);
 
-                if (StringUtils.isNotEmpty(b.getIpRanges())) {
-                    Example exampleip = new Example(BaseOrgIpSegment.class);
-                    exampleip.createCriteria().andEqualTo("areaCode", code);
-                    List<BaseOrgIpSegment> baseOrgIpSegments = baseOrgIpSegmentMapper.selectByExample(exampleip);
-                    Optional<String> idsOp =  baseOrgIpSegments.stream().map(orgip->orgip.getId().toString()).reduce((p1,p2) -> p1+","+p2);
-                    if(idsOp.isPresent() && importType == 0){
-                        baseOrgIpSegmentMapper.deleteByIds(idsOp.get());
-                    }
-
-                    for (String ipRange : b.getIpRanges().split(",")) {
-                        String[] ip = ipRange.split("-");
-                        Long start = IPUtils.ip2int(ip[0]);
-                        Long end = IPUtils.ip2int(ip[1]);
-                        BaseOrgIpSegment baseOrgIpSegment = new BaseOrgIpSegment();
-                        baseOrgIpSegment.setAreaCode(code);
-                        baseOrgIpSegment.setStartIpSegment(ip[0]);
-                        baseOrgIpSegment.setEndIpSegment(ip[1]);
-                        baseOrgIpSegment.setDepartmentCode("");
-                        baseOrgIpSegment.setAreaName(b.getName());
-                        baseOrgIpSegment.setStartIpNum(start);
-                        baseOrgIpSegment.setEndIpNum(end);
-                        segmentList.add(baseOrgIpSegment);
-                    }
-                }
+//                if (StringUtils.isNotEmpty(b.getIpRanges())) {
+//                    Example exampleip = new Example(BaseOrgIpSegment.class);
+//                    exampleip.createCriteria().andEqualTo("areaCode", code);
+//                    List<BaseOrgIpSegment> baseOrgIpSegments = baseOrgIpSegmentMapper.selectByExample(exampleip);
+//                    Optional<String> idsOp =  baseOrgIpSegments.stream().map(orgip->orgip.getId().toString()).reduce((p1,p2) -> p1+","+p2);
+//                    if(idsOp.isPresent() && importType == 0){
+//                        baseOrgIpSegmentMapper.deleteByIds(idsOp.get());
+//                    }
+//
+//                    for (String ipRange : b.getIpRanges().split(",")) {
+//                        String[] ip = ipRange.split("-");
+//                        Long start = IPUtils.ip2int(ip[0]);
+//                        Long end = IPUtils.ip2int(ip[1]);
+//                        BaseOrgIpSegment baseOrgIpSegment = new BaseOrgIpSegment();
+//                        baseOrgIpSegment.setAreaCode(code);
+//                        baseOrgIpSegment.setStartIpSegment(ip[0]);
+//                        baseOrgIpSegment.setEndIpSegment(ip[1]);
+//                        baseOrgIpSegment.setDepartmentCode("");
+//                        baseOrgIpSegment.setAreaName(b.getName());
+//                        baseOrgIpSegment.setStartIpNum(start);
+//                        baseOrgIpSegment.setEndIpNum(end);
+//                        segmentList.add(baseOrgIpSegment);
+//                    }
+//                }
             });
             if (CollectionUtils.isNotEmpty(orgList)) {
                 this.save(orgList);
@@ -871,28 +871,28 @@ public class BaseKoalOrgServiceImpl extends BaseServiceImpl<BaseKoalOrg> impleme
                     if (StringUtils.isEmpty(baseKoalOrgExcel.getOrgType())) {
                         reason += "单位类别为空;";
                     }
-                    Long start = 0L;
-                    Long end = 0L;
-                    if (StringUtils.isNotEmpty(baseKoalOrgExcel.getIpRanges())) {
-                        String ipRanges = baseKoalOrgExcel.getIpRanges().replaceAll(" ", "")
-                                .replaceAll("\n", "");
-                        for (String ipRange : ipRanges.split(",")) {
-                            String[] ip = ipRange.split("-");
-                            if (ip == null || ip.length < 2) {
-                                reason += ipRanges + "IP范围无效;";
-                            } else {
-                                if (StringUtils.isNotEmpty(ip[0])) {
-                                    start = IPUtils.ip2int(ip[0]);
-                                }
-                                if (ip.length > 1 && StringUtils.isNotEmpty(ip[1])) {
-                                    end = IPUtils.ip2int(ip[1]);
-                                }
-                                if (start == 0L || end == 0L || !IPUtils.isValidIPAddress(ip[0]) || (ip.length > 1 && !IPUtils.isValidIPAddress(ip[1]))) {
-                                    reason += ipRanges + "IP范围无效;";
-                                }
-                            }
-                        }
-                    }
+//                    Long start = 0L;
+//                    Long end = 0L;
+//                    if (StringUtils.isNotEmpty(baseKoalOrgExcel.getIpRanges())) {
+//                        String ipRanges = baseKoalOrgExcel.getIpRanges().replaceAll(" ", "")
+//                                .replaceAll("\n", "");
+//                        for (String ipRange : ipRanges.split(",")) {
+//                            String[] ip = ipRange.split("-");
+//                            if (ip == null || ip.length < 2) {
+//                                reason += ipRanges + "IP范围无效;";
+//                            } else {
+//                                if (StringUtils.isNotEmpty(ip[0])) {
+//                                    start = IPUtils.ip2int(ip[0]);
+//                                }
+//                                if (ip.length > 1 && StringUtils.isNotEmpty(ip[1])) {
+//                                    end = IPUtils.ip2int(ip[1]);
+//                                }
+//                                if (start == 0L || end == 0L || !IPUtils.isValidIPAddress(ip[0]) || (ip.length > 1 && !IPUtils.isValidIPAddress(ip[1]))) {
+//                                    reason += ipRanges + "IP范围无效;";
+//                                }
+//                            }
+//                        }
+//                    }
                     if (StringUtils.isNotEmpty(reason)) {
                         baseKoalOrgExcel.setReason(reason);
                         errorList.add(baseKoalOrgExcel);

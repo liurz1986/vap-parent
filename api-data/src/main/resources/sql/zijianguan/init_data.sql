@@ -3156,4 +3156,4 @@ INSERT INTO `data_source`( `name`, `title`, `icon`, `type`, `time_field`, `descr
 INSERT INTO `data_source`( `name`, `title`, `icon`, `type`, `time_field`, `description`, `time_format`, `data_type`, `topic_name`, `domain_field`, `topic_alias`, `change_inform`) VALUES ('base_line_admin_print_brun', '用户刻录文件时间或数量异常(管理员)V3结果表', NULL, 2, 'insert_time', NULL, 'yyyy-MM-dd HH:mm:ss', 2, 'base-line-admin-print-brun', NULL, 'base_line_admin_print_brun', 0);
 
 --changeset tuyijiang:20231120 lables:data-sour数据更新
-UPDATE data_source_field set analysis_sort = 52 WHERE source_id = 33  and field = 'http_res_code'UPDATE data_source_field set analysis_sort = 52 WHERE source_id = 33  and field = 'http_res_code';
+UPDATE data_source_field set analysis_sort = 52 WHERE source_id = 33  and field = 'http_res_code';

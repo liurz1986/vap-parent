@@ -819,13 +819,13 @@ public class OrganizationController extends ApiController {
             baseKoalOrgExcel.setOrgType(dicMap.get("zjg-单位类别").get(String.valueOf(p.getOrgType())));
             baseKoalOrgExcelList.add(baseKoalOrgExcel);
             StringBuilder ipRanges = new StringBuilder();
-            baseOrgIpSegments.stream().filter(i -> p.getCode().equals(i.getAreaCode())).forEach(i -> {
-                ipRanges.append(i.getStartIpSegment()).append("-").append(i.getEndIpSegment()).append(",");
-            });
-            if (ipRanges.length() > 0) {
-                ipRanges.deleteCharAt(ipRanges.length() - 1);
-                baseKoalOrgExcel.setIpRanges(ipRanges.toString());
-            }
+//            baseOrgIpSegments.stream().filter(i -> p.getCode().equals(i.getAreaCode())).forEach(i -> {
+//                ipRanges.append(i.getStartIpSegment()).append("-").append(i.getEndIpSegment()).append(",");
+//            });
+//            if (ipRanges.length() > 0) {
+//                ipRanges.deleteCharAt(ipRanges.length() - 1);
+//                baseKoalOrgExcel.setIpRanges(ipRanges.toString());
+//            }
         });
 
         ExcelUtil.exportExcel(baseKoalOrgExcelList, null, "组织机构信息", BaseKoalOrgExcel.class, "组织机构信息.xls",true, httpServletResponse);

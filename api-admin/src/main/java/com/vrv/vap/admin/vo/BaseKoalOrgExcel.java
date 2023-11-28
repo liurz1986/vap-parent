@@ -53,8 +53,8 @@ public class BaseKoalOrgExcel {
     @Excel(name = "单位类别" ,orderNum = "8")
     private String orgType;
 
-    @Excel(name = "IP范围",orderNum = "9")
-    private String ipRanges;
+//    @Excel(name = "IP范围",orderNum = "9")
+//    private String ipRanges;
 
     /**
      * 异常原因

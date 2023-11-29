@@ -16,7 +16,7 @@ public interface AssetMapper extends BaseMapper<Asset> {
 
     List<AssetCountModel> countByAssetType(@Param("params") ReportParam model);
 
-    List<AssetModel> getOrgNameByIpList(List<String> ipList);
+    List<AssetModel> getOrgNameByIpList(@Param("ipList") List<String> ipList);
 
     Page<AssetVO> findAssetStealLeakValue(Page<AssetVO> page, @Param("model") AssetTypeModel model);
 }

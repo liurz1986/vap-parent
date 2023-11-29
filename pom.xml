@@ -83,16 +83,7 @@
         <poi.version>5.0.0</poi.version>
         <poi-ooxml.version>5.0.0</poi-ooxml.version>
         <logstash-logback-encoder.verion>5.0</logstash-logback-encoder.verion>
-        <!--  vap服务依赖  -->
-      <!--  <vap-service.version>3.2.0-SNAPSHOT</vap-service.version>
-        <vap-utils.version>3.2.0-SNAPSHOT</vap-utils.version>
-        <vap-syslog.version>3.2.0-SNAPSHOT</vap-syslog.version>
-        <vap-swagger2.version>3.2.0-SNAPSHOT</vap-swagger2.version>
-        <vap-redis.version>3.2.0-SNAPSHOT</vap-redis.version>
-        <vap-prometheus.version>3.2.0-SNAPSHOT</vap-prometheus.version>
-        <vap-db.version>3.2.0-SNAPSHOT</vap-db.version>
-        <vap-oauth-client.version>3.1.0-SNAPSHOT</vap-oauth-client.version>-->
-        <flumeavrostarter.version>1.4.1</flumeavrostarter.version>
+        <flumeavrostarter.version>1.5.0</flumeavrostarter.version>
         <vap-jpa.version>3.1</vap-jpa.version>
         <vap-es.version>3.0</vap-es.version>
         <vap-export.version>3.2</vap-export.version>
@@ -142,10 +133,6 @@
     <!--  依赖声明  -->
     <dependencyManagement>
         <dependencies>
-            <!--  SpringBoot的依赖配置, 可以定义和覆盖父类中的版本号，
-                                例如： redis的版本号父类是1.0， 在此进行定义redis的版本号是2.0，
-                                那么本地就会比父类的版本号低，使用自定义版本号
-                          -->
             <!--  https://docs.spring.io/spring-boot/docs/2.4.5/maven-plugin/reference/htmlsingle/  -->
             <!--             <dependency> -->
             <!--                 <groupId>org.springframework.boot</groupId> -->

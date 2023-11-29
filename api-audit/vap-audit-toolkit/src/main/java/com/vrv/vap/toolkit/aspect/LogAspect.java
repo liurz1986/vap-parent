@@ -2,8 +2,8 @@ package com.vrv.vap.toolkit.aspect;
 
 import com.vrv.vap.flumeavrostarter.sender.FlumeDataSender;
 import com.vrv.vap.toolkit.config.EnviromentConfig;
-import com.vrv.vap.toolkit.tools.SessionTools;
 import com.vrv.vap.toolkit.tools.LogAspectTools;
+import com.vrv.vap.toolkit.tools.SessionTools;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;

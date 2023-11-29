@@ -31,8 +31,3 @@ ENC_ALGORITHM: PBEWithMD5AndDES
 ENC_IV_CLASS: org.jasypt.iv.RandomIvGenerator
 ENC_SALT_CLASS: org.jasypt.salt.RandomSaltGenerator
 ENC_ITERATIONS: 1000
-
-spring:
-  application:
-    name: api-netflow-1
-

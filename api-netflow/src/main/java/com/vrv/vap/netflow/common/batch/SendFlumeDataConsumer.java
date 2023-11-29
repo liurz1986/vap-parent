@@ -26,9 +26,12 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
+/**
+ * @author wh1107066
+ */
 @Service
-public class FileConsumer implements Consumer<List<Map<String, Object>>>, InitializingBean {
-    private static final Logger logger = LoggerFactory.getLogger(FileConsumer.class);
+public class SendFlumeDataConsumer implements Consumer<List<Map<String, Object>>>, InitializingBean {
+    private static final Logger logger = LoggerFactory.getLogger(SendFlumeDataConsumer.class);
     private static final ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("consumer-pool-%d").build();
     private static final ExecutorService executorService = new ThreadPoolExecutor(100, 2048,
             0L, TimeUnit.MILLISECONDS,
@@ -107,7 +110,7 @@ public class FileConsumer implements Consumer<List<Map<String, Object>>>, Initia
         // 提交avro数据到flume中
 //        List<Map<String, Object>> dstList = CollectionUtil.newCopyOnWriteArrayList(mlist);
         executorService.execute(new SendFlumeDataThread(mlist));
-        logger.info(String.format("accept结束时间：%s, 消费数量：%s", DateUtils.dateTimeNow() , mlist.size()));
+        logger.info(String.format("accept结束时间：%s, 消费数量：%s", DateUtils.getTime() , mlist.size()));
     }
 
     /**

@@ -10,12 +10,11 @@ import java.util.Map;
 
 /**
  * 定义流量数据的日志类型字典，在 nacos 中进行配置，通过Configuration进行字段绑定
+ * @author wh1107066
  */
 @ConfigurationProperties(prefix = "vap.zjg.data-batch")
 @Configuration
 public class BatchQueueProperties {
-    private Integer batchTime = 60000;
-    private Integer batchCapability = 100;
     private Integer subFolderSize=100;
     private String fileFolder = "/opt/SecAudit/vrv/vap/data/netflow";
     private String fileSuffix="txt";
@@ -23,8 +22,7 @@ public class BatchQueueProperties {
     private String logTypeDic="1,DT012;2,DT013;3,DT014;4,DT015;5,DT016;6,DT017;7,DT018;9,DT019;10,DT020;11,DT021;";
     private String devTypeDic="用户终端,0;服务器,1;安全保密产品,2;应用,3;网络设备,4;通用办公设备,5;运维终端,6";
     private String levelTypeDic="绝密,0;机密,1;秘密,2;内部,3;公开,4;";
-    private Integer maxQueueSize = 30000;
-
+    private Integer maxQueueSize = 100000;
     private String ignoreFilterIps="114.114.114.114";
 
     public String getIgnoreFilterIps() {
@@ -33,23 +31,6 @@ public class BatchQueueProperties {
 
     public void setIgnoreFilterIps(String ignoreFilterIps) {
         this.ignoreFilterIps = ignoreFilterIps;
-    }
-
-    public Integer getBatchTime() {
-        return batchTime;
-    }
-
-    public void setBatchTime(Integer batchTime) {
-        this.batchTime = batchTime;
-    }
-
-    public Integer getBatchCapability() {
-        return batchCapability;
-    }
-
-
-    public void setBatchCapability(Integer batchCapability) {
-        this.batchCapability = batchCapability;
     }
 
     public String getFileFolder() {

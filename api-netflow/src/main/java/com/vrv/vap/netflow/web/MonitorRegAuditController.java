@@ -7,7 +7,6 @@ import com.google.gson.reflect.TypeToken;
 import com.vrv.vap.common.controller.ApiController;
 import com.vrv.vap.common.vo.Query;
 import com.vrv.vap.common.vo.Result;
-import com.vrv.vap.netflow.common.batch.BatchQueue;
 import com.vrv.vap.netflow.mapper.CollectorDataAccessMapper;
 import com.vrv.vap.netflow.mapper.NetworkMonitorAuditedMapper;
 import com.vrv.vap.netflow.model.NetworkMonitor;
@@ -46,8 +45,6 @@ import java.util.function.Function;
 public class MonitorRegAuditController extends ApiController {
     private final Logger logger = LoggerFactory.getLogger(MonitorRegAuditController.class);
     private static final String KAFKA_MONITOR_STATUS_TOPIC = "monitor_status_topic";
-    @Autowired
-    BatchQueue<Map<String, Object>> batchQueue;
     @Autowired
     MonitorLogService monitorLogService;
     @Resource

@@ -1,12 +1,12 @@
 package com.vrv.vap.toolkit.tools;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vrv.vap.toolkit.annotations.LogColumn;
 import com.vrv.vap.toolkit.annotations.MaskType;
 import com.vrv.vap.toolkit.interfaces.StringFunction;
 import com.vrv.vap.toolkit.model.FieldInfo;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

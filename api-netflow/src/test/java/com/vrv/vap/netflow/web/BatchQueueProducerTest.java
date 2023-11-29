@@ -1,27 +1,14 @@
 package com.vrv.vap.netflow.web;
 
 
-import com.vrv.vap.netflow.common.config.BatchQueueProperties;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author wh1107066
  * @date 2023/8/17
  */
-public class BatchQueueTest {
+public class BatchQueueProducerTest {
 
-    public void addTest() {
-        BatchQueueProperties batchQueueProperties = new BatchQueueProperties();
-        batchQueueProperties.setBatchCapability(100);
-        batchQueueProperties.setMaxQueueSize(3000);
-        batchQueueProperties.setBatchTime(60000);
-
-        Map<String, Object> map = new HashMap<>();
-
-    }
 
     /**
      * Redis中的中文乱码转换

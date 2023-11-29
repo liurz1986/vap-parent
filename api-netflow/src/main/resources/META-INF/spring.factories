@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.vrv.vap.netflow.utils.RedisRepository
+com.vrv.vap.netflow.utils.RedisRepository, \
+com.vrv.vap.netflow.common.batch.ReceivedLinkedBlockingQueue

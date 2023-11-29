@@ -2,7 +2,8 @@ package com.vrv.vap.netflow.web;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.vrv.vap.netflow.common.batch.BatchQueue;
+import com.vrv.vap.netflow.common.batch.BatchQueueProducer;
+import com.vrv.vap.netflow.common.batch.ReceivedLinkedBlockingQueue;
 import com.vrv.vap.netflow.common.enums.MonitorTypeEnum;
 import com.vrv.vap.netflow.common.enums.NetFlowDataTypeEnum;
 import com.vrv.vap.netflow.common.enums.NetFlowLogTypeEnum;
@@ -50,7 +51,7 @@ public class MonitorV1Controller {
     private final Logger logger = LoggerFactory.getLogger(MonitorV1Controller.class);
     private static final String KAFKA_MONITOR_STATUS_TOPIC = "monitor_status_topic";
     @Autowired
-    BatchQueue<Map<String, Object>> batchQueue;
+    private ReceivedLinkedBlockingQueue receivedLinkedBlockingQueue;
     @Autowired
     MonitorLogService monitorLogService;
     @Resource
@@ -81,12 +82,12 @@ public class MonitorV1Controller {
                         handlerFileLog(log);
                         logger.debug("应用行为审计日志加入到队列中!!!");
                         // 原始数据
-                        batchQueue.add(log);
+                        new BatchQueueProducer(receivedLinkedBlockingQueue.getQueueList()).add(log);
                     }
                     // 通联日志
                     if (log.containsKey("data_type") && NetFlowDataTypeEnum.NET_CONNECT_LOG.getType().equals(log.get("data_type"))) {
                         logger.debug("网络通连日志加入到队列中!!!");
-                        batchQueue.add(log);
+                        new BatchQueueProducer(receivedLinkedBlockingQueue.getQueueList()).add(log);
                     }
                     // 代表的是文件
                     if (log.containsKey("data_type") && (Integer) (log.get("data_type")) == 99) {
@@ -139,14 +140,14 @@ public class MonitorV1Controller {
         if (o instanceof List) {
             List<Map> fileList = (List) o;
             fileList.forEach(file -> {
-                Map newFileMap = new HashMap();
+                Map<String, Object> newFileMap = new HashMap();
                 copyValue(log, newFileMap, "file_list");
                 copyValue(file, newFileMap, "file_list");
                 /**
                  * 内部协商  99 ， http关联file文件topic。 通过flume判断log_type的日志判断
                  */
                 newFileMap.put("log_type", 99);
-                batchQueue.add(newFileMap);
+                new BatchQueueProducer(receivedLinkedBlockingQueue.getQueueList()).add(newFileMap);
             });
         } else if (o instanceof String) {
             if (StringUtils.isEmpty(o.toString())) {

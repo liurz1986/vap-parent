@@ -28,7 +28,7 @@ public class ConsumerCommandLineRunner implements CommandLineRunner {
     private SendFlumeDataConsumer sendFlumeDataConsumer;
 
     /**
-     * 系统激动实例化两个消费者
+     * 系统启动实例化两个消费者
      * @param args 参数
      * @throws Exception
      */

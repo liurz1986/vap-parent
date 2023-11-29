@@ -30,7 +30,7 @@ public class BatchQueueConsumer implements Runnable {
             synchronized (queueList) {
                 // 如果消息队列为空则等待
                 while (queueList.isEmpty()) {
-                    System.out.println("Queue is empty " + Thread.currentThread().getName() + " is waiting , size is " + queueList.size());
+                    logger.warn("Queue is empty!" + Thread.currentThread().getName() + " is waiting , size is " + queueList.size());
                     try {
                         queueList.wait();
                     } catch (InterruptedException e) {

@@ -73,7 +73,7 @@ public class SendFlumeDataConsumer implements Consumer<List<Map<String, Object>>
 
     @Override
     public void accept(List<Map<String, Object>> mlist) {
-        logger.info(String.format("accept开始时间：%s, 消费数量：%s", DateUtils.dateTimeNow() , mlist.size()));
+        logger.info(String.format("accept开始时间：%s, 消费数量：%s", DateUtils.getTime() , mlist.size()));
         if (logTypeDic.isEmpty()) {
             logTypeDic = typeDictionaryProperties.getLogTypeDic();
         }

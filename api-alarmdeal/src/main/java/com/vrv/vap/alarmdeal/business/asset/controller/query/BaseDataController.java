@@ -15,11 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -199,13 +195,23 @@ public class BaseDataController extends BaseController {
     }
 
     // ===============工作台项相关接口=========================================2021-09-14
-    // 工作台获取终端资产数量
+    // 工作台获取终端资产数量  user:用户终端  om：运维终端
     @GetMapping(value = "/workplatform/queryAssetHostNum")
     @ApiOperation(value = "工作台获取终端资产数量", notes = "")
     @SysRequestLog(description = "工作台获取终端资产数量", actionType = ActionType.SELECT)
-    public Result<Long> queryAssetHostNum() {
+    public Result<Long> queryAssetHostNum(@RequestParam("type") String type) {
         try {
-            long total = assetService.queryWorkplatformnNum("asset-Host");
+            String typeData="";
+            if(StringUtils.isEmpty(type)){
+                typeData = "asset-Host"; // 不传的话默认为 用户终端
+            }else{
+                if ("user".equals(type)){
+                    typeData = "asset-Host"; //用户终端
+                }else{
+                    typeData = "asset-MaintenHost"; //运维终端
+                }
+            }
+            long total = assetService.queryWorkplatformnNum(typeData);
             return ResultUtil.success(total);
         } catch (Exception e) {
             logger.error("获取终端资产数量异常", e);

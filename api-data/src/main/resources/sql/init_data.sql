@@ -779,4 +779,6 @@ INSERT INTO `data_source_field` (`id`, `source_id`, `field`, `name`, `type`, `or
 INSERT INTO `data_source_field` (`id`, `source_id`, `field`, `name`, `type`, `origin`, `dict`, `link`, `unit`, `show`, `sorter`, `filter`, `tag`, `sort`) VALUES ('888', '4', 'userID', '', 'text', 'text', NULL, NULL, NULL, b'1', b'0', b'1', b'1', '35');
 INSERT INTO `data_source_field` (`id`, `source_id`, `field`, `name`, `type`, `origin`, `dict`, `link`, `unit`, `show`, `sorter`, `filter`, `tag`, `sort`) VALUES ('889', '4', 'userName', '', 'text', 'text', NULL, NULL, NULL, b'1', b'0', b'1', b'1', '36');
 
+--changeset bieao:20231130-apidata  labels:4.24.0
+UPDATE data_source_field set type = 'double' WHERE id = 17;
 

@@ -7,7 +7,7 @@ import com.vrv.vap.toolkit.vo.VoBuilder;
 import com.vrv.vap.xc.model.AttackModel;
 import com.vrv.vap.xc.model.EsQueryModel;
 import com.vrv.vap.xc.model.PageModel;
-import com.vrv.vap.xc.model.PrintTimeModel;
+import com.vrv.vap.xc.model.PrintBurnModel;
 import com.vrv.vap.xc.service.BigScreenService;
 import com.vrv.vap.xc.tools.QueryTools;
 import org.apache.commons.collections.CollectionUtils;
@@ -57,12 +57,12 @@ public class BigScreenServiceImpl implements BigScreenService {
     }
 
     @Override
-    public VData<List<Map<String, Object>>> attackTrend(PrintTimeModel model) {
+    public VData<List<Map<String, Object>>> attackTrend(PrintBurnModel model) {
         QueryTools.QueryWrapper wrapper = QueryTools.build();
         EsQueryModel queryModel = QueryTools.buildQueryModel(wrapper, model, "attack-audit", "event_time");
         String inter = "1d";
         String tfm = "yyyy-MM-dd";
-        if("1".equals(model.getInteval())){
+        if("1".equals(model.getInterval())){
             inter = "1h";
             tfm = "HH";
         }

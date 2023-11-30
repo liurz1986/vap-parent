@@ -184,8 +184,7 @@ public class BehaviorReportServiceImpl implements BehaviorReportService {
                 String userNo = l.get("std_user_no").toString();
                 String opType = l.get("op_type").toString();
                 Object count = l.get("count");
-                Map<String,Object> data = new HashMap<>();
-                data.putAll(l);
+                Map<String, Object> data = new HashMap<>(l);
                 data.remove("count");
                 if(maps.containsKey(userNo)){
                     data = maps.get(userNo);

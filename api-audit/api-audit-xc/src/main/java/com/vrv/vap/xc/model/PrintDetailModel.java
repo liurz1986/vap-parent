@@ -2,8 +2,12 @@ package com.vrv.vap.xc.model;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @ApiModel("printDetailModel")
+@Data
 public class PrintDetailModel extends PageModel{
     @ApiModelProperty("文件名称")
     private String fileName;
@@ -31,108 +35,10 @@ public class PrintDetailModel extends PageModel{
     private String devIp;
     @ApiModelProperty("用户名")
     private String username;
+    /**
+     * 导出文件名
+     */
+    private String modalTitle;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getDevName() {
-        return devName;
-    }
-
-    public void setDevName(String devName) {
-        this.devName = devName;
-    }
-
-    public String getDevIp() {
-        return devIp;
-    }
-
-    public void setDevIp(String devIp) {
-        this.devIp = devIp;
-    }
-
-    public String getFileLevel() {
-        return fileLevel;
-    }
-
-    public void setFileLevel(String fileLevel) {
-        this.fileLevel = fileLevel;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public String getFileSzie() {
-        return fileSzie;
-    }
-
-    public void setFileSzie(String fileSzie) {
-        this.fileSzie = fileSzie;
-    }
-
-    public String getBusiness() {
-        return business;
-    }
-
-    public void setBusiness(String business) {
-        this.business = business;
-    }
-
-    public String getFileNum() {
-        return fileNum;
-    }
-
-    public void setFileNum(String fileNum) {
-        this.fileNum = fileNum;
-    }
-
-    public String getUserNo() {
-        return userNo;
-    }
-
-    public void setUserNo(String userNo) {
-        this.userNo = userNo;
-    }
-
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
-    }
-
-    public String getOpResult() {
-        return opResult;
-    }
-
-    public void setOpResult(String opResult) {
-        this.opResult = opResult;
-    }
-
-    public String getTerminalType() {
-        return terminalType;
-    }
-
-    public void setTerminalType(String terminalType) {
-        this.terminalType = terminalType;
-    }
+    private String opType;
 }

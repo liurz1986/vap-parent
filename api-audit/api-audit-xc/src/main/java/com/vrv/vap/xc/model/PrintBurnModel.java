@@ -1,27 +1,28 @@
 package com.vrv.vap.xc.model;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@ApiModel("PrintBurnModel")
+/**
+ * 打印刻录request
+ */
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class PrintBurnModel extends PageModel{
-    @ApiModelProperty("类型，1打印 0刻录")
+    /**
+     * 时间跨度 1：小时 2：天 3：月
+     */
+    private String interval;
+    /**
+     * 操作类型（打印：0，刻录：1）
+     */
     private String opType;
-    @ApiModelProperty("时间跨度 默认天 传1小时")
-    private String intervl = "2";
-
-    public String getInteval() {
-        return intervl;
-    }
-
-    public void setIntervl(String intervl) {
-        this.intervl = intervl;
-    }
-    public String getOpType() {
-        return opType;
-    }
-
-    public void setOpType(String opType) {
-        this.opType = opType;
-    }
+    /**
+     * 文件密级
+     */
+    private String level;
+    /**
+     * 结果状态，1成功 0失败
+     */
+    private String result;
 }

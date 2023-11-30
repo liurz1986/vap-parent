@@ -4,7 +4,7 @@ import com.vrv.vap.toolkit.annotations.Ignore;
 import com.vrv.vap.toolkit.vo.VData;
 import com.vrv.vap.xc.model.AttackModel;
 import com.vrv.vap.xc.model.PageModel;
-import com.vrv.vap.xc.model.PrintTimeModel;
+import com.vrv.vap.xc.model.PrintBurnModel;
 import com.vrv.vap.xc.service.BigScreenService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +63,7 @@ public class BigScreenController {
      */
     @PostMapping("/screen/attackTrend")
     @ApiOperation("攻击趋势变化")
-    public VData<List<Map<String,Object>>> attackTrend(@RequestBody PrintTimeModel model){
+    public VData<List<Map<String,Object>>> attackTrend(@RequestBody PrintBurnModel model){
         return bigScreenService.attackTrend(model) ;
     }
 

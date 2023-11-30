@@ -2217,8 +2217,7 @@ public final class QueryTools {
         aggItems.forEach(aggItem -> {
             Map<String, Object> tmp = new HashMap<>();
             tmp.put(keyFieldRe, aggItem.get("key"));
-            tmp.put(keyFieldRe + "Count", aggItem.get("doc_count"));
-            tmp.put(sumFieldRe, ((Map<String, Double>) aggItem.get("sumAgg")).get("value"));
+            tmp.put(sumFieldRe, aggItem.get("doc_count"));
             if (topHitFields != null) {
                 List<Map<String, Object>> topRow = (List<Map<String, Object>>) ((Map<String, Map<String, Object>>) ((Map<String, Object>) aggItem.get("data")).get("hits")).get("hits");
                 Map<String, Object> row = (Map<String, Object>) topRow.get(0).get("_source");
@@ -3627,25 +3626,23 @@ public final class QueryTools {
      *
      * @param queryModel
      * @param wrapper
-     * @param dateAggField
-     * @param sumAggField
      * @param interval
      * @param dateFormat
      * @param offset
-     * @param keyField
-     * @param valueField
      * @return
      */
-    public static List<Map<String, Object>> dateAndSumAgg(EsQueryModel queryModel, QueryTools.QueryWrapper wrapper, String dateAggField, String sumAggField, DateHistogramInterval interval, String dateFormat, int offset, String keyField, String valueField) {
+    public static List<Map<String, Object>> dateAndSumAgg(EsQueryModel queryModel, QueryTools.QueryWrapper wrapper, String sumField,
+                                                          String dateField, String dateFieldKey, DateHistogramInterval interval,
+                                                          String dateFormat, int offset) {
         List<Map<String, Object>> result = new ArrayList<>();
         DateHistogramAggregationBuilder dateAgg = AggregationBuilders.dateHistogram("dateAgg");
-        dateAgg.field(dateAggField);
+        dateAgg.field(dateField);
         dateAgg.dateHistogramInterval(interval);
         dateAgg.timeZone(DateTimeZone.forOffsetHours(offset).toTimeZone().toZoneId());
         dateAgg.minDocCount(0);
         dateAgg.format(dateFormat);
 
-        SumAggregationBuilder sumAgg = AggregationBuilders.sum("sumAgg").field(sumAggField);
+        SumAggregationBuilder sumAgg = AggregationBuilders.sum("sumAgg").field(sumField);
         dateAgg.subAggregation(sumAgg);
 
         queryModel.setAggregationBuilder(dateAgg);
@@ -3660,9 +3657,8 @@ public final class QueryTools {
                     aggItems.forEach(aggItem -> {
                         String date = aggItem.get("key_as_string").toString();
                         Map<String, Object> tmp = new HashMap<>();
-                        tmp.put(keyField, date);
-                        tmp.put(valueField, aggItem.get("doc_count"));
-                        tmp.put(sumAggField, ((Map<String, Double>) aggItem.get("sumAgg")).get("value"));
+                        tmp.put(dateFieldKey, date);
+                        tmp.put("count", aggItem.get("doc_count"));
                         result.add(tmp);
                     });
                 }
@@ -3893,8 +3889,7 @@ public final class QueryTools {
                                     Map<String, Object> tmp = new HashMap<>();
                                     tmp.put(keyFieldRe, aggItem.get("key"));
                                     tmp.put(dateFieldKey, fitem.get("key_as_string"));
-                                    tmp.put(keyFieldRe + "Count", aggItem.get("doc_count"));
-                                    tmp.put(sumFieldRe, ((Map<String, Double>) aggItem.get("sumAgg")).get("value"));
+                                    tmp.put(sumFieldRe, aggItem.get("doc_count"));
                                     if (topHitFields != null) {
                                         List<Map<String, Object>> topRow = (List<Map<String, Object>>) ((Map<String, Map<String, Object>>) ((Map<String, Object>) aggItem.get("data")).get("hits")).get("hits");
                                         Map<String, Object> row = (Map<String, Object>) topRow.get(0).get("_source");
@@ -4016,6 +4011,47 @@ public final class QueryTools {
                 tmp.put(entry.getValueField(), ca.get("value"));
                 result.add(tmp);
             });
+        }
+        return result;
+    }
+
+    public static List<Map<String, Object>> aggAndDate(EsQueryModel queryModel, QueryTools.QueryWrapper wrapper, String aggField, String dateField,String dateFieldKey, int oneAggSize, DateHistogramInterval interval, String dateFormat, int offset,String valueField) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        TermsAggregationBuilder oneAgg = new TermsAggregationBuilder("oneAgg");
+        oneAgg.field(aggField).size(oneAggSize);
+        DateHistogramAggregationBuilder dateAgg = AggregationBuilders.dateHistogram("dateAgg");
+        dateAgg.field(dateField);
+        dateAgg.dateHistogramInterval(interval);
+        dateAgg.offset(offset);
+        dateAgg.timeZone(DateTimeZone.forOffsetHours(offset).toTimeZone().toZoneId());
+        dateAgg.minDocCount(0);
+        dateAgg.format(dateFormat);
+        queryModel.setAggregationBuilder(dateAgg.subAggregation(oneAgg));
+        queryModel.setUseAggre(true);
+        Map<String, Object> aggMap = wrapper.getAggResponse(queryModel);
+        if (aggMap != null && aggMap.containsKey("aggregations")) {
+            Map<String, Object> dataAggMap = (Map<String, Object>) aggMap.get("aggregations");
+            if (dataAggMap != null && dataAggMap.containsKey("dateAgg")) {
+                Map<String, Object> oneAggMap = (Map<String, Object>) dataAggMap.get("dateAgg");
+                if (oneAggMap.containsKey("buckets")) {
+                    List<Map<String, Object>> oneAggItems = (List<Map<String, Object>>) oneAggMap.get("buckets");
+                    oneAggItems.forEach(aggItem -> {
+                        if (aggItem.containsKey("oneAgg")) {
+                            Map<String, Object> twoAggMap = (Map<String, Object>) aggItem.get("oneAgg");
+                            if (twoAggMap.containsKey("buckets")) {
+                                List<Map<String, Object>> twoAggItems = (List<Map<String, Object>>) twoAggMap.get("buckets");
+                                twoAggItems.forEach(item -> {
+                                    Map<String, Object> tmp = new HashMap<>();
+                                    tmp.put(CommonTools.underLineToCamel(aggField), item.get("key"));
+                                    tmp.put(dateFieldKey, aggItem.get("key_as_string"));
+                                    tmp.put(valueField, item.get("doc_count"));
+                                    result.add(tmp);
+                                });
+                            }
+                        }
+                    });
+                }
+            }
         }
         return result;
     }
@@ -4164,6 +4200,20 @@ public final class QueryTools {
                     });
                 }
             }
+        }
+        return result;
+    }
+
+    public static Map<String, Number> statsAggregation(EsQueryModel queryModel, QueryWrapper wrapper, String aggField) {
+        Map<String, Number> result = new HashMap<>();
+        StatsAggregationBuilder aggregation = AggregationBuilders.stats("stats_agg").field(aggField);
+        queryModel.setAggregationBuilder(aggregation);
+        queryModel.setUseAggre(true);
+        Map<String, Object> aggMap = wrapper.getAggResponse(queryModel);
+        if (aggMap == null || !aggMap.containsKey("aggregations")) return result;
+        Map<String, Object> dataAggMap = (Map<String, Object>) aggMap.get("aggregations");
+        if (dataAggMap != null && dataAggMap.containsKey("stats_agg")) {
+            return (Map<String, Number>) dataAggMap.get("stats_agg");
         }
         return result;
     }
